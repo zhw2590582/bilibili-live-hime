@@ -1,1 +1,1 @@
-{"version":3,"sources":["index.scss"],"names":[],"mappings":"AAAA,iBAGE,qBAAwB","file":"index.css","sourcesContent":["*,\n*::before,\n*::after {\n  box-sizing: border-box; }\n"]}
+{"version":3,"sources":["dev/index.scss"],"names":[],"mappings":"AAAA","file":"index.css"}
