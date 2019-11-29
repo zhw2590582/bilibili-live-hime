@@ -23,13 +23,20 @@ export default class Capture {
         };
     }
 
-    tabCapture() {
+    isTypeSupported(mimeType) {
+        return MediaRecorder.isTypeSupported(mimeType);
+    }
+
+    start() {
         chrome.tabCapture.capture(Capture.constraints, stream => {
             this.ms = new MediaStream();
             stream.getTracks().forEach(track => {
-                console.log(track);
                 this.ms.addTrack(track);
             });
         });
+    }
+
+    stop() {
+        //
     }
 }

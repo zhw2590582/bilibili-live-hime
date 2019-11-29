@@ -36,7 +36,7 @@ class Popup {
     }
 
     async init() {
-        this.live = await getStorage('live');
+        this.isRecording = await getStorage('isRecording');
         this.config = await getStorage('config');
         this.activeTab = await getActiveTab();
         this.$tab.value = `${this.activeTab.title} - ${this.activeTab.url}`;
@@ -47,12 +47,12 @@ class Popup {
             this.$resolution.value = this.config.resolution;
             this.$frameRate.value = this.config.frameRate;
             this.$bitsPerSecond.value = this.config.bitsPerSecond;
-            if (this.live) {
+            if (this.isRecording) {
                 this.$tab.value = this.config.tab;
             }
         }
-        if (this.live) {
-            this.$container.classList.add('live');
+        if (this.isRecording) {
+            this.$container.classList.add('isRecording');
         }
     }
 
@@ -78,9 +78,9 @@ class Popup {
         }
 
         this.info = false;
-        this.$container.classList.add('live');
+        this.$container.classList.add('isRecording');
 
-        await setStorage('live', true);
+        await setStorage('isRecording', true);
         await setStorage('config', config);
         await openTab(config.liveUrl);
         chrome.runtime.sendMessage({
@@ -90,8 +90,8 @@ class Popup {
     }
 
     async stop() {
-        this.$container.classList.remove('live');
-        await setStorage('live', false);
+        this.$container.classList.remove('isRecording');
+        await setStorage('isRecording', false);
         chrome.runtime.sendMessage({
             type: 'stop',
         });

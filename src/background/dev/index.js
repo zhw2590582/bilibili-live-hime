@@ -1,24 +1,27 @@
 import 'crx-hotreload';
-import ChangeCSP from './changeCSP';
-import Capture from './capture';
+import './csp';
+import Recorder from './recorder';
 
 class Background {
     constructor() {
-        this.changeCSP = new ChangeCSP(this);
-        this.capture = new Capture(this);
-
+        this.recorder = new Recorder(this);
         chrome.runtime.onMessage.addListener(request => {
-            switch (request.type) {
+            const { type, data } = request;
+            switch (type) {
                 case 'start':
-                    console.log('start');
+                    this.recorder.start(data);
                     break;
                 case 'stop':
-                    console.log('stop');
+                    this.recorder.stop(data);
                     break;
                 default:
                     break;
             }
         });
+    }
+
+    postMessage(data) {
+        //
     }
 }
 

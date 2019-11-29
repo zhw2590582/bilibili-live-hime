@@ -61,8 +61,24 @@ export function setStorage(key, value) {
 
 export function openTab(url) {
     return new Promise(resolve => {
-        chrome.tabs.create({ url }, tab => {
-            resolve(tab);
+        chrome.tabs.query({}, function(tabs) {
+            const findTab = tabs.find(tab => tab.url === url);
+            if (findTab) {
+                chrome.tabs.update(
+                    findTab.id,
+                    {
+                        active: true,
+                        url: url,
+                    },
+                    tab => {
+                        resolve(tab);
+                    },
+                );
+            } else {
+                chrome.tabs.create({ url }, tab => {
+                    resolve(tab);
+                });
+            }
         });
     });
 }

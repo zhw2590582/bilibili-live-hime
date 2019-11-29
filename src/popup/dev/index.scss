@@ -82,7 +82,7 @@ body {
         }
     }
 
-    &.live {
+    &.isRecording {
         .main::after {
             content: '';
             position: absolute;
