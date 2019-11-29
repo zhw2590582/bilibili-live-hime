@@ -1,28 +1,28 @@
 import './index.scss';
-import { getActiveTab, getStorage, setStorage } from '../../share';
+import { getActiveTab, getStorage, setStorage, query, openTab } from '../../share';
 
 class Popup {
     constructor() {
         this.manifest = chrome.runtime.getManifest();
-        this.$container = document.querySelector('.container');
-        this.$name = document.querySelector('.name');
-        this.$feedback = document.querySelector('.feedback');
-        this.$tab = document.querySelector('.tab');
-        this.$rtmpUrl = document.querySelector('.rtmpUrl');
-        this.$liveUrl = document.querySelector('.liveUrl');
-        this.$resolution = document.querySelector('.resolution');
-        this.$frameRate = document.querySelector('.frameRate');
-        this.$bitsPerSecond = document.querySelector('.bitsPerSecond');
-        this.$info = document.querySelector('.info');
-        this.$start = document.querySelector('.start');
-        this.$stop = document.querySelector('.stop');
+        this.$container = query('.container');
+        this.$name = query('.name');
+        this.$feedback = query('.feedback');
+        this.$tab = query('.tab');
+        this.$rtmpUrl = query('.rtmpUrl');
+        this.$liveUrl = query('.liveUrl');
+        this.$resolution = query('.resolution');
+        this.$frameRate = query('.frameRate');
+        this.$bitsPerSecond = query('.bitsPerSecond');
+        this.$info = query('.info');
+        this.$start = query('.start');
+        this.$stop = query('.stop');
 
         this.$name.addEventListener('click', () => {
-            chrome.tabs.create({ url: 'https://chrome.google.com/webstore/detail/nagmkdppcmenlcgelpgkjoknakghllml' });
+            openTab('https://chrome.google.com/webstore/detail/nagmkdppcmenlcgelpgkjoknakghllml');
         });
 
         this.$feedback.addEventListener('click', () => {
-            chrome.tabs.create({ url: 'https://github.com/zhw2590582/bilibili-live-hime' });
+            openTab('https://github.com/zhw2590582/bilibili-live-hime');
         });
 
         this.$start.addEventListener('click', () => {
@@ -82,7 +82,7 @@ class Popup {
 
         await setStorage('live', true);
         await setStorage('config', config);
-        chrome.tabs.create({ url: config.liveUrl });
+        await openTab(config.liveUrl);
         chrome.runtime.sendMessage({
             type: 'start',
             data: config,
