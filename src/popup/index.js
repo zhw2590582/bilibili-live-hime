@@ -975,8 +975,9 @@ var bilibiliLiveHimePopup = (function () {
 	              chrome.runtime.sendMessage({
 	                type: 'stop'
 	              });
+	              window.close();
 
-	            case 4:
+	            case 5:
 	            case "end":
 	              return _context3.stop();
 	          }

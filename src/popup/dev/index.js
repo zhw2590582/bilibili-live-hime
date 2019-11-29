@@ -95,6 +95,7 @@ class Popup {
         chrome.runtime.sendMessage({
             type: 'stop',
         });
+        window.close();
     }
 
     set info(msg) {
