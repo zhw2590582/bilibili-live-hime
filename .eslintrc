@@ -1,6 +1,9 @@
 {
     "parser": "babel-eslint",
-    "extends": ["airbnb-base", "prettier"],
+    "extends": [
+        "airbnb-base",
+        "prettier"
+    ],
     "env": {
         "browser": true,
         "es6": true
@@ -11,7 +14,7 @@
     "rules": {
         "no-bitwise": 0,
         "no-console": 0,
-        "prefer-destructuring": 0
+        "class-methods-use-this": 0
     },
     "parserOptions": {
         "sourceType": "module"

@@ -16,7 +16,7 @@ module.exports = ['background', 'popup', 'content', 'injected'].map(item => {
     return {
         input: `src/${item}/dev/index.js`,
         output: {
-            name: `bilibiliLiveRecorder${item[0].toUpperCase()}${item.slice(1)}`,
+            name: `bilibiliLiveHime${item[0].toUpperCase()}${item.slice(1)}`,
             file: isProd ? `dist/${name}/${item}/index.js` : `src/${item}/index.js`,
             format: 'iife',
             sourcemap: !isProd,
@@ -59,7 +59,7 @@ module.exports = ['background', 'popup', 'content', 'injected'].map(item => {
                     output: {
                         preamble:
                             '/*!\n' +
-                            ` * bilibili-live-recorder v${version}\n` +
+                            ` * bilibili-live-hime v${version}\n` +
                             ` * Github: ${homepage}\n` +
                             ` * (c) 2018-${new Date().getFullYear()} Harvey Zack\n` +
                             ' * Released under the MIT License.\n' +

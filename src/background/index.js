@@ -1,97 +1,199 @@
-(function () {
-	'use strict';
+var bilibiliLiveHimeBackground = (function () {
+  'use strict';
 
-	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
-	function createCommonjsModule(fn, module) {
-		return module = { exports: {} }, fn(module, module.exports), module.exports;
-	}
+  var classCallCheck = _classCallCheck;
 
-	var cspGenerator = createCommonjsModule(function (module, exports) {
-	/*!
-	 * csp-generator.js v1.0.2
-	 * Github: https://github.com/zhw2590582/csp-generator#readme
-	 * (c) 2017-2019 Harvey Zack
-	 * Released under the MIT License.
-	 */
+  const filesInDirectory = dir => new Promise (resolve =>
 
-	!function(e,t){module.exports=t();}(commonjsGlobal,function(){var n=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")};function i(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i);}}var e=function(e,t,n){return t&&i(e.prototype,t),n&&i(e,n),e};return function(){function t(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:"";n(this,t),this.csp=this.parse(e);}return e(t,[{key:"parse",value:function(e){return (0<arguments.length&&void 0!==e?e:"").split(";").reduce(function(e,t){var n=t.split(" ").filter(function(e){return e.trim()}),i=n[0],r=n.slice(1);return e[i]=r,e},{})}},{key:"generate",value:function(){var n=this;return Object.keys(this.csp).reduce(function(e,t){return "".concat(e," ").concat(t," ").concat(n.csp[t].join(" "),";")},"").trim()}},{key:"append",value:function(e,t){return this.csp[e]&&-1===this.csp[e].indexOf(t)?this.csp[e].push(t):this.csp[e]=[t],this}},{key:"delete",value:function(e,t){if(t){var n=(this.csp[e]||[]).indexOf(t);-1<n&&this.csp[e].splice(n,1);}else delete this.csp[e];return this}},{key:"get",value:function(e){return this.csp[e]}}]),t}()});
-	});
+      dir.createReader ().readEntries (entries =>
 
-	const filesInDirectory = dir => new Promise (resolve =>
+          Promise.all (entries.filter (e => e.name[0] !== '.').map (e =>
 
-	    dir.createReader ().readEntries (entries =>
+              e.isDirectory
+                  ? filesInDirectory (e)
+                  : new Promise (resolve => e.file (resolve))
+          ))
+          .then (files => [].concat (...files))
+          .then (resolve)
+      )
+  );
 
-	        Promise.all (entries.filter (e => e.name[0] !== '.').map (e =>
+  const timestampForFilesInDirectory = dir =>
+          filesInDirectory (dir).then (files =>
+              files.map (f => f.name + f.lastModifiedDate).join ());
 
-	            e.isDirectory
-	                ? filesInDirectory (e)
-	                : new Promise (resolve => e.file (resolve))
-	        ))
-	        .then (files => [].concat (...files))
-	        .then (resolve)
-	    )
-	);
+  const reload = () => {
 
-	const timestampForFilesInDirectory = dir =>
-	        filesInDirectory (dir).then (files =>
-	            files.map (f => f.name + f.lastModifiedDate).join ());
+      chrome.tabs.query ({ active: true, currentWindow: true }, tabs => { // NB: see https://github.com/xpl/crx-hotreload/issues/5
 
-	const reload = () => {
+          if (tabs[0]) { chrome.tabs.reload (tabs[0].id); }
 
-	    chrome.tabs.query ({ active: true, currentWindow: true }, tabs => { // NB: see https://github.com/xpl/crx-hotreload/issues/5
+          chrome.runtime.reload ();
+      });
+  };
 
-	        if (tabs[0]) { chrome.tabs.reload (tabs[0].id); }
+  const watchChanges = (dir, lastTimestamp) => {
 
-	        chrome.runtime.reload ();
-	    });
-	};
+      timestampForFilesInDirectory (dir).then (timestamp => {
 
-	const watchChanges = (dir, lastTimestamp) => {
+          if (!lastTimestamp || (lastTimestamp === timestamp)) {
 
-	    timestampForFilesInDirectory (dir).then (timestamp => {
+              setTimeout (() => watchChanges (dir, timestamp), 1000); // retry after 1s
 
-	        if (!lastTimestamp || (lastTimestamp === timestamp)) {
+          } else {
 
-	            setTimeout (() => watchChanges (dir, timestamp), 1000); // retry after 1s
+              reload ();
+          }
+      });
 
-	        } else {
+  };
 
-	            reload ();
-	        }
-	    });
+  chrome.management.getSelf (self => {
 
-	};
+      if (self.installType === 'development') {
 
-	chrome.management.getSelf (self => {
+          chrome.runtime.getPackageDirectoryEntry (dir => watchChanges (dir));
+      }
+  });
 
-	    if (self.installType === 'development') {
+  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-	        chrome.runtime.getPackageDirectoryEntry (dir => watchChanges (dir));
-	    }
-	});
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
 
-	var manifest = chrome.runtime.getManifest();
-	chrome.webRequest.onHeadersReceived.addListener(function (details) {
-	  var header = details.responseHeaders.find(function (event) {
-	    var name = event.name.toLowerCase();
-	    return name === 'content-security-policy-report-only' || name === 'content-security-policy';
-	  });
+  var cspGenerator = createCommonjsModule(function (module, exports) {
+  /*!
+   * csp-generator.js v1.0.2
+   * Github: https://github.com/zhw2590582/csp-generator#readme
+   * (c) 2017-2019 Harvey Zack
+   * Released under the MIT License.
+   */
 
-	  if (header && header.value) {
-	    var csp = new cspGenerator(header.value);
-	    csp.append('worker-src', 'blob:');
-	    csp.append('script-src', '*.baidu.com');
-	    csp.append('img-src', '*.baidu.com');
-	    header.value = csp.generate();
-	  }
+  !function(e,t){module.exports=t();}(commonjsGlobal,function(){var n=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")};function i(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i);}}var e=function(e,t,n){return t&&i(e.prototype,t),n&&i(e,n),e};return function(){function t(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:"";n(this,t),this.csp=this.parse(e);}return e(t,[{key:"parse",value:function(e){return (0<arguments.length&&void 0!==e?e:"").split(";").reduce(function(e,t){var n=t.split(" ").filter(function(e){return e.trim()}),i=n[0],r=n.slice(1);return e[i]=r,e},{})}},{key:"generate",value:function(){var n=this;return Object.keys(this.csp).reduce(function(e,t){return "".concat(e," ").concat(t," ").concat(n.csp[t].join(" "),";")},"").trim()}},{key:"append",value:function(e,t){return this.csp[e]&&-1===this.csp[e].indexOf(t)?this.csp[e].push(t):this.csp[e]=[t],this}},{key:"delete",value:function(e,t){if(t){var n=(this.csp[e]||[]).indexOf(t);-1<n&&this.csp[e].splice(n,1);}else delete this.csp[e];return this}},{key:"get",value:function(e){return this.csp[e]}}]),t}()});
+  });
 
-	  return {
-	    responseHeaders: details.responseHeaders
-	  };
-	}, {
-	  urls: manifest.content_scripts[0].matches
-	}, ['blocking', 'responseHeaders']);
+  var ChangeCSP = function ChangeCSP() {
+    classCallCheck(this, ChangeCSP);
+
+    var manifest = chrome.runtime.getManifest();
+    chrome.webRequest.onHeadersReceived.addListener(function (details) {
+      var header = details.responseHeaders.find(function (event) {
+        var name = event.name.toLowerCase();
+        return name === 'content-security-policy-report-only' || name === 'content-security-policy';
+      });
+
+      if (header && header.value) {
+        var csp = new cspGenerator(header.value);
+        csp.append('worker-src', 'blob:');
+        csp.append('script-src', '*.baidu.com');
+        csp.append('img-src', '*.baidu.com');
+        header.value = csp.generate();
+      }
+
+      return {
+        responseHeaders: details.responseHeaders
+      };
+    }, {
+      urls: manifest.content_scripts[0].matches
+    }, ['blocking', 'responseHeaders']);
+  };
+
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  var createClass = _createClass;
+
+  var Capture =
+  /*#__PURE__*/
+  function () {
+    function Capture(bg) {
+      classCallCheck(this, Capture);
+
+      this.bg = bg;
+      this.ms = null;
+    }
+
+    createClass(Capture, [{
+      key: "getActiveTab",
+      value: function getActiveTab() {
+        return new Promise(function (resolve) {
+          chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          }, function (tabs) {
+            resolve(tabs[0]);
+          });
+        });
+      }
+    }, {
+      key: "tabCapture",
+      value: function tabCapture() {
+        var _this = this;
+
+        chrome.tabCapture.capture(Capture.constraints, function (stream) {
+          _this.ms = new MediaStream();
+          stream.getTracks().forEach(function (track) {
+            console.log(track);
+
+            _this.ms.addTrack(track);
+          });
+        });
+      }
+    }], [{
+      key: "constraints",
+      get: function get() {
+        return {
+          audio: true,
+          video: true,
+          videoConstraints: {
+            mandatory: {
+              chromeMediaSource: 'tab',
+              maxWidth: 3840,
+              maxHeight: 2160
+            }
+          },
+          audioConstraints: {
+            mandatory: {
+              echoCancellation: true
+            }
+          }
+        };
+      }
+    }]);
+
+    return Capture;
+  }();
+
+  var Background = function Background() {
+    classCallCheck(this, Background);
+
+    this.changeCSP = new ChangeCSP(this);
+    this.capture = new Capture(this);
+  };
+
+  var index = new Background();
+
+  return index;
 
 }());
 //# sourceMappingURL=index.js.map
