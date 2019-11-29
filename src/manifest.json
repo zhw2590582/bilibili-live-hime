@@ -24,6 +24,7 @@
     },
     "permissions": [
         "tabs",
+        "storage",
         "activeTab",
         "tabCapture",
         "webRequest",
@@ -45,5 +46,5 @@
         "injected/index.js",
         "injected/index.css"
     ],
-    "content_security_policy": "script-src 'self'; object-src 'self'"
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

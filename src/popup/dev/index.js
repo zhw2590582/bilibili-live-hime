@@ -1,98 +1,110 @@
 import './index.scss';
-import Storage from '../../share/storage';
-import { getActiveTab } from '../../share';
+import { getActiveTab, getStorage, setStorage } from '../../share';
 
 class Popup {
     constructor() {
-        const storage = new Storage('popup');
-        const live = storage.get('live');
-        const config = storage.get('config');
-        const manifest = chrome.runtime.getManifest();
-        const $container = document.querySelector('.container');
-        const $name = document.querySelector('.name');
-        const $feedback = document.querySelector('.feedback');
-        const $tab = document.querySelector('.tab');
-        const $rtmpUrl = document.querySelector('.rtmpUrl');
-        const $liveUrl = document.querySelector('.liveUrl');
-        const $resolution = document.querySelector('.resolution');
-        const $frameRate = document.querySelector('.frameRate');
-        const $bitsPerSecond = document.querySelector('.bitsPerSecond');
-        const $info = document.querySelector('.info');
-        const $start = document.querySelector('.start');
-        const $stop = document.querySelector('.stop');
+        this.manifest = chrome.runtime.getManifest();
+        this.$container = document.querySelector('.container');
+        this.$name = document.querySelector('.name');
+        this.$feedback = document.querySelector('.feedback');
+        this.$tab = document.querySelector('.tab');
+        this.$rtmpUrl = document.querySelector('.rtmpUrl');
+        this.$liveUrl = document.querySelector('.liveUrl');
+        this.$resolution = document.querySelector('.resolution');
+        this.$frameRate = document.querySelector('.frameRate');
+        this.$bitsPerSecond = document.querySelector('.bitsPerSecond');
+        this.$info = document.querySelector('.info');
+        this.$start = document.querySelector('.start');
+        this.$stop = document.querySelector('.stop');
 
-        $name.textContent = `${manifest.name} ${manifest.version}`;
-
-        $name.addEventListener('click', () => {
+        this.$name.addEventListener('click', () => {
             chrome.tabs.create({ url: 'https://chrome.google.com/webstore/detail/nagmkdppcmenlcgelpgkjoknakghllml' });
         });
 
-        $feedback.addEventListener('click', () => {
+        this.$feedback.addEventListener('click', () => {
             chrome.tabs.create({ url: 'https://github.com/zhw2590582/bilibili-live-hime' });
         });
 
-        getActiveTab().then(tab => {
-            $tab.value = `${tab.title} - ${tab.url}`;
-            if (config) {
-                $rtmpUrl.value = config.rtmpUrl;
-                $liveUrl.value = config.liveUrl;
-                $resolution.value = config.resolution;
-                $frameRate.value = config.frameRate;
-                $bitsPerSecond.value = config.bitsPerSecond;
-            }
-            if (live) {
-                $tab.value = config.tab;
-                $container.classList.add('live');
-            }
+        this.$start.addEventListener('click', () => {
+            this.start();
+        });
+        this.$stop.addEventListener('click', () => {
+            this.stop();
         });
 
-        function info(msg) {
-            $info.style.display = 'block';
-            $info.textContent = msg;
-        }
+        this.init();
+    }
 
-        function start() {
-            const tab = $tab.value.trim();
-            const rtmpUrl = $rtmpUrl.value.trim();
-            const liveUrl = $liveUrl.value.trim();
-            const resolution = $resolution.value.trim();
-            const frameRate = $frameRate.value.trim();
-            const bitsPerSecond = $bitsPerSecond.value.trim();
-            if (!rtmpUrl || !rtmpUrl.startsWith($rtmpUrl.placeholder)) {
-                return info('请输入正确的 rtmp 推流地址');
+    async init() {
+        this.live = await getStorage('live');
+        this.config = await getStorage('config');
+        this.activeTab = await getActiveTab();
+        this.$tab.value = `${this.activeTab.title} - ${this.activeTab.url}`;
+        this.$name.textContent = `${this.manifest.name} ${this.manifest.version}`;
+        if (this.config) {
+            this.$rtmpUrl.value = this.config.rtmpUrl;
+            this.$liveUrl.value = this.config.liveUrl;
+            this.$resolution.value = this.config.resolution;
+            this.$frameRate.value = this.config.frameRate;
+            this.$bitsPerSecond.value = this.config.bitsPerSecond;
+            if (this.live) {
+                this.$tab.value = this.config.tab;
             }
-            if (!liveUrl || !liveUrl.startsWith($liveUrl.placeholder)) {
-                return info('请输入正确的 https 直播地址');
-            }
-            $info.style.display = 'none';
-            $container.classList.add('live');
-            storage.set('live', true);
-            chrome.tabs.create({ url: liveUrl });
-            const configData = {
-                tab,
-                rtmpUrl,
-                liveUrl,
-                resolution,
-                frameRate,
-                bitsPerSecond,
-            };
-            storage.set('config', configData);
-            chrome.runtime.sendMessage({
-                type: 'start',
-                data: configData,
-            });
+        }
+        if (this.live) {
+            this.$container.classList.add('live');
+        }
+    }
+
+    async start() {
+        const config = {
+            id: this.activeTab.id,
+            tab: this.$tab.value.trim(),
+            rtmpUrl: this.$rtmpUrl.value.trim(),
+            liveUrl: this.$liveUrl.value.trim(),
+            resolution: this.$resolution.value.trim(),
+            frameRate: this.$frameRate.value.trim(),
+            bitsPerSecond: this.$bitsPerSecond.value.trim(),
+        };
+
+        if (!config.rtmpUrl || !config.rtmpUrl.startsWith(this.$rtmpUrl.placeholder)) {
+            this.info = '请输入正确的 rtmp 推流地址';
+            return;
         }
 
-        function stop() {
-            $container.classList.remove('live');
-            storage.del('live', true);
-            chrome.runtime.sendMessage({
-                type: 'stop',
-            });
+        if (!config.liveUrl || !config.liveUrl.startsWith(this.$liveUrl.placeholder)) {
+            this.info = '请输入正确的 https 直播地址';
+            return;
         }
 
-        $start.addEventListener('click', start);
-        $stop.addEventListener('click', stop);
+        this.info = false;
+        this.$container.classList.add('live');
+
+        await setStorage('live', true);
+        await setStorage('config', config);
+        chrome.tabs.create({ url: config.liveUrl });
+        chrome.runtime.sendMessage({
+            type: 'start',
+            data: config,
+        });
+    }
+
+    async stop() {
+        this.$container.classList.remove('live');
+        await setStorage('live', false);
+        chrome.runtime.sendMessage({
+            type: 'stop',
+        });
+    }
+
+    set info(msg) {
+        if (msg) {
+            this.$info.style.display = 'block';
+            this.$info.textContent = msg;
+        } else {
+            this.$info.style.display = 'none';
+            this.$info.textContent = '';
+        }
     }
 }
 

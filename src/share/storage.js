@@ -1,26 +1,30 @@
 export default class Storage {
-    constructor(name, isLocal = true) {
-        this.name = name;
-        this.storage = isLocal ? localStorage : sessionStorage;
-    }
-
-    get(key) {
-        const storage = JSON.parse(this.storage.getItem(this.name)) || {};
-        return key ? storage[key] : storage;
+    get(key, defaultValue) {
+        return new Promise(resolve => {
+            chrome.storage.local.get([key], result => {
+                if (result[key]) {
+                    resolve(result[key]);
+                } else if (defaultValue) {
+                    this.set(key, defaultValue).then(value => {
+                        resolve(value);
+                    });
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 
     set(key, value) {
-        const storage = { ...this.get(), [key]: value };
-        this.storage.setItem(this.name, JSON.stringify(storage));
-    }
-
-    del(key) {
-        const storage = this.get();
-        delete storage[key];
-        this.storage.setItem(this.name, JSON.stringify(storage));
-    }
-
-    clean() {
-        this.storage.removeItem(this.name);
+        return new Promise(resolve => {
+            chrome.storage.local.set(
+                {
+                    [key]: value,
+                },
+                () => {
+                    resolve(value);
+                },
+            );
+        });
     }
 }

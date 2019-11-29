@@ -25,3 +25,32 @@ export function getActiveTab() {
         );
     });
 }
+
+export function getStorage(key, defaultValue) {
+    return new Promise(resolve => {
+        chrome.storage.local.get([key], result => {
+            if (result[key]) {
+                resolve(result[key]);
+            } else if (defaultValue) {
+                setStorage(key, defaultValue).then(value => {
+                    resolve(value);
+                });
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+export function setStorage(key, value) {
+    return new Promise(resolve => {
+        chrome.storage.local.set(
+            {
+                [key]: value,
+            },
+            () => {
+                resolve(value);
+            },
+        );
+    });
+}
