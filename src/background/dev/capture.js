@@ -23,20 +23,6 @@ export default class Capture {
         };
     }
 
-    getActiveTab() {
-        return new Promise(resolve => {
-            chrome.tabs.query(
-                {
-                    active: true,
-                    currentWindow: true,
-                },
-                tabs => {
-                    resolve(tabs[0]);
-                },
-            );
-        });
-    }
-
     tabCapture() {
         chrome.tabCapture.capture(Capture.constraints, stream => {
             this.ms = new MediaStream();

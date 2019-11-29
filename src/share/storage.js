@@ -1,25 +1,26 @@
 export default class Storage {
-    constructor(name) {
+    constructor(name, isLocal = true) {
         this.name = name;
+        this.storage = isLocal ? localStorage : sessionStorage;
     }
 
     get(key) {
-        const storage = JSON.parse(localStorage.getItem(this.name)) || {};
+        const storage = JSON.parse(this.storage.getItem(this.name)) || {};
         return key ? storage[key] : storage;
     }
 
     set(key, value) {
         const storage = { ...this.get(), [key]: value };
-        localStorage.setItem(this.name, JSON.stringify(storage));
+        this.storage.setItem(this.name, JSON.stringify(storage));
     }
 
     del(key) {
         const storage = this.get();
         delete storage[key];
-        localStorage.setItem(this.name, JSON.stringify(storage));
+        this.storage.setItem(this.name, JSON.stringify(storage));
     }
 
     clean() {
-        localStorage.removeItem(this.name);
+        this.storage.removeItem(this.name);
     }
 }

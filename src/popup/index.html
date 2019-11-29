@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cmn-Hans">
 
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,76 @@
 </head>
 
 <body>
+    <div class="container">
+        <header class="header">
+            <div class="name"></div>
+            <div class="feedback">反馈</div>
+        </header>
+        <section class="main">
+            <div class="item">
+                <div class="key">直播标签</div>
+                <div class="value">
+                    <input class="tab" type="text" placeholder="Bilibili 直播姬" disabled>
+                </div>
+            </div>
+            <div class="item">
+                <div class="key">推流地址</div>
+                <div class="value">
+                    <input class="rtmpUrl" type="text" placeholder="rtmp://" maxlength="100">
+                </div>
+            </div>
+            <div class="item">
+                <div class="key">直播地址</div>
+                <div class="value">
+                    <input class="liveUrl" type="text" placeholder="https://live.bilibili.com/" maxlength="100">
+                </div>
+            </div>
+            <div class="item">
+                <div class="key">视频分辨率</div>
+                <div class="value">
+                    <select class="resolution">
+                        <option value="1920x1080" selected>1920P</option>
+                        <option value="1280x720">720P</option>
+                        <option value="640x480">480P</option>
+                        <option value="640x360">360P</option>
+                        <option value="320x240">240P</option>
+                    </select>
+                </div>
+            </div>
+            <div class="item">
+                <div class="key">视频帧率</div>
+                <div class="value">
+                    <select class="frameRate">
+                        <option value="30" selected>30</option>
+                        <option value="25">25</option>
+                        <option value="15">15</option>
+                    </select>
+                </div>
+            </div>
+            <div class="item">
+                <div class="key">视频比特率</div>
+                <div class="value">
+                    <select class="bitsPerSecond">
+                        <option value="8000000000" selected>1 GB per second</option>
+                        <option value="800000000">100 MB per second</option>
+                        <option value="8000000">1 MB per second</option>
+                        <option value="800000">100 KB per second</option>
+                        <option value="8000">1 KB per second</option>
+                        <option value="800">100 Bytes per second</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+        <div class="info"></div>
+        <footer class="footer">
+            <div class="start">
+                开始推流
+            </div>
+            <div class="stop">
+                停止推流
+            </div>
+        </footer>
+    </div>
     <script src="./index.js"></script>
 </body>
 

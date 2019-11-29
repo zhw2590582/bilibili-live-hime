@@ -134,18 +134,6 @@ var bilibiliLiveHimeBackground = (function () {
     }
 
     createClass(Capture, [{
-      key: "getActiveTab",
-      value: function getActiveTab() {
-        return new Promise(function (resolve) {
-          chrome.tabs.query({
-            active: true,
-            currentWindow: true
-          }, function (tabs) {
-            resolve(tabs[0]);
-          });
-        });
-      }
-    }, {
       key: "tabCapture",
       value: function tabCapture() {
         var _this = this;
@@ -189,6 +177,17 @@ var bilibiliLiveHimeBackground = (function () {
 
     this.changeCSP = new ChangeCSP(this);
     this.capture = new Capture(this);
+    chrome.runtime.onMessage.addListener(function (request) {
+      switch (request.type) {
+        case 'start':
+          console.log('start');
+          break;
+
+        case 'stop':
+          console.log('stop');
+          break;
+      }
+    });
   };
 
   var index = new Background();
