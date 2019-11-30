@@ -18,7 +18,7 @@ class Popup {
         this.$stop = query('.stop');
 
         this.$name.addEventListener('click', () => {
-            openTab('https://chrome.google.com/webstore/detail/nagmkdppcmenlcgelpgkjoknakghllml');
+            openTab('https://chrome.google.com/webstore/detail/' + chrome.runtime.id);
         });
 
         this.$feedback.addEventListener('click', () => {
