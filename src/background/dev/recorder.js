@@ -1,4 +1,4 @@
-export default class Capture {
+export default class Recorder {
     constructor(bg) {
         this.bg = bg;
         this.ms = null;
@@ -28,7 +28,7 @@ export default class Capture {
     }
 
     start() {
-        chrome.tabCapture.capture(Capture.constraints, stream => {
+        chrome.tabCapture.capture(Recorder.constraints, stream => {
             this.ms = new MediaStream();
             stream.getTracks().forEach(track => {
                 this.ms.addTrack(track);

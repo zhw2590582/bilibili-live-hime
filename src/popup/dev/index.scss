@@ -13,9 +13,9 @@ body {
 }
 
 .container {
+    width: 300px;
     display: flex;
     flex-direction: column;
-    width: 300px;
 
     .header {
         display: flex;
@@ -32,7 +32,9 @@ body {
         }
     }
 
-    .main {
+    .config {
+        display: flex;
+        flex-direction: column;
         position: relative;
         padding: 10px 10px 0;
         .item {
@@ -52,9 +54,37 @@ body {
         }
     }
 
+    .debug {
+        display: none;
+        flex-direction: column;
+        padding: 10px 10px 0;
+        height: 200px;
+        overflow: auto;
+        line-height: 1.2;
+        color: #54de1d;
+        background: #000;
+
+        p {
+            position: relative;
+            margin: 0 0 5px;
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: -5px;
+                top: 8px;
+                width: 2px;
+                height: 2px;
+                border-radius: 50%;
+                background: #54de1d;
+            }
+        }
+    }
+
     .info {
         display: none;
         padding: 10px;
+        text-align: center;
         color: red;
     }
 
@@ -83,21 +113,12 @@ body {
     }
 
     &.isRecording {
-        .main::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-        }
-
+        .config,
         .start {
             display: none;
         }
 
+        .debug,
         .stop {
             display: flex;
         }

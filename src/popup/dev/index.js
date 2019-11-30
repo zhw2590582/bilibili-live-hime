@@ -1,4 +1,5 @@
 import './index.scss';
+import objToString from 'obj-to-string';
 import { getActiveTab, getStorage, setStorage, query, openTab } from '../../share';
 
 class Popup {
@@ -14,6 +15,7 @@ class Popup {
         this.$frameRate = query('.frameRate');
         this.$bitsPerSecond = query('.bitsPerSecond');
         this.$info = query('.info');
+        this.$debug = query('.debug');
         this.$start = query('.start');
         this.$stop = query('.stop');
 
@@ -33,14 +35,27 @@ class Popup {
         });
 
         this.init();
+
+        chrome.runtime.onMessage.addListener(request => {
+            const { type, data } = request;
+            switch (type) {
+                case 'log':
+                    this.log(data);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     async init() {
         this.isRecording = await getStorage('isRecording');
         this.config = await getStorage('config');
+        this.debug = await getStorage('debug');
         this.activeTab = await getActiveTab();
         this.$tab.value = `${this.activeTab.title} - ${this.activeTab.url}`;
         this.$name.textContent = `${this.manifest.name} ${this.manifest.version}`;
+
         if (this.config) {
             this.$rtmpUrl.value = this.config.rtmpUrl;
             this.$liveUrl.value = this.config.liveUrl;
@@ -51,14 +66,19 @@ class Popup {
                 this.$tab.value = this.config.tab;
             }
         }
+
         if (this.isRecording) {
             this.$container.classList.add('isRecording');
+        }
+
+        if (this.debug) {
+            this.$debug.innerHTML = this.debug;
         }
     }
 
     async start() {
         const config = {
-            id: this.activeTab.id,
+            recordId: this.activeTab.id,
             tab: this.$tab.value.trim(),
             rtmpUrl: this.$rtmpUrl.value.trim(),
             liveUrl: this.$liveUrl.value.trim(),
@@ -82,16 +102,21 @@ class Popup {
 
         await setStorage('isRecording', true);
         await setStorage('config', config);
-        await openTab(config.liveUrl);
+        const liveTab = await openTab(config.liveUrl);
         chrome.runtime.sendMessage({
             type: 'start',
-            data: config,
+            data: {
+                ...config,
+                liveId: liveTab.id,
+            },
         });
     }
 
     async stop() {
         this.$container.classList.remove('isRecording');
         await setStorage('isRecording', false);
+        await setStorage('debug', '');
+        this.$debug.innerHTML = '';
         chrome.runtime.sendMessage({
             type: 'stop',
         });
@@ -106,6 +131,13 @@ class Popup {
             this.$info.style.display = 'none';
             this.$info.textContent = '';
         }
+    }
+
+    async log(msg) {
+        msg = msg instanceof Error ? msg.message.trim() : objToString(msg);
+        this.$debug.innerHTML += `<p>${msg}</p>`;
+        this.$debug.scrollTo(0, this.$debug.scrollHeight);
+        await setStorage('debug', this.$debug.innerHTML);
     }
 }
 

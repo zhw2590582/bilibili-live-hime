@@ -9,6 +9,24 @@ var bilibiliLiveHimeBackground = (function () {
 
   var classCallCheck = _classCallCheck;
 
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  var createClass = _createClass;
+
   const filesInDirectory = dir => new Promise (resolve =>
 
       dir.createReader ().readEntries (entries =>
@@ -79,73 +97,58 @@ var bilibiliLiveHimeBackground = (function () {
   !function(e,t){module.exports=t();}(commonjsGlobal,function(){var n=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")};function i(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i);}}var e=function(e,t,n){return t&&i(e.prototype,t),n&&i(e,n),e};return function(){function t(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:"";n(this,t),this.csp=this.parse(e);}return e(t,[{key:"parse",value:function(e){return (0<arguments.length&&void 0!==e?e:"").split(";").reduce(function(e,t){var n=t.split(" ").filter(function(e){return e.trim()}),i=n[0],r=n.slice(1);return e[i]=r,e},{})}},{key:"generate",value:function(){var n=this;return Object.keys(this.csp).reduce(function(e,t){return "".concat(e," ").concat(t," ").concat(n.csp[t].join(" "),";")},"").trim()}},{key:"append",value:function(e,t){return this.csp[e]&&-1===this.csp[e].indexOf(t)?this.csp[e].push(t):this.csp[e]=[t],this}},{key:"delete",value:function(e,t){if(t){var n=(this.csp[e]||[]).indexOf(t);-1<n&&this.csp[e].splice(n,1);}else delete this.csp[e];return this}},{key:"get",value:function(e){return this.csp[e]}}]),t}()});
   });
 
-  var ChangeCSP = function ChangeCSP() {
-    classCallCheck(this, ChangeCSP);
+  var manifest = chrome.runtime.getManifest();
+  chrome.webRequest.onHeadersReceived.addListener(function (details) {
+    var header = details.responseHeaders.find(function (event) {
+      var name = event.name.toLowerCase();
+      return name === 'content-security-policy-report-only' || name === 'content-security-policy';
+    });
 
-    var manifest = chrome.runtime.getManifest();
-    chrome.webRequest.onHeadersReceived.addListener(function (details) {
-      var header = details.responseHeaders.find(function (event) {
-        var name = event.name.toLowerCase();
-        return name === 'content-security-policy-report-only' || name === 'content-security-policy';
-      });
-
-      if (header && header.value) {
-        var csp = new cspGenerator(header.value);
-        csp.append('worker-src', 'blob:');
-        csp.append('script-src', '*.baidu.com');
-        csp.append('img-src', '*.baidu.com');
-        header.value = csp.generate();
-      }
-
-      return {
-        responseHeaders: details.responseHeaders
-      };
-    }, {
-      urls: manifest.content_scripts[0].matches
-    }, ['blocking', 'responseHeaders']);
-  };
-
-  function _defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
+    if (header && header.value) {
+      var csp = new cspGenerator(header.value);
+      csp.append('worker-src', 'blob:');
+      csp.append('script-src', '*.baidu.com');
+      csp.append('img-src', '*.baidu.com');
+      header.value = csp.generate();
     }
-  }
 
-  function _createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    return Constructor;
-  }
+    return {
+      responseHeaders: details.responseHeaders
+    };
+  }, {
+    urls: manifest.content_scripts[0].matches
+  }, ['blocking', 'responseHeaders']);
 
-  var createClass = _createClass;
-
-  var Capture =
+  var Recorder =
   /*#__PURE__*/
   function () {
-    function Capture(bg) {
-      classCallCheck(this, Capture);
+    function Recorder(bg) {
+      classCallCheck(this, Recorder);
 
       this.bg = bg;
       this.ms = null;
     }
 
-    createClass(Capture, [{
-      key: "tabCapture",
-      value: function tabCapture() {
+    createClass(Recorder, [{
+      key: "isTypeSupported",
+      value: function isTypeSupported(mimeType) {
+        return MediaRecorder.isTypeSupported(mimeType);
+      }
+    }, {
+      key: "start",
+      value: function start() {
         var _this = this;
 
-        chrome.tabCapture.capture(Capture.constraints, function (stream) {
+        chrome.tabCapture.capture(Recorder.constraints, function (stream) {
           _this.ms = new MediaStream();
           stream.getTracks().forEach(function (track) {
-            console.log(track);
-
             _this.ms.addTrack(track);
           });
         });
+      }
+    }, {
+      key: "stop",
+      value: function stop() {//
       }
     }], [{
       key: "constraints",
@@ -169,26 +172,46 @@ var bilibiliLiveHimeBackground = (function () {
       }
     }]);
 
-    return Capture;
+    return Recorder;
   }();
 
-  var Background = function Background() {
-    classCallCheck(this, Background);
+  var Background =
+  /*#__PURE__*/
+  function () {
+    function Background() {
+      var _this = this;
 
-    this.changeCSP = new ChangeCSP(this);
-    this.capture = new Capture(this);
-    chrome.runtime.onMessage.addListener(function (request) {
-      switch (request.type) {
-        case 'start':
-          console.log('start');
-          break;
+      classCallCheck(this, Background);
 
-        case 'stop':
-          console.log('stop');
-          break;
+      this.recorder = new Recorder(this);
+      chrome.runtime.onMessage.addListener(function (request) {
+        console.log(request);
+        var type = request.type,
+            data = request.data;
+
+        switch (type) {
+          case 'start':
+            _this.recorder.start(data);
+
+            console.log(data);
+            break;
+
+          case 'stop':
+            _this.recorder.stop(data);
+
+            break;
+        }
+      });
+    }
+
+    createClass(Background, [{
+      key: "postMessage",
+      value: function postMessage(data) {//
       }
-    });
-  };
+    }]);
+
+    return Background;
+  }();
 
   var index = new Background();
 

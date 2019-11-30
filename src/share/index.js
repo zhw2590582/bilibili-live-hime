@@ -67,7 +67,7 @@ export function openTab(url) {
                 chrome.tabs.update(
                     findTab.id,
                     {
-                        active: true,
+                        active: false,
                         url: url,
                     },
                     tab => {
@@ -75,10 +75,38 @@ export function openTab(url) {
                     },
                 );
             } else {
-                chrome.tabs.create({ url }, tab => {
+                chrome.tabs.create({ url, active: false }, tab => {
                     resolve(tab);
                 });
             }
         });
+    });
+}
+
+export function openWindowTab(url) {
+    return new Promise(resolve => {
+        chrome.windows.create(
+            {
+                url,
+                focused: true,
+            },
+            win => {
+                resolve(win);
+            },
+        );
+    });
+}
+
+export function activeTab(id) {
+    return new Promise(resolve => {
+        chrome.tabs.update(
+            id,
+            {
+                active: true,
+            },
+            tab => {
+                resolve(tab);
+            },
+        );
     });
 }
