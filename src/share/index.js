@@ -1,3 +1,5 @@
+import objToString from 'obj-to-string';
+
 export function sleep(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -108,5 +110,15 @@ export function activeTab(id) {
                 resolve(tab);
             },
         );
+    });
+}
+
+export async function log(msg) {
+    return new Promise(resolve => {
+        msg = msg instanceof Error ? msg.message.trim() : objToString(msg);
+        const logs = (await getStorage('debug')) || [];
+        logs.push(msg);
+        await setStorage('debug', logs);
+        resolve(logs);
     });
 }

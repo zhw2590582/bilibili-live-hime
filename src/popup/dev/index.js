@@ -1,5 +1,4 @@
 import './index.scss';
-import objToString from 'obj-to-string';
 import { getActiveTab, getStorage, setStorage, query, openTab } from '../../share';
 
 class Popup {
@@ -35,17 +34,6 @@ class Popup {
         });
 
         this.init();
-
-        chrome.runtime.onMessage.addListener(request => {
-            const { type, data } = request;
-            switch (type) {
-                case 'log':
-                    this.log(data);
-                    break;
-                default:
-                    break;
-            }
-        });
     }
 
     async init() {
@@ -133,11 +121,10 @@ class Popup {
         }
     }
 
-    async log(msg) {
-        msg = msg instanceof Error ? msg.message.trim() : objToString(msg);
-        this.$debug.innerHTML += `<p>${msg}</p>`;
+    async updateLog() {
+        const logs = (await getStorage('debug')) || [];
+        this.$debug.innerHTML = logs.map(item => `<p>${item}</p>`);
         this.$debug.scrollTo(0, this.$debug.scrollHeight);
-        await setStorage('debug', this.$debug.innerHTML);
     }
 }
 
