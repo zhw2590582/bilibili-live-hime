@@ -88,9 +88,19 @@ var bilibiliLiveHimeBackground = (function () {
 
     if (header && header.value) {
       var csp = new cspGenerator(header.value);
-      csp.append('worker-src', 'blob:');
-      csp.append('script-src', '*.baidu.com');
-      csp.append('img-src', '*.baidu.com');
+
+      if (csp.get('worker-src')) {
+        csp.append('worker-src', 'blob:');
+      }
+
+      if (csp.get('script-src')) {
+        csp.append('script-src', '*.baidu.com');
+      }
+
+      if (csp.get('img-src')) {
+        csp.append('img-src', '*.baidu.com');
+      }
+
       header.value = csp.generate();
     }
 
@@ -849,12 +859,6 @@ var bilibiliLiveHimeBackground = (function () {
 
   var createClass = _createClass;
 
-  function sleep() {
-    var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    return new Promise(function (resolve) {
-      return setTimeout(resolve, ms);
-    });
-  }
   function sendMessageToTab(tabId, type, data) {
     chrome.tabs.sendMessage(tabId, {
       type: type,
@@ -868,6 +872,17 @@ var bilibiliLiveHimeBackground = (function () {
       });
     });
   }
+  function download(data, name) {
+    var blob = new Blob(Array.isArray(data) ? data : [data]);
+    var blobUrl = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = name;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
   var Recorder =
   /*#__PURE__*/
@@ -878,6 +893,7 @@ var bilibiliLiveHimeBackground = (function () {
       this.config = null;
       this.stream = null;
       this.mediaRecorder = null;
+      this.blobs = [];
     }
 
     createClass(Recorder, [{
@@ -888,13 +904,9 @@ var bilibiliLiveHimeBackground = (function () {
             switch (_context.prev = _context.next) {
               case 0:
                 sendMessageToTab(this.config.recordId, 'recordStop');
-                _context.next = 3;
-                return regenerator.awrap(sleep(1000));
+                download(this.blobs, 'test.webm');
 
-              case 3:
-                chrome.runtime.reload();
-
-              case 4:
+              case 2:
               case "end":
                 return _context.stop();
             }
@@ -910,6 +922,7 @@ var bilibiliLiveHimeBackground = (function () {
             switch (_context2.prev = _context2.next) {
               case 0:
                 if (event.data && event.data.size > 0) {
+                  this.blobs.push(event.data);
                   blobUrl = URL.createObjectURL(event.data);
                   sendMessageToTab(this.config.recordId, 'recording', blobUrl);
                 }
@@ -945,7 +958,7 @@ var bilibiliLiveHimeBackground = (function () {
                     _this.mediaRecorder.ondataavailable = _this.recordDataavailable.bind(_this);
                     _this.mediaRecorder.onstop = _this.recordStop.bind(_this);
 
-                    _this.mediaRecorder.start(1000);
+                    _this.mediaRecorder.start(100);
                   }
                 });
 
@@ -1014,7 +1027,7 @@ var bilibiliLiveHimeBackground = (function () {
         return {
           audioBitsPerSecond: 128000,
           videoBitsPerSecond: 2500000,
-          mimeType: 'video/webm;codecs=avc1'
+          mimeType: 'video/webm; codecs="vp8, opus"'
         };
       }
     }, {

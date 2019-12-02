@@ -757,51 +757,69 @@
 	sleep().then(function () {
 	  return document.head.appendChild($style);
 	});
-	chrome.runtime.onMessage.addListener(function _callee(request) {
-	  var type, data, buf;
-	  return regenerator.async(function _callee$(_context) {
-	    while (1) {
-	      switch (_context.prev = _context.next) {
-	        case 0:
-	          type = request.type, data = request.data;
-	          _context.t0 = type;
-	          _context.next = _context.t0 === 'recording' ? 4 : _context.t0 === 'recordStop' ? 15 : 17;
-	          break;
+	sleep(1000).then(function () {
+	  var video = document.createElement('video');
+	  document.body.insertAdjacentElement('afterbegin', video);
+	  var mediaSource = new MediaSource();
+	  mediaSource.addEventListener('sourceopen', function () {
+	    var sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8, opus"');
+	    chrome.runtime.onMessage.addListener(function _callee(request) {
+	      var type, data, buf;
+	      return regenerator.async(function _callee$(_context) {
+	        while (1) {
+	          switch (_context.prev = _context.next) {
+	            case 0:
+	              type = request.type, data = request.data;
+	              _context.t0 = type;
+	              _context.next = _context.t0 === 'recording' ? 4 : _context.t0 === 'recordStop' ? 16 : 19;
+	              break;
 
-	        case 4:
-	          _context.prev = 4;
-	          _context.next = 7;
-	          return regenerator.awrap(fetch(data).then(function (res) {
-	            return res.arrayBuffer();
-	          }));
+	            case 4:
+	              _context.prev = 4;
+	              _context.next = 7;
+	              return regenerator.awrap(fetch(data).then(function (res) {
+	                return res.arrayBuffer();
+	              }));
 
-	        case 7:
-	          buf = _context.sent;
-	          URL.revokeObjectURL(data);
-	          console.log(buf.byteLength);
-	          _context.next = 14;
-	          break;
+	            case 7:
+	              buf = _context.sent;
+	              URL.revokeObjectURL(data);
+	              console.log(mediaSource.readyState, buf.byteLength);
+	              sourceBuffer.appendBuffer(new Uint8Array(buf));
+	              _context.next = 15;
+	              break;
 
-	        case 12:
-	          _context.prev = 12;
-	          _context.t1 = _context["catch"](4);
+	            case 13:
+	              _context.prev = 13;
+	              _context.t1 = _context["catch"](4);
 
-	        case 14:
-	          return _context.abrupt("break", 18);
+	            case 15:
+	              return _context.abrupt("break", 20);
 
-	        case 15:
-	          console.log('recordStop');
-	          return _context.abrupt("break", 18);
+	            case 16:
+	              console.log('recordStop');
+	              mediaSource.endOfStream();
+	              return _context.abrupt("break", 20);
 
-	        case 17:
-	          return _context.abrupt("break", 18);
+	            case 19:
+	              return _context.abrupt("break", 20);
 
-	        case 18:
-	        case "end":
-	          return _context.stop();
-	      }
+	            case 20:
+	            case "end":
+	              return _context.stop();
+	          }
+	        }
+	      }, null, null, [[4, 13]]);
+	    });
+	  });
+	  video.src = URL.createObjectURL(mediaSource);
+	  var isPlaying = false;
+	  video.addEventListener('canplay', function () {
+	    if (!isPlaying) {
+	      isPlaying = true;
+	      video.play();
 	    }
-	  }, null, null, [[4, 12]]);
+	  });
 	});
 
 }());

@@ -10,9 +10,15 @@ chrome.webRequest.onHeadersReceived.addListener(
 
         if (header && header.value) {
             const csp = new CSP(header.value);
-            csp.append('worker-src', 'blob:');
-            csp.append('script-src', '*.baidu.com');
-            csp.append('img-src', '*.baidu.com');
+            if (csp.get('worker-src')) {
+                csp.append('worker-src', 'blob:');
+            }
+            if (csp.get('script-src')) {
+                csp.append('script-src', '*.baidu.com');
+            }
+            if (csp.get('img-src')) {
+                csp.append('img-src', '*.baidu.com');
+            }
             header.value = csp.generate();
         }
 

@@ -1,10 +1,11 @@
-import { sleep, getLiveTab, sendMessageToTab } from '../../share';
+import { download, getLiveTab, sendMessageToTab } from '../../share';
 
 export default class Recorder {
     constructor() {
         this.config = null;
         this.stream = null;
         this.mediaRecorder = null;
+        this.blobs = [];
     }
 
     static get CaptureOptions() {
@@ -32,7 +33,7 @@ export default class Recorder {
         return {
             audioBitsPerSecond: 128000,
             videoBitsPerSecond: 2500000,
-            mimeType: 'video/webm;codecs=avc1',
+            mimeType: 'video/webm; codecs="vp8, opus"',
         };
     }
 
@@ -63,12 +64,12 @@ export default class Recorder {
 
     async recordStop() {
         sendMessageToTab(this.config.recordId, 'recordStop');
-        await sleep(1000);
-        chrome.runtime.reload();
+        download(this.blobs, 'test.webm');
     }
 
     async recordDataavailable(event) {
         if (event.data && event.data.size > 0) {
+            this.blobs.push(event.data);
             const blobUrl = URL.createObjectURL(event.data);
             sendMessageToTab(this.config.recordId, 'recording', blobUrl);
         }
@@ -88,7 +89,7 @@ export default class Recorder {
                 this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
                 this.mediaRecorder.ondataavailable = this.recordDataavailable.bind(this);
                 this.mediaRecorder.onstop = this.recordStop.bind(this);
-                this.mediaRecorder.start(1000);
+                this.mediaRecorder.start(100);
             }
         });
     }
