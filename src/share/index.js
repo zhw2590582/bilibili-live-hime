@@ -105,3 +105,11 @@ export function sendMessage(type, data) {
         data,
     });
 }
+
+export function getLiveTab() {
+    return new Promise(resolve => {
+        chrome.tabCapture.getCapturedTabs(tabs => {
+            resolve(tabs[0]);
+        });
+    });
+}

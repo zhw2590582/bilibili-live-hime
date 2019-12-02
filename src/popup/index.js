@@ -1018,7 +1018,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 21:
 	              _context.next = 23;
-	              return regenerator.awrap(setStorage('debug', ''));
+	              return regenerator.awrap(setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']));
 
 	            case 23:
 	            case "end":
@@ -1119,7 +1119,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 3:
 	              _context3.next = 5;
-	              return regenerator.awrap(setStorage('debug', ''));
+	              return regenerator.awrap(setStorage('debug', []));
 
 	            case 5:
 	              this.$debug.innerHTML = '';

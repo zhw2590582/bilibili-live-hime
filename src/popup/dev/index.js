@@ -66,7 +66,7 @@ class Popup {
             this.$liveUrl.disabled = true;
             this.$resolution.disabled = true;
         } else {
-            await setStorage('debug', '');
+            await setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']);
         }
     }
 
@@ -103,7 +103,7 @@ class Popup {
     async stop() {
         this.$container.classList.remove('recording');
         await setStorage('recording', false);
-        await setStorage('debug', '');
+        await setStorage('debug', []);
         this.$debug.innerHTML = '';
         await sendMessage('stop');
         await log('正在关闭推流...');
