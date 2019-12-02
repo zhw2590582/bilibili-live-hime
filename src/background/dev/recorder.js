@@ -1,13 +1,10 @@
-import { getLiveTab, sendMessageToTab } from '../../share';
+import { sleep, getLiveTab, sendMessageToTab } from '../../share';
 
 export default class Recorder {
-    constructor(bg) {
-        this.bg = bg;
+    constructor() {
         this.config = null;
         this.stream = null;
         this.mediaRecorder = null;
-        this.recordStop = this.recordStop.bind(this);
-        this.recordDataavailable = this.recordDataavailable.bind(this);
     }
 
     static get CaptureOptions() {
@@ -65,6 +62,8 @@ export default class Recorder {
     }
 
     async recordStop() {
+        sendMessageToTab(this.config.recordId, 'recordStop');
+        await sleep(1000);
         chrome.runtime.reload();
     }
 
@@ -87,8 +86,8 @@ export default class Recorder {
             if (stream) {
                 this.stream = stream;
                 this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
-                this.mediaRecorder.ondataavailable = this.recordDataavailable;
-                this.mediaRecorder.onstop = this.recordStop;
+                this.mediaRecorder.ondataavailable = this.recordDataavailable.bind(this);
+                this.mediaRecorder.onstop = this.recordStop.bind(this);
                 this.mediaRecorder.start(1000);
             }
         });

@@ -849,6 +849,12 @@ var bilibiliLiveHimeBackground = (function () {
 
   var createClass = _createClass;
 
+  function sleep() {
+    var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    return new Promise(function (resolve) {
+      return setTimeout(resolve, ms);
+    });
+  }
   function sendMessageToTab(tabId, type, data) {
     chrome.tabs.sendMessage(tabId, {
       type: type,
@@ -866,15 +872,12 @@ var bilibiliLiveHimeBackground = (function () {
   var Recorder =
   /*#__PURE__*/
   function () {
-    function Recorder(bg) {
+    function Recorder() {
       classCallCheck(this, Recorder);
 
-      this.bg = bg;
       this.config = null;
       this.stream = null;
       this.mediaRecorder = null;
-      this.recordStop = this.recordStop.bind(this);
-      this.recordDataavailable = this.recordDataavailable.bind(this);
     }
 
     createClass(Recorder, [{
@@ -884,14 +887,19 @@ var bilibiliLiveHimeBackground = (function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                sendMessageToTab(this.config.recordId, 'recordStop');
+                _context.next = 3;
+                return regenerator.awrap(sleep(1000));
+
+              case 3:
                 chrome.runtime.reload();
 
-              case 1:
+              case 4:
               case "end":
                 return _context.stop();
             }
           }
-        });
+        }, null, this);
       }
     }, {
       key: "recordDataavailable",
@@ -934,8 +942,8 @@ var bilibiliLiveHimeBackground = (function () {
                   if (stream) {
                     _this.stream = stream;
                     _this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
-                    _this.mediaRecorder.ondataavailable = _this.recordDataavailable;
-                    _this.mediaRecorder.onstop = _this.recordStop;
+                    _this.mediaRecorder.ondataavailable = _this.recordDataavailable.bind(_this);
+                    _this.mediaRecorder.onstop = _this.recordStop.bind(_this);
 
                     _this.mediaRecorder.start(1000);
                   }
