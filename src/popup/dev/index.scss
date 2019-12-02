@@ -38,7 +38,7 @@ body {
         position: relative;
         padding: 10px 10px 0;
         .item {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             .key {
                 margin-bottom: 5px;
             }
@@ -55,37 +55,19 @@ body {
     }
 
     .debug {
-        display: none;
+        display: flex;
         flex-direction: column;
         padding: 10px 10px 0;
-        height: 200px;
+        height: 100px;
         overflow: auto;
         line-height: 1.2;
-        color: #54de1d;
-        background: #000;
+        background: #f7f7f7;
+        border-top: 1px solid #e6e6e6;
 
         p {
             position: relative;
             margin: 0 0 5px;
-
-            &::before {
-                content: '';
-                position: absolute;
-                left: -5px;
-                top: 8px;
-                width: 2px;
-                height: 2px;
-                border-radius: 50%;
-                background: #54de1d;
-            }
         }
-    }
-
-    .info {
-        display: none;
-        padding: 10px;
-        text-align: center;
-        color: red;
     }
 
     .footer {
@@ -112,13 +94,11 @@ body {
         }
     }
 
-    &.isRecording {
-        .config,
+    &.recording {
         .start {
             display: none;
         }
 
-        .debug,
         .stop {
             display: flex;
         }

@@ -61,7 +61,11 @@ export function setStorage(key, value) {
     });
 }
 
-export function openTab(url) {
+export function storageChange(callback) {
+    chrome.storage.onChanged.addListener(callback);
+}
+
+export function openTab(url, active = false) {
     return new Promise(resolve => {
         chrome.tabs.query({}, function(tabs) {
             const findTab = tabs.find(tab => tab.url === url);
@@ -69,7 +73,7 @@ export function openTab(url) {
                 chrome.tabs.update(
                     findTab.id,
                     {
-                        active: false,
+                        active,
                         url: url,
                     },
                     tab => {
@@ -77,7 +81,7 @@ export function openTab(url) {
                     },
                 );
             } else {
-                chrome.tabs.create({ url, active: false }, tab => {
+                chrome.tabs.create({ url, active }, tab => {
                     resolve(tab);
                 });
             }
@@ -85,40 +89,19 @@ export function openTab(url) {
     });
 }
 
-export function openWindowTab(url) {
-    return new Promise(resolve => {
-        chrome.windows.create(
-            {
-                url,
-                focused: true,
-            },
-            win => {
-                resolve(win);
-            },
-        );
-    });
-}
-
-export function activeTab(id) {
-    return new Promise(resolve => {
-        chrome.tabs.update(
-            id,
-            {
-                active: true,
-            },
-            tab => {
-                resolve(tab);
-            },
-        );
-    });
-}
-
 export async function log(msg) {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
         msg = msg instanceof Error ? msg.message.trim() : objToString(msg);
         const logs = (await getStorage('debug')) || [];
         logs.push(msg);
         await setStorage('debug', logs);
         resolve(logs);
+    });
+}
+
+export function sendMessage(type, data) {
+    chrome.runtime.sendMessage({
+        type,
+        data,
     });
 }
