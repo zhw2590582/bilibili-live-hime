@@ -77,16 +77,21 @@ export default class Recorder {
 
     async start(config) {
         this.config = config;
+
         const captureOptions = Recorder.CaptureOptions;
         const resolution = Recorder.Resolution[config.resolution];
         captureOptions.videoConstraints.mandatory.maxWidth = resolution.width;
         captureOptions.videoConstraints.mandatory.minWidth = resolution.width;
         captureOptions.videoConstraints.mandatory.maxHeight = resolution.height;
         captureOptions.videoConstraints.mandatory.minHeight = resolution.height;
+
+        const recorderOptions = Recorder.RecorderOptions;
+        recorderOptions.videoBitsPerSecond = config.videoBitsPerSecond;
+
         chrome.tabCapture.capture(captureOptions, stream => {
             if (stream) {
                 this.stream = stream;
-                this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
+                this.mediaRecorder = new MediaRecorder(stream, recorderOptions);
                 this.mediaRecorder.ondataavailable = this.recordDataavailable.bind(this);
                 this.mediaRecorder.onstop = this.recordStop.bind(this);
                 this.mediaRecorder.start(1000);

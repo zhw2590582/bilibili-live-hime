@@ -947,6 +947,7 @@ var bilibiliLiveHimePopup = (function () {
 	    this.$rtmpUrl = query('.rtmpUrl');
 	    this.$liveUrl = query('.liveUrl');
 	    this.$resolution = query('.resolution');
+	    this.$videoBitsPerSecond = query('.videoBitsPerSecond');
 	    this.$debug = query('.debug');
 	    this.$start = query('.start');
 	    this.$stop = query('.stop');
@@ -1002,10 +1003,11 @@ var bilibiliLiveHimePopup = (function () {
 	                this.$rtmpUrl.value = this.config.rtmpUrl;
 	                this.$liveUrl.value = this.config.liveUrl;
 	                this.$resolution.value = this.config.resolution;
+	                this.$videoBitsPerSecond.value = this.config.videoBitsPerSecond;
 	              }
 
 	              if (!this.recording) {
-	                _context.next = 21;
+	                _context.next = 22;
 	                break;
 	              }
 
@@ -1013,14 +1015,15 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$rtmpUrl.disabled = true;
 	              this.$liveUrl.disabled = true;
 	              this.$resolution.disabled = true;
-	              _context.next = 23;
+	              this.$videoBitsPerSecond.disabled = true;
+	              _context.next = 24;
 	              break;
 
-	            case 21:
-	              _context.next = 23;
+	            case 22:
+	              _context.next = 24;
 	              return regenerator.awrap(setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']));
 
-	            case 23:
+	            case 24:
 	            case "end":
 	              return _context.stop();
 	          }
@@ -1039,7 +1042,8 @@ var bilibiliLiveHimePopup = (function () {
 	                recordId: this.activeTab.id,
 	                rtmpUrl: this.$rtmpUrl.value.trim(),
 	                liveUrl: this.$liveUrl.value.trim(),
-	                resolution: this.$resolution.value
+	                resolution: this.$resolution.value,
+	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
 	              };
 
 	              if (!(!config.rtmpUrl || !config.rtmpUrl.startsWith(this.$rtmpUrl.placeholder))) {
@@ -1070,32 +1074,33 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$rtmpUrl.disabled = true;
 	              this.$liveUrl.disabled = true;
 	              this.$resolution.disabled = true;
-	              _context2.next = 15;
+	              this.$videoBitsPerSecond.disabled = true;
+	              _context2.next = 16;
 	              return regenerator.awrap(setStorage('recording', true));
 
-	            case 15:
-	              _context2.next = 17;
+	            case 16:
+	              _context2.next = 18;
 	              return regenerator.awrap(setStorage('config', config));
 
-	            case 17:
-	              _context2.next = 19;
+	            case 18:
+	              _context2.next = 20;
 	              return regenerator.awrap(openTab(config.liveUrl));
 
-	            case 19:
+	            case 20:
 	              liveTab = _context2.sent;
 	              config.config = liveTab.id;
-	              _context2.next = 23;
+	              _context2.next = 24;
 	              return regenerator.awrap(log('已打开直播间：' + config.liveUrl));
 
-	            case 23:
-	              _context2.next = 25;
+	            case 24:
+	              _context2.next = 26;
 	              return regenerator.awrap(sendMessage('start', config));
 
-	            case 25:
-	              _context2.next = 27;
+	            case 26:
+	              _context2.next = 28;
 	              return regenerator.awrap(log('请保持当前页面选中状态，否则无法推流'));
 
-	            case 27:
+	            case 28:
 	            case "end":
 	              return _context2.stop();
 	          }

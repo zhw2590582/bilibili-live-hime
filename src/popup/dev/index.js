@@ -20,6 +20,7 @@ class Popup {
         this.$rtmpUrl = query('.rtmpUrl');
         this.$liveUrl = query('.liveUrl');
         this.$resolution = query('.resolution');
+        this.$videoBitsPerSecond = query('.videoBitsPerSecond');
         this.$debug = query('.debug');
         this.$start = query('.start');
         this.$stop = query('.stop');
@@ -58,6 +59,7 @@ class Popup {
             this.$rtmpUrl.value = this.config.rtmpUrl;
             this.$liveUrl.value = this.config.liveUrl;
             this.$resolution.value = this.config.resolution;
+            this.$videoBitsPerSecond.value = this.config.videoBitsPerSecond;
         }
 
         if (this.recording) {
@@ -65,6 +67,7 @@ class Popup {
             this.$rtmpUrl.disabled = true;
             this.$liveUrl.disabled = true;
             this.$resolution.disabled = true;
+            this.$videoBitsPerSecond.disabled = true;
         } else {
             await setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']);
         }
@@ -76,6 +79,7 @@ class Popup {
             rtmpUrl: this.$rtmpUrl.value.trim(),
             liveUrl: this.$liveUrl.value.trim(),
             resolution: this.$resolution.value,
+            videoBitsPerSecond: Number(this.$videoBitsPerSecond.value),
         };
 
         if (!config.rtmpUrl || !config.rtmpUrl.startsWith(this.$rtmpUrl.placeholder)) {
@@ -90,6 +94,7 @@ class Popup {
         this.$rtmpUrl.disabled = true;
         this.$liveUrl.disabled = true;
         this.$resolution.disabled = true;
+        this.$videoBitsPerSecond.disabled = true;
         await setStorage('recording', true);
         await setStorage('config', config);
         const liveTab = await openTab(config.liveUrl);

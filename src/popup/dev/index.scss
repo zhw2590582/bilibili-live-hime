@@ -51,22 +51,21 @@ body {
                     outline: none;
                 }
             }
-        }
-    }
+            .debug {
+                display: flex;
+                flex-direction: column;
+                padding: 5px;
+                height: 100px;
+                overflow: auto;
+                line-height: 1.4;
+                background: #f7f7f7;
+                border: 1px solid #e6e6e6;
 
-    .debug {
-        display: flex;
-        flex-direction: column;
-        padding: 10px 10px 0;
-        height: 100px;
-        overflow: auto;
-        line-height: 1.4;
-        background: #f7f7f7;
-        border-top: 1px solid #e6e6e6;
-
-        p {
-            position: relative;
-            margin: 0 0 5px;
+                p {
+                    position: relative;
+                    margin: 0 0 5px;
+                }
+            }
         }
     }
 

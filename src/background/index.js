@@ -939,7 +939,7 @@ var bilibiliLiveHimeBackground = (function () {
       value: function start(config) {
         var _this = this;
 
-        var captureOptions, resolution;
+        var captureOptions, resolution, recorderOptions;
         return regenerator.async(function start$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -951,10 +951,12 @@ var bilibiliLiveHimeBackground = (function () {
                 captureOptions.videoConstraints.mandatory.minWidth = resolution.width;
                 captureOptions.videoConstraints.mandatory.maxHeight = resolution.height;
                 captureOptions.videoConstraints.mandatory.minHeight = resolution.height;
+                recorderOptions = Recorder.RecorderOptions;
+                recorderOptions.videoBitsPerSecond = config.videoBitsPerSecond;
                 chrome.tabCapture.capture(captureOptions, function (stream) {
                   if (stream) {
                     _this.stream = stream;
-                    _this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
+                    _this.mediaRecorder = new MediaRecorder(stream, recorderOptions);
                     _this.mediaRecorder.ondataavailable = _this.recordDataavailable.bind(_this);
                     _this.mediaRecorder.onstop = _this.recordStop.bind(_this);
 
@@ -962,7 +964,7 @@ var bilibiliLiveHimeBackground = (function () {
                   }
                 });
 
-              case 8:
+              case 10:
               case "end":
                 return _context3.stop();
             }
