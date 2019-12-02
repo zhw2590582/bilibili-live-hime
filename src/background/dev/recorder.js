@@ -64,7 +64,7 @@ export default class Recorder {
 
     async recordStop() {
         sendMessageToTab(this.config.recordId, 'recordStop');
-        download(this.blobs, 'test.webm');
+        this.download();
     }
 
     async recordDataavailable(event) {
@@ -102,5 +102,10 @@ export default class Recorder {
             this.stream = null;
             this.mediaRecorder = null;
         }
+    }
+
+    download() {
+        download(this.blobs, 'test.webm');
+        this.blobs = [];
     }
 }

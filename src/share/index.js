@@ -122,3 +122,28 @@ export function download(data, name) {
     link.click();
     document.body.removeChild(link);
 }
+
+export function addScript(url) {
+    return new Promise(resolve => {
+        const $script = document.createElement('script');
+        $script.onload = () => {
+            $script.remove();
+            resolve();
+        };
+        $script.src = url;
+        document.documentElement.appendChild($script);
+    });
+}
+
+export function addStyle(url) {
+    return new Promise(resolve => {
+        const $style = document.createElement('link');
+        $style.rel = 'stylesheet';
+        $style.type = 'text/css';
+        $style.onload = () => {
+            resolve();
+        };
+        $style.href = url;
+        document.head.appendChild($style);
+    });
+}

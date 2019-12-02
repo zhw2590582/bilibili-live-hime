@@ -904,7 +904,7 @@ var bilibiliLiveHimeBackground = (function () {
             switch (_context.prev = _context.next) {
               case 0:
                 sendMessageToTab(this.config.recordId, 'recordStop');
-                download(this.blobs, 'test.webm');
+                this.download();
 
               case 2:
               case "end":
@@ -999,6 +999,13 @@ var bilibiliLiveHimeBackground = (function () {
           }
         }, null, this);
       }
+    }, {
+      key: "download",
+      value: function download$1() {
+        download(this.blobs, 'test.webm');
+
+        this.blobs = [];
+      }
     }], [{
       key: "CaptureOptions",
       get: function get() {
@@ -1079,6 +1086,11 @@ var bilibiliLiveHimeBackground = (function () {
 
         case 'stop':
           _this.recorder.stop();
+
+          break;
+
+        case 'download':
+          _this.recorder.download();
 
           break;
       }

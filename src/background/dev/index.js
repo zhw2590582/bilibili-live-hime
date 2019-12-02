@@ -14,6 +14,9 @@ class Background {
                 case 'stop':
                     this.recorder.stop();
                     break;
+                case 'download':
+                    this.recorder.download();
+                    break;
                 default:
                     break;
             }

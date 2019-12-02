@@ -1,4 +1,4 @@
-(function () {
+var bilibiliLiveHimeContent = (function () {
 	'use strict';
 
 	function createCommonjsModule(fn, module) {
@@ -735,92 +735,220 @@
 
 	var regenerator = runtime_1;
 
+	function _classCallCheck(instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	}
+
+	var classCallCheck = _classCallCheck;
+
+	function _defineProperties(target, props) {
+	  for (var i = 0; i < props.length; i++) {
+	    var descriptor = props[i];
+	    descriptor.enumerable = descriptor.enumerable || false;
+	    descriptor.configurable = true;
+	    if ("value" in descriptor) descriptor.writable = true;
+	    Object.defineProperty(target, descriptor.key, descriptor);
+	  }
+	}
+
+	function _createClass(Constructor, protoProps, staticProps) {
+	  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+	  if (staticProps) _defineProperties(Constructor, staticProps);
+	  return Constructor;
+	}
+
+	var createClass = _createClass;
+
 	function sleep() {
 	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 	  return new Promise(function (resolve) {
 	    return setTimeout(resolve, ms);
 	  });
 	}
+	function addScript(url) {
+	  return new Promise(function (resolve) {
+	    var $script = document.createElement('script');
 
-	var $script = document.createElement('script');
-	$script.src = chrome.extension.getURL('injected/index.js');
+	    $script.onload = function () {
+	      $script.remove();
+	      resolve();
+	    };
 
-	$script.onload = function () {
-	  return $script.remove();
-	};
+	    $script.src = url;
+	    document.documentElement.appendChild($script);
+	  });
+	}
+	function addStyle(url) {
+	  return new Promise(function (resolve) {
+	    var $style = document.createElement('link');
+	    $style.rel = 'stylesheet';
+	    $style.type = 'text/css';
 
-	document.documentElement.appendChild($script);
-	var $style = document.createElement('link');
-	$style.rel = 'stylesheet';
-	$style.type = 'text/css';
-	$style.href = chrome.extension.getURL('injected/index.css');
-	sleep().then(function () {
-	  return document.head.appendChild($style);
-	});
-	sleep(1000).then(function () {
-	  var video = document.createElement('video');
-	  document.body.insertAdjacentElement('afterbegin', video);
-	  var mediaSource = new MediaSource();
-	  mediaSource.addEventListener('sourceopen', function () {
-	    var sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8, opus"');
-	    chrome.runtime.onMessage.addListener(function _callee(request) {
-	      var type, data, buf;
-	      return regenerator.async(function _callee$(_context) {
+	    $style.onload = function () {
+	      resolve();
+	    };
+
+	    $style.href = url;
+	    document.head.appendChild($style);
+	  });
+	}
+
+	var Content =
+	/*#__PURE__*/
+	function () {
+	  function Content() {
+	    classCallCheck(this, Content);
+
+	    var scriptUrl = chrome.extension.getURL('injected/index.js');
+	    var styleUrl = chrome.extension.getURL('injected/index.css');
+	    sleep().then(function () {
+	      return addStyle(styleUrl);
+	    });
+	    addScript(scriptUrl);
+	    this.init();
+	  }
+
+	  createClass(Content, [{
+	    key: "init",
+	    value: function init() {
+	      var _this = this;
+
+	      return regenerator.async(function init$(_context2) {
 	        while (1) {
-	          switch (_context.prev = _context.next) {
+	          switch (_context2.prev = _context2.next) {
 	            case 0:
-	              type = request.type, data = request.data;
-	              _context.t0 = type;
-	              _context.next = _context.t0 === 'recording' ? 4 : _context.t0 === 'recordStop' ? 16 : 19;
-	              break;
+	              chrome.runtime.onMessage.addListener(function _callee(request) {
+	                var type, data;
+	                return regenerator.async(function _callee$(_context) {
+	                  while (1) {
+	                    switch (_context.prev = _context.next) {
+	                      case 0:
+	                        type = request.type, data = request.data;
+	                        _context.t0 = type;
+	                        _context.next = _context.t0 === 'recordInit' ? 4 : _context.t0 === 'liveInit' ? 6 : _context.t0 === 'recording' ? 8 : _context.t0 === 'recordStop' ? 10 : 12;
+	                        break;
 
-	            case 4:
-	              _context.prev = 4;
-	              _context.next = 7;
+	                      case 4:
+	                        _this.recordInit();
+
+	                        return _context.abrupt("break", 13);
+
+	                      case 6:
+	                        _this.liveInit();
+
+	                        return _context.abrupt("break", 13);
+
+	                      case 8:
+	                        _this.recording(data);
+
+	                        return _context.abrupt("break", 13);
+
+	                      case 10:
+	                        _this.recordStop();
+
+	                        return _context.abrupt("break", 13);
+
+	                      case 12:
+	                        return _context.abrupt("break", 13);
+
+	                      case 13:
+	                      case "end":
+	                        return _context.stop();
+	                    }
+	                  }
+	                });
+	              });
+
+	            case 1:
+	            case "end":
+	              return _context2.stop();
+	          }
+	        }
+	      });
+	    }
+	  }, {
+	    key: "recordInit",
+	    value: function recordInit() {
+	      return regenerator.async(function recordInit$(_context3) {
+	        while (1) {
+	          switch (_context3.prev = _context3.next) {
+	            case 0:
+	              console.log('recordInit');
+
+	            case 1:
+	            case "end":
+	              return _context3.stop();
+	          }
+	        }
+	      });
+	    }
+	  }, {
+	    key: "liveInit",
+	    value: function liveInit() {
+	      return regenerator.async(function liveInit$(_context4) {
+	        while (1) {
+	          switch (_context4.prev = _context4.next) {
+	            case 0:
+	              console.log('liveInit');
+
+	            case 1:
+	            case "end":
+	              return _context4.stop();
+	          }
+	        }
+	      });
+	    }
+	  }, {
+	    key: "recording",
+	    value: function recording() {
+	      var buf;
+	      return regenerator.async(function recording$(_context5) {
+	        while (1) {
+	          switch (_context5.prev = _context5.next) {
+	            case 0:
+	              _context5.next = 2;
 	              return regenerator.awrap(fetch(data).then(function (res) {
 	                return res.arrayBuffer();
 	              }));
 
-	            case 7:
-	              buf = _context.sent;
+	            case 2:
+	              buf = _context5.sent;
 	              URL.revokeObjectURL(data);
-	              console.log(mediaSource.readyState, buf.byteLength);
-	              sourceBuffer.appendBuffer(new Uint8Array(buf));
-	              _context.next = 15;
-	              break;
+	              console.log(buf.byteLength);
 
-	            case 13:
-	              _context.prev = 13;
-	              _context.t1 = _context["catch"](4);
-
-	            case 15:
-	              return _context.abrupt("break", 20);
-
-	            case 16:
-	              console.log('recordStop');
-	              mediaSource.endOfStream();
-	              return _context.abrupt("break", 20);
-
-	            case 19:
-	              return _context.abrupt("break", 20);
-
-	            case 20:
+	            case 5:
 	            case "end":
-	              return _context.stop();
+	              return _context5.stop();
 	          }
 	        }
-	      }, null, null, [[4, 13]]);
-	    });
-	  });
-	  video.src = URL.createObjectURL(mediaSource);
-	  var isPlaying = false;
-	  video.addEventListener('canplay', function () {
-	    if (!isPlaying) {
-	      isPlaying = true;
-	      video.play();
+	      });
 	    }
-	  });
-	});
+	  }, {
+	    key: "recordStop",
+	    value: function recordStop() {
+	      return regenerator.async(function recordStop$(_context6) {
+	        while (1) {
+	          switch (_context6.prev = _context6.next) {
+	            case 0:
+	              console.log('recordStop');
+
+	            case 1:
+	            case "end":
+	              return _context6.stop();
+	          }
+	        }
+	      });
+	    }
+	  }]);
+
+	  return Content;
+	}();
+
+	var index = new Content();
+
+	return index;
 
 }());
 //# sourceMappingURL=index.js.map
