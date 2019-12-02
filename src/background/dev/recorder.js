@@ -1,11 +1,13 @@
-import { log, getLiveTab } from '../../share';
+import { getLiveTab, sendMessageToTab } from '../../share';
 
 export default class Recorder {
     constructor(bg) {
         this.bg = bg;
+        this.config = null;
         this.stream = null;
         this.mediaRecorder = null;
-        this.chunkHandle = this.chunkHandle.bind(this);
+        this.recordStop = this.recordStop.bind(this);
+        this.recordDataavailable = this.recordDataavailable.bind(this);
     }
 
     static get CaptureOptions() {
@@ -33,7 +35,7 @@ export default class Recorder {
         return {
             audioBitsPerSecond: 128000,
             videoBitsPerSecond: 2500000,
-            mimeType: 'video/webm;codecs=h264',
+            mimeType: 'video/webm;codecs=avc1',
         };
     }
 
@@ -62,17 +64,19 @@ export default class Recorder {
         };
     }
 
-    async chunkHandle(event) {
-        console.log(event);
+    async recordStop() {
+        chrome.runtime.reload();
     }
 
-    async recordError(error) {
-        log('调用MediaRecorder错误');
-        log(Recorder.RecorderOptions);
-        log(error);
+    async recordDataavailable(event) {
+        if (event.data && event.data.size > 0) {
+            const blobUrl = URL.createObjectURL(event.data);
+            sendMessageToTab(this.config.recordId, 'recording', blobUrl);
+        }
     }
 
     async start(config) {
+        this.config = config;
         const captureOptions = Recorder.CaptureOptions;
         const resolution = Recorder.Resolution[config.resolution];
         captureOptions.videoConstraints.mandatory.maxWidth = resolution.width;
@@ -83,12 +87,9 @@ export default class Recorder {
             if (stream) {
                 this.stream = stream;
                 this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
-                this.mediaRecorder.addEventListener('dataavailable', this.chunkHandle);
-                this.mediaRecorder.addEventListener('error', this.recordError);
+                this.mediaRecorder.ondataavailable = this.recordDataavailable;
+                this.mediaRecorder.onstop = this.recordStop;
                 this.mediaRecorder.start(1000);
-            } else {
-                log('调用chrome.tabCapture.capture错误');
-                log(captureOptions);
             }
         });
     }
@@ -97,8 +98,9 @@ export default class Recorder {
         const tab = await getLiveTab();
         if (tab && tab.status === 'active' && this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
-            this.mediaRecorder.removeEventListener('dataavailable', this.chunkHandle);
-            this.mediaRecorder.removeEventListener('error', this.recordError);
+            this.mediaRecorder.stop();
+            this.stream = null;
+            this.mediaRecorder = null;
         }
     }
 }

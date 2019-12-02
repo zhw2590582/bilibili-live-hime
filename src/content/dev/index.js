@@ -10,3 +10,7 @@ $style.rel = 'stylesheet';
 $style.type = 'text/css';
 $style.href = chrome.extension.getURL('injected/index.css');
 sleep().then(() => document.head.appendChild($style));
+
+chrome.runtime.onMessage.addListener(request => {
+    console.log(request);
+});

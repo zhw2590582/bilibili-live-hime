@@ -8,16 +8,6 @@ export function query(el, doc = document) {
     return doc.querySelector(el);
 }
 
-export function download(url, name) {
-    const elink = document.createElement('a');
-    elink.style.display = 'none';
-    elink.href = url;
-    elink.download = name;
-    document.body.appendChild(elink);
-    elink.click();
-    document.body.removeChild(elink);
-}
-
 export function getActiveTab() {
     return new Promise(resolve => {
         chrome.tabs.query(
@@ -106,10 +96,29 @@ export function sendMessage(type, data) {
     });
 }
 
+export function sendMessageToTab(tabId, type, data) {
+    chrome.tabs.sendMessage(tabId, {
+        type,
+        data,
+    });
+}
+
 export function getLiveTab() {
     return new Promise(resolve => {
         chrome.tabCapture.getCapturedTabs(tabs => {
             resolve(tabs[0]);
         });
     });
+}
+
+export function download(data, name) {
+    const blob = new Blob(Array.isArray(data) ? data : [data]);
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = name;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }

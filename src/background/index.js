@@ -849,119 +849,10 @@ var bilibiliLiveHimeBackground = (function () {
 
   var createClass = _createClass;
 
-  function _defineProperty(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  }
-
-  var defineProperty = _defineProperty;
-
-  function objToString(obj) {
-    switch (typeof obj) {
-      case "undefined":
-          return 'undefined';
-      case "object":
-          let type = Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
-          switch (type) {
-              case "null":
-                  return 'null';
-              case "array":
-                  return '[' + obj.map(key => objToString(key)).join(', ') + ']';
-              case 'object':
-                  return '{ ' + Object.keys(obj).map(key => key + ': ' + objToString(obj[key])).join(', ') + ' }';
-              default:
-                  try {
-                    return obj.toString();
-                  } catch (e) {
-                    return '[Unknown type: ' + type + ']';
-                  }
-          }
-      default:
-          return obj.toString();
-    }
-  }
-
-  var _objToString_1_0_1_objToString = objToString;
-
-  function getStorage(key, defaultValue) {
-    return new Promise(function (resolve) {
-      chrome.storage.local.get([key], function (result) {
-        if (result[key]) {
-          resolve(result[key]);
-        } else if (defaultValue) {
-          setStorage(key, defaultValue).then(function (value) {
-            resolve(value);
-          });
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-  function setStorage(key, value) {
-    return new Promise(function (resolve) {
-      chrome.storage.local.set(defineProperty({}, key, value), function () {
-        resolve(value);
-      });
-    });
-  }
-  function log(msg) {
-    return regenerator.async(function log$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            return _context2.abrupt("return", new Promise(function _callee(resolve) {
-              var logs;
-              return regenerator.async(function _callee$(_context) {
-                while (1) {
-                  switch (_context.prev = _context.next) {
-                    case 0:
-                      msg = msg instanceof Error ? msg.message.trim() : _objToString_1_0_1_objToString(msg);
-                      _context.next = 3;
-                      return regenerator.awrap(getStorage('debug'));
-
-                    case 3:
-                      _context.t0 = _context.sent;
-
-                      if (_context.t0) {
-                        _context.next = 6;
-                        break;
-                      }
-
-                      _context.t0 = [];
-
-                    case 6:
-                      logs = _context.t0;
-                      logs.push(msg);
-                      _context.next = 10;
-                      return regenerator.awrap(setStorage('debug', logs));
-
-                    case 10:
-                      resolve(logs);
-
-                    case 11:
-                    case "end":
-                      return _context.stop();
-                  }
-                }
-              });
-            }));
-
-          case 1:
-          case "end":
-            return _context2.stop();
-        }
-      }
+  function sendMessageToTab(tabId, type, data) {
+    chrome.tabs.sendMessage(tabId, {
+      type: type,
+      data: data
     });
   }
   function getLiveTab() {
@@ -979,19 +870,21 @@ var bilibiliLiveHimeBackground = (function () {
       classCallCheck(this, Recorder);
 
       this.bg = bg;
+      this.config = null;
       this.stream = null;
       this.mediaRecorder = null;
-      this.chunkHandle = this.chunkHandle.bind(this);
+      this.recordStop = this.recordStop.bind(this);
+      this.recordDataavailable = this.recordDataavailable.bind(this);
     }
 
     createClass(Recorder, [{
-      key: "chunkHandle",
-      value: function chunkHandle(event) {
-        return regenerator.async(function chunkHandle$(_context) {
+      key: "recordStop",
+      value: function recordStop() {
+        return regenerator.async(function recordStop$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                console.log(event);
+                chrome.runtime.reload();
 
               case 1:
               case "end":
@@ -1001,22 +894,24 @@ var bilibiliLiveHimeBackground = (function () {
         });
       }
     }, {
-      key: "recordError",
-      value: function recordError(error) {
-        return regenerator.async(function recordError$(_context2) {
+      key: "recordDataavailable",
+      value: function recordDataavailable(event) {
+        var blobUrl;
+        return regenerator.async(function recordDataavailable$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                log('调用MediaRecorder错误');
-                log(Recorder.RecorderOptions);
-                log(error);
+                if (event.data && event.data.size > 0) {
+                  blobUrl = URL.createObjectURL(event.data);
+                  sendMessageToTab(this.config.recordId, 'recording', blobUrl);
+                }
 
-              case 3:
+              case 1:
               case "end":
                 return _context2.stop();
             }
           }
-        });
+        }, null, this);
       }
     }, {
       key: "start",
@@ -1028,6 +923,7 @@ var bilibiliLiveHimeBackground = (function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
+                this.config = config;
                 captureOptions = Recorder.CaptureOptions;
                 resolution = Recorder.Resolution[config.resolution];
                 captureOptions.videoConstraints.mandatory.maxWidth = resolution.width;
@@ -1038,24 +934,19 @@ var bilibiliLiveHimeBackground = (function () {
                   if (stream) {
                     _this.stream = stream;
                     _this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
-
-                    _this.mediaRecorder.addEventListener('dataavailable', _this.chunkHandle);
-
-                    _this.mediaRecorder.addEventListener('error', _this.recordError);
+                    _this.mediaRecorder.ondataavailable = _this.recordDataavailable;
+                    _this.mediaRecorder.onstop = _this.recordStop;
 
                     _this.mediaRecorder.start(1000);
-                  } else {
-                    log('调用chrome.tabCapture.capture错误');
-                    log(captureOptions);
                   }
                 });
 
-              case 7:
+              case 8:
               case "end":
                 return _context3.stop();
             }
           }
-        });
+        }, null, this);
       }
     }, {
       key: "stop",
@@ -1075,8 +966,9 @@ var bilibiliLiveHimeBackground = (function () {
                   this.stream.getTracks().forEach(function (track) {
                     return track.stop();
                   });
-                  this.mediaRecorder.removeEventListener('dataavailable', this.chunkHandle);
-                  this.mediaRecorder.removeEventListener('error', this.recordError);
+                  this.mediaRecorder.stop();
+                  this.stream = null;
+                  this.mediaRecorder = null;
                 }
 
               case 4:
@@ -1114,7 +1006,7 @@ var bilibiliLiveHimeBackground = (function () {
         return {
           audioBitsPerSecond: 128000,
           videoBitsPerSecond: 2500000,
-          mimeType: 'video/webm;codecs=h264'
+          mimeType: 'video/webm;codecs=avc1'
         };
       }
     }, {

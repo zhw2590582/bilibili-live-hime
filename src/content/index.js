@@ -755,6 +755,9 @@
 	sleep().then(function () {
 	  return document.head.appendChild($style);
 	});
+	chrome.runtime.onMessage.addListener(function (request) {
+	  console.log(request);
+	});
 
 }());
 //# sourceMappingURL=index.js.map
