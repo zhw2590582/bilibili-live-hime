@@ -890,10 +890,10 @@ var bilibiliLiveHimeBackground = (function () {
     function Recorder() {
       classCallCheck(this, Recorder);
 
+      this.blobs = [];
       this.config = null;
       this.stream = null;
       this.mediaRecorder = null;
-      this.blobs = [];
     }
 
     createClass(Recorder, [{
@@ -958,7 +958,7 @@ var bilibiliLiveHimeBackground = (function () {
                     _this.mediaRecorder.ondataavailable = _this.recordDataavailable.bind(_this);
                     _this.mediaRecorder.onstop = _this.recordStop.bind(_this);
 
-                    _this.mediaRecorder.start(100);
+                    _this.mediaRecorder.start(1000);
                   }
                 });
 
@@ -1002,9 +1002,11 @@ var bilibiliLiveHimeBackground = (function () {
     }, {
       key: "download",
       value: function download$1() {
-        download(this.blobs, 'test.webm');
+        if (this.blobs.length) {
+          download(this.blobs, "".concat(Date.now(), ".webm"));
 
-        this.blobs = [];
+          this.blobs = [];
+        }
       }
     }], [{
       key: "CaptureOptions",

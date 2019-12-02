@@ -96,18 +96,18 @@ class Popup {
         config.config = liveTab.id;
         await log('已打开直播间：' + config.liveUrl);
         await sendMessage('start', config);
-        await log('请保持当前页面激活状态，否则无法推流');
-        await log(config);
+        await log('请保持当前页面选中状态，否则无法推流');
     }
 
     async stop() {
         this.$container.classList.remove('recording');
         await setStorage('recording', false);
-        await setStorage('debug', []);
         this.$debug.innerHTML = '';
         await sendMessage('stop');
         await log('正在关闭推流...');
-        await sleep(1000);
+        await sleep(3000);
+        await setStorage('debug', []);
+        chrome.runtime.reload();
         window.close();
     }
 

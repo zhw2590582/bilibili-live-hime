@@ -20,7 +20,7 @@ class Content {
                     this.liveInit();
                     break;
                 case 'recording':
-                    this.recording(data);
+                    this.recording();
                     break;
                 case 'recordStop':
                     this.recordStop();
@@ -40,9 +40,7 @@ class Content {
     }
 
     async recording() {
-        const buf = await fetch(data).then(res => res.arrayBuffer());
-        URL.revokeObjectURL(data);
-        console.log(buf.byteLength);
+        console.log('recording');
     }
 
     async recordStop() {

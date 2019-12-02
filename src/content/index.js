@@ -841,7 +841,7 @@ var bilibiliLiveHimeContent = (function () {
 	                        return _context.abrupt("break", 13);
 
 	                      case 8:
-	                        _this.recording(data);
+	                        _this.recording();
 
 	                        return _context.abrupt("break", 13);
 
@@ -903,22 +903,13 @@ var bilibiliLiveHimeContent = (function () {
 	  }, {
 	    key: "recording",
 	    value: function recording() {
-	      var buf;
 	      return regenerator.async(function recording$(_context5) {
 	        while (1) {
 	          switch (_context5.prev = _context5.next) {
 	            case 0:
-	              _context5.next = 2;
-	              return regenerator.awrap(fetch(data).then(function (res) {
-	                return res.arrayBuffer();
-	              }));
+	              console.log('recording');
 
-	            case 2:
-	              buf = _context5.sent;
-	              URL.revokeObjectURL(data);
-	              console.log(buf.byteLength);
-
-	            case 5:
+	            case 1:
 	            case "end":
 	              return _context5.stop();
 	          }

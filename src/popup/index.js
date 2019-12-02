@@ -1093,13 +1093,9 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 25:
 	              _context2.next = 27;
-	              return regenerator.awrap(log('请保持当前页面激活状态，否则无法推流'));
+	              return regenerator.awrap(log('请保持当前页面选中状态，否则无法推流'));
 
 	            case 27:
-	              _context2.next = 29;
-	              return regenerator.awrap(log(config));
-
-	            case 29:
 	            case "end":
 	              return _context2.stop();
 	          }
@@ -1118,26 +1114,27 @@ var bilibiliLiveHimePopup = (function () {
 	              return regenerator.awrap(setStorage('recording', false));
 
 	            case 3:
-	              _context3.next = 5;
-	              return regenerator.awrap(setStorage('debug', []));
-
-	            case 5:
 	              this.$debug.innerHTML = '';
-	              _context3.next = 8;
+	              _context3.next = 6;
 	              return regenerator.awrap(sendMessage('stop'));
+
+	            case 6:
+	              _context3.next = 8;
+	              return regenerator.awrap(log('正在关闭推流...'));
 
 	            case 8:
 	              _context3.next = 10;
-	              return regenerator.awrap(log('正在关闭推流...'));
+	              return regenerator.awrap(sleep(3000));
 
 	            case 10:
 	              _context3.next = 12;
-	              return regenerator.awrap(sleep(1000));
+	              return regenerator.awrap(setStorage('debug', []));
 
 	            case 12:
+	              chrome.runtime.reload();
 	              window.close();
 
-	            case 13:
+	            case 14:
 	            case "end":
 	              return _context3.stop();
 	          }

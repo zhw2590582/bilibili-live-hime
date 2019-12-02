@@ -2,10 +2,10 @@ import { download, getLiveTab, sendMessageToTab } from '../../share';
 
 export default class Recorder {
     constructor() {
+        this.blobs = [];
         this.config = null;
         this.stream = null;
         this.mediaRecorder = null;
-        this.blobs = [];
     }
 
     static get CaptureOptions() {
@@ -89,7 +89,7 @@ export default class Recorder {
                 this.mediaRecorder = new MediaRecorder(stream, Recorder.RecorderOptions);
                 this.mediaRecorder.ondataavailable = this.recordDataavailable.bind(this);
                 this.mediaRecorder.onstop = this.recordStop.bind(this);
-                this.mediaRecorder.start(100);
+                this.mediaRecorder.start(1000);
             }
         });
     }
@@ -105,7 +105,9 @@ export default class Recorder {
     }
 
     download() {
-        download(this.blobs, 'test.webm');
-        this.blobs = [];
+        if (this.blobs.length) {
+            download(this.blobs, `${Date.now()}.webm`);
+            this.blobs = [];
+        }
     }
 }
