@@ -1,3 +1,4 @@
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const spawn = require('child_process').spawn;
 
 module.exports = rtmpUrl => {
@@ -30,5 +31,5 @@ module.exports = rtmpUrl => {
         rtmpUrl,
     ];
 
-    return spawn('ffmpeg', ops);
+    return spawn(ffmpegPath, ops);
 };

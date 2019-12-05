@@ -1,41 +1,37 @@
 const io = require('socket.io')(8080);
-const cfp = require('./createFfmpegProcess');
+const cfp = require('./createFFmpegProcess');
 
-let ffmpeg_process = null;
+let ffmpeg = null;
 io.on('connection', function(socket) {
     socket.on('rtmpUrl', rtmpUrl => {
-        ffmpeg_process = cfp(rtmpUrl);
+        ffmpeg = cfp(rtmpUrl);
 
-        ffmpeg_process.stderr.on('data', error => {
+        ffmpeg.stderr.on('data', error => {
             socket.emit('fatal', String(error));
         });
 
-        ffmpeg_process.on('error', error => {
+        ffmpeg.on('error', error => {
             socket.emit('fatal', String(error));
             socket.disconnect();
         });
 
-        ffmpeg_process.on('exit', error => {
+        ffmpeg.on('exit', error => {
             socket.emit('fatal', String(error));
             socket.disconnect();
         });
     });
 
     socket.on('binarystream', data => {
-        if (ffmpeg_process) {
-            ffmpeg_process.stdin.write(data);
+        if (ffmpeg) {
+            ffmpeg.stdin.write(data);
         }
     });
 
     socket.on('disconnect', () => {
-        console.log('disconnect');
-        if (ffmpeg_process) {
-            try {
-                ffmpeg_process.stdin.end();
-                ffmpeg_process.kill('SIGINT');
-            } catch (error) {
-                console.warn('killing ffmpeg process attempt failed...');
-            }
+        if (ffmpeg) {
+            ffmpeg.stdin.end();
+            ffmpeg.kill('SIGINT');
+            ffmpeg = null;
         }
     });
 });
