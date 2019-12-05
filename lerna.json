@@ -1,0 +1,16 @@
+{
+    "lerna": "3.19.0",
+    "version": "1.0.0",
+    "packages": [
+        "packages/*"
+    ],
+    "command": {
+        "publish": {
+            "ignoreChanges": [
+                "dist/**",
+                "docs/**",
+                "package.json"
+            ]
+        }
+    }
+}

@@ -1,4 +1,5 @@
 import 'crx-hotreload';
+import io from 'socket.io-client/dist/socket.io';
 import './csp';
 import { log, download, getLiveTab, sendMessageToTab } from '../../share';
 
@@ -109,6 +110,9 @@ class Background {
 
         const recorderOptions = Background.RecorderOptions;
         recorderOptions.videoBitsPerSecond = this.config.videoBitsPerSecond;
+
+        const socket = io('http://localhost:8080');
+        socket.emit('test', 'Background');
 
         chrome.tabCapture.capture(captureOptions, stream => {
             if (stream && MediaRecorder && MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {

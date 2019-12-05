@@ -1,7 +1,5 @@
-var bilibiliLiveHimeBackground = (function () {
+var bilibiliLiveHimePopup = (function () {
 	'use strict';
-
-	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 	function createCommonjsModule(fn, module) {
 		return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -737,23 +735,6 @@ var bilibiliLiveHimeBackground = (function () {
 
 	var regenerator = runtime_1;
 
-	function _defineProperty(obj, key, value) {
-	  if (key in obj) {
-	    Object.defineProperty(obj, key, {
-	      value: value,
-	      enumerable: true,
-	      configurable: true,
-	      writable: true
-	    });
-	  } else {
-	    obj[key] = value;
-	  }
-
-	  return obj;
-	}
-
-	var defineProperty = _defineProperty;
-
 	function _classCallCheck(instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
 	    throw new TypeError("Cannot call a class as a function");
@@ -780,101 +761,22 @@ var bilibiliLiveHimeBackground = (function () {
 
 	var createClass = _createClass;
 
-	const filesInDirectory = dir => new Promise (resolve =>
-
-	    dir.createReader ().readEntries (entries =>
-
-	        Promise.all (entries.filter (e => e.name[0] !== '.').map (e =>
-
-	            e.isDirectory
-	                ? filesInDirectory (e)
-	                : new Promise (resolve => e.file (resolve))
-	        ))
-	        .then (files => [].concat (...files))
-	        .then (resolve)
-	    )
-	);
-
-	const timestampForFilesInDirectory = dir =>
-	        filesInDirectory (dir).then (files =>
-	            files.map (f => f.name + f.lastModifiedDate).join ());
-
-	const reload = () => {
-
-	    chrome.tabs.query ({ active: true, currentWindow: true }, tabs => { // NB: see https://github.com/xpl/crx-hotreload/issues/5
-
-	        if (tabs[0]) { chrome.tabs.reload (tabs[0].id); }
-
-	        chrome.runtime.reload ();
+	function _defineProperty(obj, key, value) {
+	  if (key in obj) {
+	    Object.defineProperty(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
 	    });
-	};
-
-	const watchChanges = (dir, lastTimestamp) => {
-
-	    timestampForFilesInDirectory (dir).then (timestamp => {
-
-	        if (!lastTimestamp || (lastTimestamp === timestamp)) {
-
-	            setTimeout (() => watchChanges (dir, timestamp), 1000); // retry after 1s
-
-	        } else {
-
-	            reload ();
-	        }
-	    });
-
-	};
-
-	chrome.management.getSelf (self => {
-
-	    if (self.installType === 'development') {
-
-	        chrome.runtime.getPackageDirectoryEntry (dir => watchChanges (dir));
-	    }
-	});
-
-	var cspGenerator = createCommonjsModule(function (module, exports) {
-	/*!
-	 * csp-generator.js v1.0.2
-	 * Github: https://github.com/zhw2590582/csp-generator#readme
-	 * (c) 2017-2019 Harvey Zack
-	 * Released under the MIT License.
-	 */
-
-	!function(e,t){module.exports=t();}(commonjsGlobal,function(){var n=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")};function i(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i);}}var e=function(e,t,n){return t&&i(e.prototype,t),n&&i(e,n),e};return function(){function t(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:"";n(this,t),this.csp=this.parse(e);}return e(t,[{key:"parse",value:function(e){return (0<arguments.length&&void 0!==e?e:"").split(";").reduce(function(e,t){var n=t.split(" ").filter(function(e){return e.trim()}),i=n[0],r=n.slice(1);return e[i]=r,e},{})}},{key:"generate",value:function(){var n=this;return Object.keys(this.csp).reduce(function(e,t){return "".concat(e," ").concat(t," ").concat(n.csp[t].join(" "),";")},"").trim()}},{key:"append",value:function(e,t){return this.csp[e]&&-1===this.csp[e].indexOf(t)?this.csp[e].push(t):this.csp[e]=[t],this}},{key:"delete",value:function(e,t){if(t){var n=(this.csp[e]||[]).indexOf(t);-1<n&&this.csp[e].splice(n,1);}else delete this.csp[e];return this}},{key:"get",value:function(e){return this.csp[e]}}]),t}()});
-	});
-
-	var manifest = chrome.runtime.getManifest();
-	chrome.webRequest.onHeadersReceived.addListener(function (details) {
-	  var header = details.responseHeaders.find(function (event) {
-	    var name = event.name.toLowerCase();
-	    return name === 'content-security-policy-report-only' || name === 'content-security-policy';
-	  });
-
-	  if (header && header.value) {
-	    var csp = new cspGenerator(header.value);
-
-	    if (csp.get('worker-src')) {
-	      csp.append('worker-src', 'blob:');
-	    }
-
-	    if (csp.get('script-src')) {
-	      csp.append('script-src', '*.baidu.com');
-	    }
-
-	    if (csp.get('img-src')) {
-	      csp.append('img-src', '*.baidu.com');
-	    }
-
-	    header.value = csp.generate();
+	  } else {
+	    obj[key] = value;
 	  }
 
-	  return {
-	    responseHeaders: details.responseHeaders
-	  };
-	}, {
-	  urls: manifest.content_scripts[0].matches
-	}, ['blocking', 'responseHeaders']);
+	  return obj;
+	}
+
+	var defineProperty = _defineProperty;
 
 	function objToString(obj) {
 	  switch (typeof obj) {
@@ -901,8 +803,28 @@ var bilibiliLiveHimeBackground = (function () {
 	  }
 	}
 
-	var _objToString_1_0_1_objToString = objToString;
+	var objToString_1 = objToString;
 
+	function sleep() {
+	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+	  return new Promise(function (resolve) {
+	    return setTimeout(resolve, ms);
+	  });
+	}
+	function query(el) {
+	  var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
+	  return doc.querySelector(el);
+	}
+	function getActiveTab() {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.query({
+	      active: true,
+	      currentWindow: true
+	    }, function (tabs) {
+	      resolve(tabs[0]);
+	    });
+	  });
+	}
 	function setStorage(key, value) {
 	  return new Promise(function (resolve) {
 	    chrome.storage.local.set(defineProperty({}, key, value), function () {
@@ -925,6 +847,35 @@ var bilibiliLiveHimeBackground = (function () {
 	    });
 	  });
 	}
+	function storageChange(callback) {
+	  chrome.storage.onChanged.addListener(callback);
+	}
+	function openTab(url) {
+	  var active = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	  return new Promise(function (resolve) {
+	    chrome.tabs.query({}, function (tabs) {
+	      var findTab = tabs.find(function (tab) {
+	        return tab.url === url;
+	      });
+
+	      if (findTab) {
+	        chrome.tabs.update(findTab.id, {
+	          active: active,
+	          url: url
+	        }, function (tab) {
+	          resolve(tab);
+	        });
+	      } else {
+	        chrome.tabs.create({
+	          url: url,
+	          active: active
+	        }, function (tab) {
+	          resolve(tab);
+	        });
+	      }
+	    });
+	  });
+	}
 	function log(msg) {
 	  return regenerator.async(function log$(_context2) {
 	    while (1) {
@@ -936,7 +887,7 @@ var bilibiliLiveHimeBackground = (function () {
 	              while (1) {
 	                switch (_context.prev = _context.next) {
 	                  case 0:
-	                    msg = msg instanceof Error ? msg.message.trim() : _objToString_1_0_1_objToString(msg);
+	                    msg = msg instanceof Error ? msg.message.trim() : objToString_1(msg);
 	                    _context.next = 3;
 	                    return regenerator.awrap(getStorage('debug'));
 
@@ -974,118 +925,112 @@ var bilibiliLiveHimeBackground = (function () {
 	    }
 	  });
 	}
+	function sendMessage(type, data) {
+	  chrome.runtime.sendMessage({
+	    type: type,
+	    data: data
+	  });
+	}
 	function sendMessageToTab(tabId, type, data) {
 	  chrome.tabs.sendMessage(tabId, {
 	    type: type,
 	    data: data
 	  });
 	}
-	function getLiveTab() {
-	  return new Promise(function (resolve) {
-	    chrome.tabCapture.getCapturedTabs(function (tabs) {
-	      resolve(tabs[0]);
-	    });
-	  });
-	}
-	function download(data, name) {
-	  var blob = new Blob(Array.isArray(data) ? data : [data]);
-	  var blobUrl = URL.createObjectURL(blob);
-	  var link = document.createElement('a');
-	  link.href = blobUrl;
-	  link.download = name;
-	  link.style.display = 'none';
-	  document.body.appendChild(link);
-	  link.click();
-	  document.body.removeChild(link);
-	}
 
-	function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-	function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-	var Background =
+	var Popup =
 	/*#__PURE__*/
 	function () {
-	  function Background() {
+	  function Popup() {
 	    var _this = this;
 
-	    classCallCheck(this, Background);
+	    classCallCheck(this, Popup);
 
-	    this.blobs = [];
-	    this.config = null;
-	    this.stream = null;
-	    this.mediaRecorder = null;
-	    chrome.runtime.onMessage.addListener(function (request) {
-	      var type = request.type,
-	          data = request.data;
-
-	      switch (type) {
-	        case 'start':
-	          _this.config = _objectSpread({}, Background.config, {}, data);
-
-	          _this.start();
-
-	          break;
-
-	        case 'stop':
-	          _this.stop();
-
-	          break;
-	      }
+	    this.manifest = chrome.runtime.getManifest();
+	    this.$container = query('.container');
+	    this.$name = query('.name');
+	    this.$feedback = query('.feedback');
+	    this.$rtmpUrl = query('.rtmpUrl');
+	    this.$liveUrl = query('.liveUrl');
+	    this.$resolution = query('.resolution');
+	    this.$videoBitsPerSecond = query('.videoBitsPerSecond');
+	    this.$debug = query('.debug');
+	    this.$start = query('.start');
+	    this.$stop = query('.stop');
+	    this.$name.addEventListener('click', function () {
+	      openTab("https://chrome.google.com/webstore/detail/".concat(chrome.runtime.id));
+	    });
+	    this.$feedback.addEventListener('click', function () {
+	      openTab('https://github.com/zhw2590582/bilibili-live-hime');
+	    });
+	    this.$start.addEventListener('click', function () {
+	      _this.start();
+	    });
+	    this.$stop.addEventListener('click', function () {
+	      _this.stop();
+	    });
+	    this.init();
+	    this.updateLog();
+	    storageChange(function () {
+	      _this.updateLog();
 	    });
 	  }
 
-	  createClass(Background, [{
-	    key: "sendMessage",
-	    value: function sendMessage(type, data) {
-	      sendMessageToTab(this.config.recordId, type, data);
-	    }
-	  }, {
-	    key: "start",
-	    value: function start() {
-	      var _this2 = this;
-
-	      var captureOptions, resolution, recorderOptions;
-	      return regenerator.async(function start$(_context) {
+	  createClass(Popup, [{
+	    key: "init",
+	    value: function init() {
+	      return regenerator.async(function init$(_context) {
 	        while (1) {
 	          switch (_context.prev = _context.next) {
 	            case 0:
-	              captureOptions = Background.CaptureOptions;
-	              resolution = Background.Resolution[this.config.resolution];
-	              captureOptions.videoConstraints.mandatory.maxWidth = resolution.width;
-	              captureOptions.videoConstraints.mandatory.minWidth = resolution.width;
-	              captureOptions.videoConstraints.mandatory.maxHeight = resolution.height;
-	              captureOptions.videoConstraints.mandatory.minHeight = resolution.height;
-	              recorderOptions = Background.RecorderOptions;
-	              recorderOptions.videoBitsPerSecond = this.config.videoBitsPerSecond;
-	              chrome.tabCapture.capture(captureOptions, function (stream) {
-	                if (stream && MediaRecorder && MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {
-	                  _this2.stream = stream;
-	                  _this2.mediaRecorder = new MediaRecorder(stream, recorderOptions);
+	              _context.next = 2;
+	              return regenerator.awrap(getStorage('recording'));
 
-	                  _this2.mediaRecorder.ondataavailable = function (event) {
-	                    if (event.data && event.data.size > 0) {
-	                      var blobUrl = URL.createObjectURL(event.data);
+	            case 2:
+	              this.recording = _context.sent;
+	              _context.next = 5;
+	              return regenerator.awrap(getStorage('config'));
 
-	                      _this2.sendMessage('record@ing', blobUrl);
+	            case 5:
+	              this.config = _context.sent;
+	              _context.next = 8;
+	              return regenerator.awrap(getStorage('debug'));
 
-	                      if (_this2.config.downloadAfterStop) {
-	                        _this2.blobs.push(event.data);
-	                      }
-	                    }
-	                  };
+	            case 8:
+	              this.debug = _context.sent;
+	              _context.next = 11;
+	              return regenerator.awrap(getActiveTab());
 
-	                  log('开始录制');
+	            case 11:
+	              this.activeTab = _context.sent;
+	              sendMessageToTab(this.activeTab.id, 'record@init');
+	              this.$name.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
 
-	                  _this2.sendMessage('record@start');
+	              if (this.config) {
+	                this.$rtmpUrl.value = this.config.rtmpUrl;
+	                this.$liveUrl.value = this.config.liveUrl;
+	                this.$resolution.value = this.config.resolution;
+	                this.$videoBitsPerSecond.value = this.config.videoBitsPerSecond;
+	              }
 
-	                  _this2.mediaRecorder.start(_this2.config.timeslice);
-	                } else {
-	                  _this2.stop();
-	                }
-	              });
+	              if (!this.recording) {
+	                _context.next = 23;
+	                break;
+	              }
 
-	            case 9:
+	              this.$container.classList.add('recording');
+	              this.$rtmpUrl.disabled = true;
+	              this.$liveUrl.disabled = true;
+	              this.$resolution.disabled = true;
+	              this.$videoBitsPerSecond.disabled = true;
+	              _context.next = 25;
+	              break;
+
+	            case 23:
+	              _context.next = 25;
+	              return regenerator.awrap(setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']));
+
+	            case 25:
 	            case "end":
 	              return _context.stop();
 	          }
@@ -1093,124 +1038,176 @@ var bilibiliLiveHimeBackground = (function () {
 	      }, null, this);
 	    }
 	  }, {
-	    key: "stop",
-	    value: function stop() {
-	      var tab;
-	      return regenerator.async(function stop$(_context2) {
+	    key: "start",
+	    value: function start() {
+	      var config, liveTab;
+	      return regenerator.async(function start$(_context2) {
 	        while (1) {
 	          switch (_context2.prev = _context2.next) {
 	            case 0:
-	              log('结束录制');
-	              this.sendMessage('record@stop');
+	              config = {
+	                recordId: this.activeTab.id,
+	                rtmpUrl: this.$rtmpUrl.value.trim(),
+	                liveUrl: this.$liveUrl.value.trim(),
+	                resolution: this.$resolution.value,
+	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
+	              };
+
+	              if (!(!config.rtmpUrl || !/^rtmp:\/\/.+/i.test(config.rtmpUrl))) {
+	                _context2.next = 5;
+	                break;
+	              }
+
 	              _context2.next = 4;
-	              return regenerator.awrap(getLiveTab());
+	              return regenerator.awrap(log('请输入正确的推流地址'));
 
 	            case 4:
-	              tab = _context2.sent;
+	              return _context2.abrupt("return");
 
-	              if (tab && tab.status === 'active' && this.stream) {
-	                this.stream.getTracks().forEach(function (track) {
-	                  return track.stop();
-	                });
-	                this.stream = null;
+	            case 5:
+	              if (!(!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl))) {
+	                _context2.next = 9;
+	                break;
 	              }
 
-	              if (this.mediaRecorder) {
-	                this.mediaRecorder.stop();
-	                this.mediaRecorder = null;
-	              }
-
-	              if (this.config.downloadAfterStop) {
-	                log('开始下载');
-	                this.sendMessage('record@download');
-	                download(this.blobs, "".concat(Date.now(), ".webm"));
-	                this.blobs = [];
-	              }
+	              _context2.next = 8;
+	              return regenerator.awrap(log('请输入正确的直播地址'));
 
 	            case 8:
+	              return _context2.abrupt("return");
+
+	            case 9:
+	              this.$container.classList.add('recording');
+	              this.$rtmpUrl.disabled = true;
+	              this.$liveUrl.disabled = true;
+	              this.$resolution.disabled = true;
+	              this.$videoBitsPerSecond.disabled = true;
+	              _context2.next = 16;
+	              return regenerator.awrap(setStorage('recording', true));
+
+	            case 16:
+	              _context2.next = 18;
+	              return regenerator.awrap(setStorage('config', config));
+
+	            case 18:
+	              _context2.next = 20;
+	              return regenerator.awrap(openTab(config.liveUrl));
+
+	            case 20:
+	              liveTab = _context2.sent;
+
+	              if (!liveTab) {
+	                _context2.next = 31;
+	                break;
+	              }
+
+	              config.config = liveTab.id;
+	              _context2.next = 25;
+	              return regenerator.awrap(log("\u5DF2\u6253\u5F00\u76F4\u64AD\u95F4\uFF1A".concat(config.liveUrl)));
+
+	            case 25:
+	              _context2.next = 27;
+	              return regenerator.awrap(sendMessage('start', config));
+
+	            case 27:
+	              _context2.next = 29;
+	              return regenerator.awrap(log('请保持当前页面选中状态，否则无法推流'));
+
+	            case 29:
+	              _context2.next = 33;
+	              break;
+
+	            case 31:
+	              _context2.next = 33;
+	              return regenerator.awrap(log('无法打开直播地址，请重试'));
+
+	            case 33:
 	            case "end":
 	              return _context2.stop();
 	          }
 	        }
 	      }, null, this);
 	    }
-	  }], [{
-	    key: "config",
-	    get: function get() {
-	      return {
-	        liveTab: null,
-	        recordId: null,
-	        rtmpUrl: '',
-	        liveUrl: '',
-	        timeslice: 1000,
-	        resolution: 1920,
-	        videoBitsPerSecond: 2500000,
-	        downloadAfterStop: true
-	      };
-	    }
 	  }, {
-	    key: "CaptureOptions",
-	    get: function get() {
-	      return {
-	        audio: true,
-	        video: true,
-	        videoConstraints: {
-	          mandatory: {
-	            chromeMediaSource: 'tab',
-	            maxWidth: 1920,
-	            minWidth: 1920,
-	            maxHeight: 1080,
-	            minHeight: 1080
-	          }
-	        },
-	        audioConstraints: {
-	          mandatory: {
-	            echoCancellation: true
+	    key: "stop",
+	    value: function stop() {
+	      return regenerator.async(function stop$(_context3) {
+	        while (1) {
+	          switch (_context3.prev = _context3.next) {
+	            case 0:
+	              this.$container.classList.remove('recording');
+	              _context3.next = 3;
+	              return regenerator.awrap(setStorage('recording', false));
+
+	            case 3:
+	              this.$debug.innerHTML = '';
+	              _context3.next = 6;
+	              return regenerator.awrap(sendMessage('stop'));
+
+	            case 6:
+	              _context3.next = 8;
+	              return regenerator.awrap(log('正在关闭推流...'));
+
+	            case 8:
+	              _context3.next = 10;
+	              return regenerator.awrap(sleep(3000));
+
+	            case 10:
+	              _context3.next = 12;
+	              return regenerator.awrap(setStorage('debug', []));
+
+	            case 12:
+	              chrome.runtime.reload();
+	              window.close();
+
+	            case 14:
+	            case "end":
+	              return _context3.stop();
 	          }
 	        }
-	      };
+	      }, null, this);
 	    }
 	  }, {
-	    key: "RecorderOptions",
-	    get: function get() {
-	      return {
-	        audioBitsPerSecond: 128000,
-	        videoBitsPerSecond: 2500000,
-	        mimeType: 'video/webm; codecs="vp8, opus"'
-	      };
-	    }
-	  }, {
-	    key: "Resolution",
-	    get: function get() {
-	      return {
-	        1920: {
-	          width: 1920,
-	          height: 1080
-	        },
-	        720: {
-	          width: 1280,
-	          height: 720
-	        },
-	        480: {
-	          width: 640,
-	          height: 480
-	        },
-	        360: {
-	          width: 640,
-	          height: 360
-	        },
-	        240: {
-	          width: 320,
-	          height: 240
+	    key: "updateLog",
+	    value: function updateLog() {
+	      var logs;
+	      return regenerator.async(function updateLog$(_context4) {
+	        while (1) {
+	          switch (_context4.prev = _context4.next) {
+	            case 0:
+	              _context4.next = 2;
+	              return regenerator.awrap(getStorage('debug'));
+
+	            case 2:
+	              _context4.t0 = _context4.sent;
+
+	              if (_context4.t0) {
+	                _context4.next = 5;
+	                break;
+	              }
+
+	              _context4.t0 = [];
+
+	            case 5:
+	              logs = _context4.t0;
+	              this.$debug.innerHTML = logs.map(function (item) {
+	                return "<p>".concat(item, "</p>");
+	              }).join('');
+	              this.$debug.scrollTo(0, this.$debug.scrollHeight);
+
+	            case 8:
+	            case "end":
+	              return _context4.stop();
+	          }
 	        }
-	      };
+	      }, null, this);
 	    }
 	  }]);
 
-	  return Background;
+	  return Popup;
 	}();
 
-	var index = new Background();
+	var index = new Popup();
 
 	return index;
 
