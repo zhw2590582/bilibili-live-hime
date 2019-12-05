@@ -803,7 +803,7 @@ var bilibiliLiveHimePopup = (function () {
 	  }
 	}
 
-	var objToString_1 = objToString;
+	var _objToString_1_0_1_objToString = objToString;
 
 	function sleep() {
 	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
@@ -887,7 +887,7 @@ var bilibiliLiveHimePopup = (function () {
 	              while (1) {
 	                switch (_context.prev = _context.next) {
 	                  case 0:
-	                    msg = msg instanceof Error ? msg.message.trim() : objToString_1(msg);
+	                    msg = msg instanceof Error ? msg.message.trim() : _objToString_1_0_1_objToString(msg);
 	                    _context.next = 3;
 	                    return regenerator.awrap(getStorage('debug'));
 

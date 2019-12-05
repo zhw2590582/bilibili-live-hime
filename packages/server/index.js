@@ -1,23 +1,40 @@
 const io = require('socket.io')(8080);
-const cfp = require('./createFFmpegProcess');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const spawn = require('child_process').spawn;
+const exec = require('child_process').exec;
+
+function createFFmpegProcess(rtmpUrl) {
+    return spawn(ffmpegPath, [
+        '-re',
+        '-i',
+        '-',
+        '-vcodec',
+        'copy',
+        '-acodec',
+        'aac',
+        '-b:a',
+        '192k',
+        '-f',
+        'flv',
+        rtmpUrl,
+    ]);
+}
 
 let ffmpeg = null;
 io.on('connection', function(socket) {
     socket.on('rtmpUrl', rtmpUrl => {
-        ffmpeg = cfp(rtmpUrl);
+        ffmpeg = createFFmpegProcess(rtmpUrl);
 
-        ffmpeg.stderr.on('data', error => {
-            socket.emit('fatal', String(error));
+        ffmpeg.stdout.on('data', data => {
+            console.log(String(data));
         });
 
-        ffmpeg.on('error', error => {
-            socket.emit('fatal', String(error));
-            socket.disconnect();
+        ffmpeg.stderr.on('data', data => {
+            console.log(String(data));
         });
 
-        ffmpeg.on('exit', error => {
-            socket.emit('fatal', String(error));
-            socket.disconnect();
+        ffmpeg.on('close', code => {
+            console.log(`子进程退出，退出码 ${code}`);
         });
     });
 

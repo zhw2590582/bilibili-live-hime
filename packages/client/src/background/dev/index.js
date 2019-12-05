@@ -69,7 +69,7 @@ class Background {
         return {
             audioBitsPerSecond: 128000,
             videoBitsPerSecond: 2500000,
-            mimeType: 'video/webm; codecs="vp8, opus"',
+            mimeType: 'video/webm; codecs="h264, opus"',
         };
     }
 
