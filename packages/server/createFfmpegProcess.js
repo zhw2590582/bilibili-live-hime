@@ -31,5 +31,5 @@ module.exports = rtmpUrl => {
         rtmpUrl,
     ];
 
-    return spawn(ffmpegPath, ops);
+    return spawn('ffmpeg', ops);
 };
