@@ -19,6 +19,7 @@ class Popup {
         this.$name = query('.name');
         this.$feedback = query('.feedback');
         this.$rtmpUrl = query('.rtmpUrl');
+        this.$socketUrl = query('.socketUrl');
         this.$liveUrl = query('.liveUrl');
         this.$resolution = query('.resolution');
         this.$videoBitsPerSecond = query('.videoBitsPerSecond');
@@ -59,6 +60,7 @@ class Popup {
 
         if (this.config) {
             this.$rtmpUrl.value = this.config.rtmpUrl;
+            this.$socketUrl.value = this.config.socketUrl;
             this.$liveUrl.value = this.config.liveUrl;
             this.$resolution.value = this.config.resolution;
             this.$videoBitsPerSecond.value = this.config.videoBitsPerSecond;
@@ -67,6 +69,7 @@ class Popup {
         if (this.recording) {
             this.$container.classList.add('recording');
             this.$rtmpUrl.disabled = true;
+            this.$socketUrl.disabled = true;
             this.$liveUrl.disabled = true;
             this.$resolution.disabled = true;
             this.$videoBitsPerSecond.disabled = true;
@@ -79,6 +82,7 @@ class Popup {
         const config = {
             recordId: this.activeTab.id,
             rtmpUrl: this.$rtmpUrl.value.trim(),
+            socketUrl: this.$socketUrl.value.trim(),
             liveUrl: this.$liveUrl.value.trim(),
             resolution: this.$resolution.value,
             videoBitsPerSecond: Number(this.$videoBitsPerSecond.value),
@@ -89,6 +93,11 @@ class Popup {
             return;
         }
 
+        if (!config.socketUrl || !/^https?:\/\/.+/i.test(config.socketUrl)) {
+            await log('请输入正确的中转地址');
+            return;
+        }
+
         if (!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl)) {
             await log('请输入正确的直播地址');
             return;
@@ -96,6 +105,7 @@ class Popup {
 
         this.$container.classList.add('recording');
         this.$rtmpUrl.disabled = true;
+        this.$socketUrl.disabled = true;
         this.$liveUrl.disabled = true;
         this.$resolution.disabled = true;
         this.$videoBitsPerSecond.disabled = true;

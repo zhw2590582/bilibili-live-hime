@@ -951,6 +951,7 @@ var bilibiliLiveHimePopup = (function () {
 	    this.$name = query('.name');
 	    this.$feedback = query('.feedback');
 	    this.$rtmpUrl = query('.rtmpUrl');
+	    this.$socketUrl = query('.socketUrl');
 	    this.$liveUrl = query('.liveUrl');
 	    this.$resolution = query('.resolution');
 	    this.$videoBitsPerSecond = query('.videoBitsPerSecond');
@@ -1008,29 +1009,31 @@ var bilibiliLiveHimePopup = (function () {
 
 	              if (this.config) {
 	                this.$rtmpUrl.value = this.config.rtmpUrl;
+	                this.$socketUrl.value = this.config.socketUrl;
 	                this.$liveUrl.value = this.config.liveUrl;
 	                this.$resolution.value = this.config.resolution;
 	                this.$videoBitsPerSecond.value = this.config.videoBitsPerSecond;
 	              }
 
 	              if (!this.recording) {
-	                _context.next = 23;
+	                _context.next = 24;
 	                break;
 	              }
 
 	              this.$container.classList.add('recording');
 	              this.$rtmpUrl.disabled = true;
+	              this.$socketUrl.disabled = true;
 	              this.$liveUrl.disabled = true;
 	              this.$resolution.disabled = true;
 	              this.$videoBitsPerSecond.disabled = true;
-	              _context.next = 25;
+	              _context.next = 26;
 	              break;
 
-	            case 23:
-	              _context.next = 25;
+	            case 24:
+	              _context.next = 26;
 	              return regenerator.awrap(setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']));
 
-	            case 25:
+	            case 26:
 	            case "end":
 	              return _context.stop();
 	          }
@@ -1048,6 +1051,7 @@ var bilibiliLiveHimePopup = (function () {
 	              config = {
 	                recordId: this.activeTab.id,
 	                rtmpUrl: this.$rtmpUrl.value.trim(),
+	                socketUrl: this.$socketUrl.value.trim(),
 	                liveUrl: this.$liveUrl.value.trim(),
 	                resolution: this.$resolution.value,
 	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
@@ -1065,63 +1069,76 @@ var bilibiliLiveHimePopup = (function () {
 	              return _context2.abrupt("return");
 
 	            case 5:
-	              if (!(!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl))) {
+	              if (!(!config.socketUrl || !/^https?:\/\/.+/i.test(config.socketUrl))) {
 	                _context2.next = 9;
 	                break;
 	              }
 
 	              _context2.next = 8;
-	              return regenerator.awrap(log('请输入正确的直播地址'));
+	              return regenerator.awrap(log('请输入正确的中转地址'));
 
 	            case 8:
 	              return _context2.abrupt("return");
 
 	            case 9:
+	              if (!(!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl))) {
+	                _context2.next = 13;
+	                break;
+	              }
+
+	              _context2.next = 12;
+	              return regenerator.awrap(log('请输入正确的直播地址'));
+
+	            case 12:
+	              return _context2.abrupt("return");
+
+	            case 13:
 	              this.$container.classList.add('recording');
 	              this.$rtmpUrl.disabled = true;
+	              this.$socketUrl.disabled = true;
 	              this.$liveUrl.disabled = true;
 	              this.$resolution.disabled = true;
 	              this.$videoBitsPerSecond.disabled = true;
-	              _context2.next = 16;
+	              _context2.next = 21;
 	              return regenerator.awrap(setStorage('recording', true));
 
-	            case 16:
-	              _context2.next = 18;
+	            case 21:
+	              _context2.next = 23;
 	              return regenerator.awrap(setStorage('config', config));
 
-	            case 18:
-	              _context2.next = 20;
+	            case 23:
+	              _context2.next = 25;
 	              return regenerator.awrap(openTab(config.liveUrl));
 
-	            case 20:
+	            case 25:
 	              liveTab = _context2.sent;
 
 	              if (!liveTab) {
-	                _context2.next = 31;
+	                _context2.next = 36;
 	                break;
 	              }
 
 	              config.config = liveTab.id;
-	              _context2.next = 25;
+	              _context2.next = 30;
 	              return regenerator.awrap(log("\u5DF2\u6253\u5F00\u76F4\u64AD\u95F4\uFF1A".concat(config.liveUrl)));
 
-	            case 25:
-	              _context2.next = 27;
+	            case 30:
+	              _context2.next = 32;
 	              return regenerator.awrap(sendMessage('start', config));
 
-	            case 27:
-	              _context2.next = 29;
+	            case 32:
+	              _context2.next = 34;
 	              return regenerator.awrap(log('请保持当前页面选中状态，否则无法推流'));
 
-	            case 29:
-	              _context2.next = 33;
+	            case 34:
+	              _context2.next = 38;
 	              break;
 
-	            case 31:
-	              _context2.next = 33;
+	            case 36:
+	              _context2.next = 38;
 	              return regenerator.awrap(log('无法打开直播地址，请重试'));
 
-	            case 33:
+	            case 38:
 	            case "end":
 	              return _context2.stop();
 	          }

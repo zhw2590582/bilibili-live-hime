@@ -1,7 +1,11 @@
 var io = require('socket.io')(8080);
 
 io.on('connection', function(socket) {
-    socket.on('test', function(msg) {
-        console.log(msg);
+    socket.on('rtmpUrl', data => {
+        console.log(data);
+    });
+
+    socket.on('binarystream', data => {
+        console.log(data);
     });
 });

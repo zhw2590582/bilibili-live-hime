@@ -1,13 +1,14 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
 import './csp';
-import { log, download, getLiveTab, sendMessageToTab } from '../../share';
+import { log, download, sendMessageToTab } from '../../share';
 
 class Background {
     constructor() {
         this.blobs = [];
         this.config = null;
         this.stream = null;
+        this.socket = null;
         this.mediaRecorder = null;
 
         chrome.runtime.onMessage.addListener(request => {
@@ -34,6 +35,7 @@ class Background {
             liveTab: null,
             recordId: null,
             rtmpUrl: '',
+            socketUrl: '',
             liveUrl: '',
             timeslice: 1000,
             resolution: 1920,
@@ -97,60 +99,101 @@ class Background {
     }
 
     sendMessage(type, data) {
-        sendMessageToTab(this.config.recordId, type, data);
+        if (this.config.recordId) {
+            sendMessageToTab(this.config.recordId, type, data);
+        }
     }
 
-    async start() {
-        const captureOptions = Background.CaptureOptions;
-        const resolution = Background.Resolution[this.config.resolution];
-        captureOptions.videoConstraints.mandatory.maxWidth = resolution.width;
-        captureOptions.videoConstraints.mandatory.minWidth = resolution.width;
-        captureOptions.videoConstraints.mandatory.maxHeight = resolution.height;
-        captureOptions.videoConstraints.mandatory.minHeight = resolution.height;
+    connectSocket(socketUrl) {
+        return new Promise((revolve, reject) => {
+            const socket = io(socketUrl);
+            socket.on('connect_error', error => {
+                log(`socket 连接出错: ${error.message.trim()}`);
+                reject(error);
+            });
 
-        const recorderOptions = Background.RecorderOptions;
-        recorderOptions.videoBitsPerSecond = this.config.videoBitsPerSecond;
+            socket.on('connect', () => {
+                log(`socket 连接成功`);
+                revolve(socket);
+            });
+        });
+    }
 
-        const socket = io('http://localhost:8080');
-        socket.emit('test', 'Background');
+    tabCapture(res) {
+        return new Promise((revolve, reject) => {
+            const captureOptions = Background.CaptureOptions;
+            const resolution = Background.Resolution[res];
+            captureOptions.videoConstraints.mandatory.maxWidth = resolution.width;
+            captureOptions.videoConstraints.mandatory.minWidth = resolution.width;
+            captureOptions.videoConstraints.mandatory.maxHeight = resolution.height;
+            captureOptions.videoConstraints.mandatory.minHeight = resolution.height;
+            chrome.tabCapture.capture(captureOptions, stream => {
+                if (stream) {
+                    revolve(stream);
+                } else {
+                    log('无法获取标签的视频流');
+                    reject(new Error('无法获取标签的视频流'));
+                }
+            });
+        });
+    }
 
-        chrome.tabCapture.capture(captureOptions, stream => {
-            if (stream && MediaRecorder && MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {
-                this.stream = stream;
-                this.mediaRecorder = new MediaRecorder(stream, recorderOptions);
-                this.mediaRecorder.ondataavailable = event => {
-                    if (event.data && event.data.size > 0) {
-                        const blobUrl = URL.createObjectURL(event.data);
-                        this.sendMessage('record@ing', blobUrl);
-                        if (this.config.downloadAfterStop) {
-                            this.blobs.push(event.data);
-                        }
-                    }
-                };
-                log('开始录制');
-                this.sendMessage('record@start');
-                this.mediaRecorder.start(this.config.timeslice);
+    recorder(stream, videoBitsPerSecond) {
+        return new Promise((revolve, reject) => {
+            const recorderOptions = Background.RecorderOptions;
+            recorderOptions.videoBitsPerSecond = videoBitsPerSecond;
+            if (MediaRecorder && MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {
+                const mediaRecorder = new MediaRecorder(stream, recorderOptions);
+                revolve(mediaRecorder);
             } else {
-                this.stop();
+                log('当前环境不支持录制');
+                reject(new Error('当前环境不支持录制'));
             }
         });
     }
 
+    async start() {
+        const { timeslice, socketUrl, rtmpUrl, resolution, videoBitsPerSecond, downloadAfterStop } = this.config;
+
+        this.socket = await this.connectSocket(socketUrl);
+        if (!this.socket) return this.stop();
+
+        this.socket.emit('rtmpUrl', rtmpUrl);
+
+        this.stream = await this.tabCapture(resolution);
+        if (!this.socket) return this.stop();
+
+        this.mediaRecorder = await this.recorder(this.stream, videoBitsPerSecond);
+        if (!this.mediaRecorder) return this.stop();
+
+        this.mediaRecorder.ondataavailable = event => {
+            if (event.data && event.data.size > 0) {
+                this.socket.emit('binarystream', event.data);
+                if (downloadAfterStop) {
+                    this.blobs.push(event.data);
+                }
+            }
+        };
+
+        log('开始录制');
+        this.mediaRecorder.start(timeslice);
+
+        return this;
+    }
+
     async stop() {
         log('结束录制');
-        this.sendMessage('record@stop');
-        const tab = await getLiveTab();
-        if (tab && tab.status === 'active' && this.stream) {
+        if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
-            this.stream = null;
+        }
+        if (this.socket) {
+            this.socket.close();
         }
         if (this.mediaRecorder) {
             this.mediaRecorder.stop();
-            this.mediaRecorder = null;
         }
         if (this.config.downloadAfterStop) {
             log('开始下载');
-            this.sendMessage('record@download');
             download(this.blobs, `${Date.now()}.webm`);
             this.blobs = [];
         }
