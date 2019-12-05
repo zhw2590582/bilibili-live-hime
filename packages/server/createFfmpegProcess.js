@@ -2,7 +2,7 @@ const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const spawn = require('child_process').spawn;
 
 module.exports = rtmpUrl => {
-    var ops = [
+    return spawn(ffmpegPath, [
         '-i',
         '-',
         '-c:v',
@@ -10,26 +10,22 @@ module.exports = rtmpUrl => {
         '-preset',
         'veryfast',
         '-tune',
-        'zerolatency', // video codec config: low latency, adaptive bitrate
+        'zerolatency',
         '-c:a',
         'aac',
         '-ar',
         '44100',
         '-b:a',
-        '64k', // audio codec config: sampling frequency (11025, 22050, 44100), bitrate 64 kbits
-        '-y', //force to overwrite
+        '64k',
+        '-y',
         '-use_wallclock_as_timestamps',
-        '1', // used for audio sync
+        '1',
         '-async',
-        '1', // used for audio sync
-        //'-filter_complex', 'aresample=44100', // resample audio to 44100Hz, needed if input is not 44100
-        //'-strict', 'experimental',
+        '1',
         '-bufsize',
         '1000',
         '-f',
         'flv',
         rtmpUrl,
-    ];
-
-    return spawn('ffmpeg', ops);
+    ]);
 };
