@@ -22,6 +22,19 @@ export function getActiveTab() {
     });
 }
 
+export function setStorage(key, value) {
+    return new Promise(resolve => {
+        chrome.storage.local.set(
+            {
+                [key]: value,
+            },
+            () => {
+                resolve(value);
+            },
+        );
+    });
+}
+
 export function getStorage(key, defaultValue) {
     return new Promise(resolve => {
         chrome.storage.local.get([key], result => {
@@ -38,33 +51,20 @@ export function getStorage(key, defaultValue) {
     });
 }
 
-export function setStorage(key, value) {
-    return new Promise(resolve => {
-        chrome.storage.local.set(
-            {
-                [key]: value,
-            },
-            () => {
-                resolve(value);
-            },
-        );
-    });
-}
-
 export function storageChange(callback) {
     chrome.storage.onChanged.addListener(callback);
 }
 
 export function openTab(url, active = false) {
     return new Promise(resolve => {
-        chrome.tabs.query({}, function(tabs) {
+        chrome.tabs.query({}, tabs => {
             const findTab = tabs.find(tab => tab.url === url);
             if (findTab) {
                 chrome.tabs.update(
                     findTab.id,
                     {
                         active,
-                        url: url,
+                        url,
                     },
                     tab => {
                         resolve(tab);

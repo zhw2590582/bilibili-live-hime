@@ -743,30 +743,6 @@ var bilibiliLiveHimeContent = (function () {
 
 	var classCallCheck = _classCallCheck;
 
-	function _defineProperties(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties(Constructor, staticProps);
-	  return Constructor;
-	}
-
-	var createClass = _createClass;
-
-	function sleep() {
-	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-	  return new Promise(function (resolve) {
-	    return setTimeout(resolve, ms);
-	  });
-	}
 	function addScript(url) {
 	  return new Promise(function (resolve) {
 	    var $script = document.createElement('script');
@@ -795,147 +771,61 @@ var bilibiliLiveHimeContent = (function () {
 	  });
 	}
 
-	var Content =
-	/*#__PURE__*/
-	function () {
-	  function Content() {
-	    classCallCheck(this, Content);
+	var Content = function Content() {
+	  var _this = this;
 
-	    var scriptUrl = chrome.extension.getURL('injected/index.js');
-	    var styleUrl = chrome.extension.getURL('injected/index.css');
-	    sleep().then(function () {
-	      return addStyle(styleUrl);
+	  classCallCheck(this, Content);
+
+	  this.isInit = false;
+	  chrome.runtime.onMessage.addListener(function _callee(request) {
+	    var type;
+	    return regenerator.async(function _callee$(_context) {
+	      while (1) {
+	        switch (_context.prev = _context.next) {
+	          case 0:
+	            type = request.type;
+	            _context.t0 = type;
+	            _context.next = _context.t0 === 'record@init' ? 4 : _context.t0 === 'record@start' ? 7 : _context.t0 === 'record@ing' ? 9 : _context.t0 === 'record@stop' ? 11 : _context.t0 === 'record@download' ? 13 : 15;
+	            break;
+
+	          case 4:
+	            console.log(type);
+
+	            if (!_this.isInit) {
+	              _this.isInit = true;
+	              addScript(chrome.extension.getURL('injected/index.js'));
+	              addStyle(chrome.extension.getURL('injected/index.css'));
+	            }
+
+	            return _context.abrupt("break", 16);
+
+	          case 7:
+	            console.log(type);
+	            return _context.abrupt("break", 16);
+
+	          case 9:
+	            console.log(type);
+	            return _context.abrupt("break", 16);
+
+	          case 11:
+	            console.log(type);
+	            return _context.abrupt("break", 16);
+
+	          case 13:
+	            console.log(type);
+	            return _context.abrupt("break", 16);
+
+	          case 15:
+	            return _context.abrupt("break", 16);
+
+	          case 16:
+	          case "end":
+	            return _context.stop();
+	        }
+	      }
 	    });
-	    addScript(scriptUrl);
-	    this.init();
-	  }
-
-	  createClass(Content, [{
-	    key: "init",
-	    value: function init() {
-	      var _this = this;
-
-	      return regenerator.async(function init$(_context2) {
-	        while (1) {
-	          switch (_context2.prev = _context2.next) {
-	            case 0:
-	              chrome.runtime.onMessage.addListener(function _callee(request) {
-	                var type, data;
-	                return regenerator.async(function _callee$(_context) {
-	                  while (1) {
-	                    switch (_context.prev = _context.next) {
-	                      case 0:
-	                        type = request.type, data = request.data;
-	                        _context.t0 = type;
-	                        _context.next = _context.t0 === 'recordInit' ? 4 : _context.t0 === 'liveInit' ? 6 : _context.t0 === 'recording' ? 8 : _context.t0 === 'recordStop' ? 10 : 12;
-	                        break;
-
-	                      case 4:
-	                        _this.recordInit();
-
-	                        return _context.abrupt("break", 13);
-
-	                      case 6:
-	                        _this.liveInit();
-
-	                        return _context.abrupt("break", 13);
-
-	                      case 8:
-	                        _this.recording();
-
-	                        return _context.abrupt("break", 13);
-
-	                      case 10:
-	                        _this.recordStop();
-
-	                        return _context.abrupt("break", 13);
-
-	                      case 12:
-	                        return _context.abrupt("break", 13);
-
-	                      case 13:
-	                      case "end":
-	                        return _context.stop();
-	                    }
-	                  }
-	                });
-	              });
-
-	            case 1:
-	            case "end":
-	              return _context2.stop();
-	          }
-	        }
-	      });
-	    }
-	  }, {
-	    key: "recordInit",
-	    value: function recordInit() {
-	      return regenerator.async(function recordInit$(_context3) {
-	        while (1) {
-	          switch (_context3.prev = _context3.next) {
-	            case 0:
-	              console.log('recordInit');
-
-	            case 1:
-	            case "end":
-	              return _context3.stop();
-	          }
-	        }
-	      });
-	    }
-	  }, {
-	    key: "liveInit",
-	    value: function liveInit() {
-	      return regenerator.async(function liveInit$(_context4) {
-	        while (1) {
-	          switch (_context4.prev = _context4.next) {
-	            case 0:
-	              console.log('liveInit');
-
-	            case 1:
-	            case "end":
-	              return _context4.stop();
-	          }
-	        }
-	      });
-	    }
-	  }, {
-	    key: "recording",
-	    value: function recording() {
-	      return regenerator.async(function recording$(_context5) {
-	        while (1) {
-	          switch (_context5.prev = _context5.next) {
-	            case 0:
-	              console.log('recording');
-
-	            case 1:
-	            case "end":
-	              return _context5.stop();
-	          }
-	        }
-	      });
-	    }
-	  }, {
-	    key: "recordStop",
-	    value: function recordStop() {
-	      return regenerator.async(function recordStop$(_context6) {
-	        while (1) {
-	          switch (_context6.prev = _context6.next) {
-	            case 0:
-	              console.log('recordStop');
-
-	            case 1:
-	            case "end":
-	              return _context6.stop();
-	          }
-	        }
-	      });
-	    }
-	  }]);
-
-	  return Content;
-	}();
+	  });
+	};
 
 	var index = new Content();
 

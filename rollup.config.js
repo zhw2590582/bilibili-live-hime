@@ -12,7 +12,7 @@ const cssnano = require('cssnano');
 const { name, version, homepage } = require('./package.json');
 
 const isProd = process.env.NODE_ENV === 'production';
-module.exports = ['background', 'popup', 'content', 'injected', 'options'].map(item => {
+module.exports = ['background', 'popup', 'content', 'injected'].map(item => {
     return {
         input: `src/${item}/dev/index.js`,
         output: {

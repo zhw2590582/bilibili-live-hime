@@ -1,8 +1,5 @@
 /dist
 /node_modules
 /rollup-config.js
-/src/**/index.js
-/src/**/index.js.map
 package.json
-/src/manifest.json
 /archive.js

@@ -9,6 +9,7 @@ import {
     sendMessage,
     getActiveTab,
     storageChange,
+    sendMessageToTab,
 } from '../../share';
 
 class Popup {
@@ -26,7 +27,7 @@ class Popup {
         this.$stop = query('.stop');
 
         this.$name.addEventListener('click', () => {
-            openTab('https://chrome.google.com/webstore/detail/' + chrome.runtime.id);
+            openTab(`https://chrome.google.com/webstore/detail/${chrome.runtime.id}`);
         });
 
         this.$feedback.addEventListener('click', () => {
@@ -53,6 +54,7 @@ class Popup {
         this.config = await getStorage('config');
         this.debug = await getStorage('debug');
         this.activeTab = await getActiveTab();
+        sendMessageToTab(this.activeTab.id, 'record@init');
         this.$name.textContent = `${this.manifest.name} ${this.manifest.version}`;
 
         if (this.config) {
@@ -82,12 +84,14 @@ class Popup {
             videoBitsPerSecond: Number(this.$videoBitsPerSecond.value),
         };
 
-        if (!config.rtmpUrl || !config.rtmpUrl.startsWith(this.$rtmpUrl.placeholder)) {
-            return await log('请输入正确的 rtmp 推流地址');
+        if (!config.rtmpUrl || !/^rtmp:\/\/.+/i.test(config.rtmpUrl)) {
+            await log('请输入正确的推流地址');
+            return;
         }
 
-        if (!config.liveUrl || !config.liveUrl.startsWith(this.$liveUrl.placeholder)) {
-            return await log('请输入正确的 https 直播地址');
+        if (!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl)) {
+            await log('请输入正确的直播地址');
+            return;
         }
 
         this.$container.classList.add('recording');
@@ -98,10 +102,14 @@ class Popup {
         await setStorage('recording', true);
         await setStorage('config', config);
         const liveTab = await openTab(config.liveUrl);
-        config.config = liveTab.id;
-        await log('已打开直播间：' + config.liveUrl);
-        await sendMessage('start', config);
-        await log('请保持当前页面选中状态，否则无法推流');
+        if (liveTab) {
+            config.config = liveTab.id;
+            await log(`已打开直播间：${config.liveUrl}`);
+            await sendMessage('start', config);
+            await log('请保持当前页面选中状态，否则无法推流');
+        } else {
+            await log('无法打开直播地址，请重试');
+        }
     }
 
     async stop() {

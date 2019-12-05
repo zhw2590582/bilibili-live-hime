@@ -825,6 +825,13 @@ var bilibiliLiveHimePopup = (function () {
 	    });
 	  });
 	}
+	function setStorage(key, value) {
+	  return new Promise(function (resolve) {
+	    chrome.storage.local.set(defineProperty({}, key, value), function () {
+	      resolve(value);
+	    });
+	  });
+	}
 	function getStorage(key, defaultValue) {
 	  return new Promise(function (resolve) {
 	    chrome.storage.local.get([key], function (result) {
@@ -837,13 +844,6 @@ var bilibiliLiveHimePopup = (function () {
 	      } else {
 	        resolve();
 	      }
-	    });
-	  });
-	}
-	function setStorage(key, value) {
-	  return new Promise(function (resolve) {
-	    chrome.storage.local.set(defineProperty({}, key, value), function () {
-	      resolve(value);
 	    });
 	  });
 	}
@@ -931,6 +931,12 @@ var bilibiliLiveHimePopup = (function () {
 	    data: data
 	  });
 	}
+	function sendMessageToTab(tabId, type, data) {
+	  chrome.tabs.sendMessage(tabId, {
+	    type: type,
+	    data: data
+	  });
+	}
 
 	var Popup =
 	/*#__PURE__*/
@@ -952,7 +958,7 @@ var bilibiliLiveHimePopup = (function () {
 	    this.$start = query('.start');
 	    this.$stop = query('.stop');
 	    this.$name.addEventListener('click', function () {
-	      openTab('https://chrome.google.com/webstore/detail/' + chrome.runtime.id);
+	      openTab("https://chrome.google.com/webstore/detail/".concat(chrome.runtime.id));
 	    });
 	    this.$feedback.addEventListener('click', function () {
 	      openTab('https://github.com/zhw2590582/bilibili-live-hime');
@@ -997,6 +1003,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 11:
 	              this.activeTab = _context.sent;
+	              sendMessageToTab(this.activeTab.id, 'record@init');
 	              this.$name.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
 
 	              if (this.config) {
@@ -1007,7 +1014,7 @@ var bilibiliLiveHimePopup = (function () {
 	              }
 
 	              if (!this.recording) {
-	                _context.next = 22;
+	                _context.next = 23;
 	                break;
 	              }
 
@@ -1016,14 +1023,14 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$liveUrl.disabled = true;
 	              this.$resolution.disabled = true;
 	              this.$videoBitsPerSecond.disabled = true;
-	              _context.next = 24;
+	              _context.next = 25;
 	              break;
 
-	            case 22:
-	              _context.next = 24;
+	            case 23:
+	              _context.next = 25;
 	              return regenerator.awrap(setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']));
 
-	            case 24:
+	            case 25:
 	            case "end":
 	              return _context.stop();
 	          }
@@ -1046,28 +1053,28 @@ var bilibiliLiveHimePopup = (function () {
 	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
 	              };
 
-	              if (!(!config.rtmpUrl || !config.rtmpUrl.startsWith(this.$rtmpUrl.placeholder))) {
+	              if (!(!config.rtmpUrl || !/^rtmp:\/\/.+/i.test(config.rtmpUrl))) {
 	                _context2.next = 5;
 	                break;
 	              }
 
 	              _context2.next = 4;
-	              return regenerator.awrap(log('请输入正确的 rtmp 推流地址'));
+	              return regenerator.awrap(log('请输入正确的推流地址'));
 
 	            case 4:
-	              return _context2.abrupt("return", _context2.sent);
+	              return _context2.abrupt("return");
 
 	            case 5:
-	              if (!(!config.liveUrl || !config.liveUrl.startsWith(this.$liveUrl.placeholder))) {
+	              if (!(!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl))) {
 	                _context2.next = 9;
 	                break;
 	              }
 
 	              _context2.next = 8;
-	              return regenerator.awrap(log('请输入正确的 https 直播地址'));
+	              return regenerator.awrap(log('请输入正确的直播地址'));
 
 	            case 8:
-	              return _context2.abrupt("return", _context2.sent);
+	              return _context2.abrupt("return");
 
 	            case 9:
 	              this.$container.classList.add('recording');
@@ -1088,19 +1095,33 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 20:
 	              liveTab = _context2.sent;
-	              config.config = liveTab.id;
-	              _context2.next = 24;
-	              return regenerator.awrap(log('已打开直播间：' + config.liveUrl));
 
-	            case 24:
-	              _context2.next = 26;
+	              if (!liveTab) {
+	                _context2.next = 31;
+	                break;
+	              }
+
+	              config.config = liveTab.id;
+	              _context2.next = 25;
+	              return regenerator.awrap(log("\u5DF2\u6253\u5F00\u76F4\u64AD\u95F4\uFF1A".concat(config.liveUrl)));
+
+	            case 25:
+	              _context2.next = 27;
 	              return regenerator.awrap(sendMessage('start', config));
 
-	            case 26:
-	              _context2.next = 28;
+	            case 27:
+	              _context2.next = 29;
 	              return regenerator.awrap(log('请保持当前页面选中状态，否则无法推流'));
 
-	            case 28:
+	            case 29:
+	              _context2.next = 33;
+	              break;
+
+	            case 31:
+	              _context2.next = 33;
+	              return regenerator.awrap(log('无法打开直播地址，请重试'));
+
+	            case 33:
 	            case "end":
 	              return _context2.stop();
 	          }

@@ -9,9 +9,10 @@ var bilibiliLiveHimeInjected = (function () {
 
   var classCallCheck = _classCallCheck;
 
-  var Injected = function Injected() {//
-
+  var Injected = function Injected() {
     classCallCheck(this, Injected);
+
+    console.log('Injected');
   };
 
   var index = new Injected();

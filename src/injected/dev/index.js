@@ -2,7 +2,7 @@ import './index.scss';
 
 class Injected {
     constructor() {
-        //
+        console.log('Injected');
     }
 }
 
