@@ -1127,34 +1127,39 @@ var bilibiliLiveHimeBackground = (function () {
 
 	            case 6:
 	              this.socket.emit('rtmpUrl', rtmpUrl);
-	              _context.next = 9;
+	              this.socket.on('fatal', function (info) {
+	                log("\u670D\u52A1\u5668\u62A5\u9519: ".concat(info.trim()));
+
+	                _this2.stop();
+	              });
+	              _context.next = 10;
 	              return regenerator.awrap(this.tabCapture(resolution));
 
-	            case 9:
+	            case 10:
 	              this.stream = _context.sent;
 
 	              if (this.socket) {
-	                _context.next = 12;
+	                _context.next = 13;
 	                break;
 	              }
 
 	              return _context.abrupt("return", this.stop());
 
-	            case 12:
-	              _context.next = 14;
+	            case 13:
+	              _context.next = 15;
 	              return regenerator.awrap(this.recorder(this.stream, videoBitsPerSecond));
 
-	            case 14:
+	            case 15:
 	              this.mediaRecorder = _context.sent;
 
 	              if (this.mediaRecorder) {
-	                _context.next = 17;
+	                _context.next = 18;
 	                break;
 	              }
 
 	              return _context.abrupt("return", this.stop());
 
-	            case 17:
+	            case 18:
 	              this.mediaRecorder.ondataavailable = function (event) {
 	                if (event.data && event.data.size > 0) {
 	                  _this2.socket.emit('binarystream', event.data);
@@ -1165,7 +1170,6 @@ var bilibiliLiveHimeBackground = (function () {
 	                }
 	              };
 
-	              log('开始录制');
 	              this.mediaRecorder.start(timeslice);
 	              return _context.abrupt("return", this);
 
@@ -1183,8 +1187,6 @@ var bilibiliLiveHimeBackground = (function () {
 	        while (1) {
 	          switch (_context2.prev = _context2.next) {
 	            case 0:
-	              log('结束录制');
-
 	              if (this.stream) {
 	                this.stream.getTracks().forEach(function (track) {
 	                  return track.stop();
@@ -1192,6 +1194,7 @@ var bilibiliLiveHimeBackground = (function () {
 	              }
 
 	              if (this.socket) {
+	                this.socket.emit('disconnect');
 	                this.socket.close();
 	              }
 
@@ -1199,13 +1202,15 @@ var bilibiliLiveHimeBackground = (function () {
 	                this.mediaRecorder.stop();
 	              }
 
-	              if (this.config.downloadAfterStop) {
-	                log('开始下载');
+	              if (this.config.downloadAfterStop && this.blobs.length) {
 	                download(this.blobs, "".concat(Date.now(), ".webm"));
 	                this.blobs = [];
 	              }
 
-	            case 5:
+	              _context2.next = 6;
+	              return regenerator.awrap(setStorage('recording', false));
+
+	            case 6:
 	            case "end":
 	              return _context2.stop();
 	          }

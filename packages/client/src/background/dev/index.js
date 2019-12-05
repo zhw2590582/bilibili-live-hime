@@ -1,7 +1,7 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
 import './csp';
-import { log, download, sendMessageToTab } from '../../share';
+import { log, download, setStorage, sendMessageToTab } from '../../share';
 
 class Background {
     constructor() {
@@ -159,6 +159,10 @@ class Background {
         if (!this.socket) return this.stop();
 
         this.socket.emit('rtmpUrl', rtmpUrl);
+        this.socket.on('fatal', info => {
+            log(`服务器报错: ${info.trim()}`);
+            this.stop();
+        });
 
         this.stream = await this.tabCapture(resolution);
         if (!this.socket) return this.stop();
@@ -175,28 +179,27 @@ class Background {
             }
         };
 
-        log('开始录制');
         this.mediaRecorder.start(timeslice);
 
         return this;
     }
 
     async stop() {
-        log('结束录制');
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
         }
         if (this.socket) {
+            this.socket.emit('disconnect');
             this.socket.close();
         }
         if (this.mediaRecorder) {
             this.mediaRecorder.stop();
         }
-        if (this.config.downloadAfterStop) {
-            log('开始下载');
+        if (this.config.downloadAfterStop && this.blobs.length) {
             download(this.blobs, `${Date.now()}.webm`);
             this.blobs = [];
         }
+        await setStorage('recording', false);
     }
 }
 
