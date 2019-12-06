@@ -162,6 +162,7 @@ class Popup {
             return;
         }
 
+        await debug.log(`当前页面：${activeTab.title}`);
         await setStorage('recording', true);
         await setStorage('config', config);
         sendMessage('start', config);

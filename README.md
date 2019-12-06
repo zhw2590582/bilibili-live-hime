@@ -1,4 +1,4 @@
-# :beer: Chrome 扩展 - Bilibili 直播姬
+# :strawberry: Chrome 扩展 - Bilibili 直播姬
 
 > 把浏览器页面直播到 Bilibili 直播间
 

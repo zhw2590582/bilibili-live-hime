@@ -21,8 +21,10 @@ function createFFmpegProcess(rtmp) {
 }
 
 let ffmpeg = null;
+console.log(`中转地址：http://localhost:${port}`);
+
 io.on('connection', function(socket) {
-    // rtmp 事件用于初始化ffmpeg
+    // rtmp 事件用于告知服务器初始化ffmpeg
     socket.on('rtmp', rtmp => {
         if (ffmpeg) {
             ffmpeg.stdin.end();
@@ -50,14 +52,14 @@ io.on('connection', function(socket) {
         });
     });
 
-    // binarystream 事件用于接收来自浏览器的数据流
+    // binarystream 事件用于告知服务器接收数据流
     socket.on('binarystream', data => {
         if (ffmpeg) {
             ffmpeg.stdin.write(data);
         }
     });
 
-    // disconnect 事件用于关闭ffmpeg进程
+    // disconnect 事件用于告知服务器关闭ffmpeg进程
     socket.on('disconnect', () => {
         if (ffmpeg) {
             ffmpeg.stdin.end();

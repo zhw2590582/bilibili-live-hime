@@ -1317,16 +1317,20 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 20:
 	              _context7.next = 22;
-	              return regenerator.awrap(setStorage('recording', true));
+	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
 
 	            case 22:
 	              _context7.next = 24;
-	              return regenerator.awrap(setStorage('config', config));
+	              return regenerator.awrap(setStorage('recording', true));
 
 	            case 24:
+	              _context7.next = 26;
+	              return regenerator.awrap(setStorage('config', config));
+
+	            case 26:
 	              sendMessage('start', config);
 
-	            case 25:
+	            case 27:
 	            case "end":
 	              return _context7.stop();
 	          }
