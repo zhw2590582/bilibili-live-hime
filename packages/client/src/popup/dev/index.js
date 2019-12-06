@@ -2,12 +2,14 @@ import './index.scss';
 import {
     debug,
     query,
+    sleep,
     openTab,
     onMessage,
     getStorage,
     setStorage,
     sendMessage,
     getActiveTab,
+    findTabById,
     storageChange,
 } from '../../share';
 
@@ -93,9 +95,9 @@ class Popup {
     async updateConfig() {
         const config = await getStorage('config');
         if (config) {
-            this.$rtmp.value = config.rtmp || '';
+            this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
             this.$streamname.value = config.streamname || '';
-            this.$socket.value = config.socket || '';
+            this.$socket.value = config.socket || 'http://localhost:8080';
             this.$resolution.value = config.resolution || '1920';
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
         }
@@ -109,13 +111,20 @@ class Popup {
 
     async updateRecording() {
         const recording = await getStorage('recording');
-        if (recording) {
-            this.$container.classList.add('recording');
-            this.$rtmp.disabled = true;
-            this.$streamname.disabled = true;
-            this.$socket.disabled = true;
-            this.$resolution.disabled = true;
-            this.$videoBitsPerSecond.disabled = true;
+        const config = await getStorage('config');
+        if (recording && config) {
+            const tab = await findTabById(config.tab);
+            if (tab) {
+                this.$container.classList.add('recording');
+                this.$rtmp.disabled = true;
+                this.$streamname.disabled = true;
+                this.$socket.disabled = true;
+                this.$resolution.disabled = true;
+                this.$videoBitsPerSecond.disabled = true;
+            } else {
+                await this.stop();
+                await this.close();
+            }
         } else {
             await debug.clean();
         }
@@ -163,6 +172,8 @@ class Popup {
     }
 
     async close() {
+        await debug.log('正在关闭连接...');
+        await sleep(1000);
         await setStorage('recording', false);
         await debug.clean();
         chrome.runtime.reload();

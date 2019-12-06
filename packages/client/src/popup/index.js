@@ -805,6 +805,12 @@ var bilibiliLiveHimePopup = (function () {
 
 	var objToString_1 = objToString;
 
+	function sleep() {
+	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+	  return new Promise(function (resolve) {
+	    return setTimeout(resolve, ms);
+	  });
+	}
 	function query(el) {
 	  var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
 	  return doc.querySelector(el);
@@ -867,6 +873,13 @@ var bilibiliLiveHimePopup = (function () {
 	          resolve(tab);
 	        });
 	      }
+	    });
+	  });
+	}
+	function findTabById(id) {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.get(id, function (tab) {
+	      resolve(tab);
 	    });
 	  });
 	}
@@ -1116,9 +1129,9 @@ var bilibiliLiveHimePopup = (function () {
 	              config = _context4.sent;
 
 	              if (config) {
-	                this.$rtmp.value = config.rtmp || '';
+	                this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
 	                this.$streamname.value = config.streamname || '';
-	                this.$socket.value = config.socket || '';
+	                this.$socket.value = config.socket || 'http://localhost:8080';
 	                this.$resolution.value = config.resolution || '1920';
 	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
 	              }
@@ -1168,7 +1181,7 @@ var bilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "updateRecording",
 	    value: function updateRecording() {
-	      var recording;
+	      var recording, config, tab;
 	      return regenerator.async(function updateRecording$(_context6) {
 	        while (1) {
 	          switch (_context6.prev = _context6.next) {
@@ -1178,9 +1191,25 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 2:
 	              recording = _context6.sent;
+	              _context6.next = 5;
+	              return regenerator.awrap(getStorage('config'));
 
-	              if (!recording) {
-	                _context6.next = 12;
+	            case 5:
+	              config = _context6.sent;
+
+	              if (!(recording && config)) {
+	                _context6.next = 25;
+	                break;
+	              }
+
+	              _context6.next = 9;
+	              return regenerator.awrap(findTabById(config.tab));
+
+	            case 9:
+	              tab = _context6.sent;
+
+	              if (!tab) {
+	                _context6.next = 19;
 	                break;
 	              }
 
@@ -1190,14 +1219,26 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$socket.disabled = true;
 	              this.$resolution.disabled = true;
 	              this.$videoBitsPerSecond.disabled = true;
-	              _context6.next = 14;
+	              _context6.next = 23;
 	              break;
 
-	            case 12:
-	              _context6.next = 14;
+	            case 19:
+	              _context6.next = 21;
+	              return regenerator.awrap(this.stop());
+
+	            case 21:
+	              _context6.next = 23;
+	              return regenerator.awrap(this.close());
+
+	            case 23:
+	              _context6.next = 27;
+	              break;
+
+	            case 25:
+	              _context6.next = 27;
 	              return regenerator.awrap(debug.clean());
 
-	            case 14:
+	            case 27:
 	            case "end":
 	              return _context6.stop();
 	          }
@@ -1316,17 +1357,25 @@ var bilibiliLiveHimePopup = (function () {
 	          switch (_context9.prev = _context9.next) {
 	            case 0:
 	              _context9.next = 2;
-	              return regenerator.awrap(setStorage('recording', false));
+	              return regenerator.awrap(debug.log('正在关闭连接...'));
 
 	            case 2:
 	              _context9.next = 4;
-	              return regenerator.awrap(debug.clean());
+	              return regenerator.awrap(sleep(1000));
 
 	            case 4:
+	              _context9.next = 6;
+	              return regenerator.awrap(setStorage('recording', false));
+
+	            case 6:
+	              _context9.next = 8;
+	              return regenerator.awrap(debug.clean());
+
+	            case 8:
 	              chrome.runtime.reload();
 	              window.close();
 
-	            case 6:
+	            case 10:
 	            case "end":
 	              return _context9.stop();
 	          }

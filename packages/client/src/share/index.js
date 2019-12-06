@@ -79,6 +79,14 @@ export function openTab(url, active = true) {
     });
 }
 
+export function findTabById(id) {
+    return new Promise(resolve => {
+        chrome.tabs.get(id, tab => {
+            resolve(tab);
+        });
+    });
+}
+
 export const debug = {
     async log(msg) {
         const logs = (await getStorage('debug')) || [];

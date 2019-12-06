@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "哔哩哔哩直播姬 Chrome 扩展服务端",
   "scripts": {
-    "start": "npx nodemon ./index.js"
+    "start": "npx nodemon ./index.js 8080"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",

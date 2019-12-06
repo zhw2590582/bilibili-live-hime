@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development rollup -c -m -w",
     "build": "cross-env NODE_ENV=production rollup -c && node ./archive.js",
-    "test": "eslint packages/client/**/dev/*.js"
+    "test": "eslint src/**/dev/*.js"
   },
   "devDependencies": {
     "@babel/core": "^7.7.4",
