@@ -1,6 +1,6 @@
 {
   "name": "bilibili-live-hime-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "哔哩哔哩直播姬 Chrome 扩展客户端",
   "scripts": {
     "dev": "cross-env NODE_ENV=development rollup -c -m -w",

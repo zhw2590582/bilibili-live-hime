@@ -1,6 +1,6 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
-import { debug, sendMessage, onMessage } from '../../share';
+import { debug, setBadge, setStorage, onMessage, storageChange } from '../../share';
 
 class Background {
     constructor() {
@@ -24,6 +24,16 @@ class Background {
                     break;
                 default:
                     break;
+            }
+        });
+
+        storageChange(async changes => {
+            if (changes.recording) {
+                if (changes.recording.newValue) {
+                    setBadge('ON');
+                } else {
+                    setBadge('');
+                }
             }
         });
     }
@@ -93,9 +103,9 @@ class Background {
         };
     }
 
-    connectSocket(socketUrl) {
+    connectSocket(url) {
         return new Promise((revolve, reject) => {
-            const socket = io(socketUrl);
+            const socket = io(url);
 
             socket.on('connect_error', error => {
                 reject(error);
@@ -115,7 +125,6 @@ class Background {
             captureOptions.videoConstraints.mandatory.minWidth = resolution.width;
             captureOptions.videoConstraints.mandatory.maxHeight = resolution.height;
             captureOptions.videoConstraints.mandatory.minHeight = resolution.height;
-
             chrome.tabCapture.capture(captureOptions, stream => {
                 if (stream) {
                     revolve(stream);
@@ -130,7 +139,6 @@ class Background {
         return new Promise((revolve, reject) => {
             const recorderOptions = Background.RecorderOptions;
             recorderOptions.videoBitsPerSecond = videoBitsPerSecond;
-
             if (MediaRecorder && MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {
                 const mediaRecorder = new MediaRecorder(stream, recorderOptions);
                 revolve(mediaRecorder);
@@ -143,28 +151,26 @@ class Background {
     async start() {
         const { socket, rtmp, streamname, resolution, videoBitsPerSecond } = this.config;
 
-        await debug.log('欢迎使用 Bilibili 直播姬，欢迎反馈问题');
-
         try {
             this.socket = await this.connectSocket(socket);
-            await debug.log('建立socket连接成功...');
+            await debug.log('建立socket连接成功');
             this.socket.emit('rtmp', rtmp + streamname);
             this.socket.on('fail', async info => {
-                await debug.err(`socket 返回错误：${info}`);
+                await debug.err(info);
                 await this.stop();
             });
             this.socket.on('log', async info => {
-                await debug.log(info.trim());
+                await debug.log(info);
             });
         } catch (error) {
-            await debug.err(`建立socket连接失败，请检查中转地址: ${error.message.trim()}`);
+            await debug.err(`建立socket连接失败: ${error.message.trim()}`);
             await this.stop();
             return;
         }
 
         try {
             this.stream = await this.tabCapture(resolution);
-            await debug.log('获取标签视频流成功...');
+            await debug.log('获取标签视频流成功');
         } catch (error) {
             await debug.err('无法获取标签视频流，请重试！');
             await this.stop();
@@ -173,7 +179,7 @@ class Background {
 
         try {
             this.mediaRecorder = await this.recorder(this.stream, videoBitsPerSecond);
-            await debug.log('录制器启动成功...');
+            await debug.log('录制器启动成功');
             this.mediaRecorder.ondataavailable = event => {
                 if (event.data && event.data.size > 0) {
                     this.socket.emit('binarystream', event.data);
@@ -185,21 +191,24 @@ class Background {
             await this.stop();
         }
 
-        await debug.log('正在推流中，请尽量保持当前标签选中状态');
+        await debug.log('正在推流中...');
     }
 
     async stop() {
+        setStorage('recording', false);
+
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
         }
+
         if (this.socket) {
             this.socket.emit('disconnect');
             this.socket.close();
         }
+
         if (this.mediaRecorder) {
             this.mediaRecorder.stop();
         }
-        sendMessage('close');
     }
 }
 

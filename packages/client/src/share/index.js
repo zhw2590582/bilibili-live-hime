@@ -22,6 +22,10 @@ export function getActiveTab() {
     });
 }
 
+export function has(result, key) {
+    return Object.prototype.hasOwnProperty.call(result, key);
+}
+
 export function setStorage(key, value) {
     return new Promise(resolve => {
         chrome.storage.local.set(
@@ -38,7 +42,7 @@ export function setStorage(key, value) {
 export function getStorage(key, defaultValue) {
     return new Promise(resolve => {
         chrome.storage.local.get([key], result => {
-            if (result[key]) {
+            if (has(result, key)) {
                 resolve(result[key]);
             } else if (defaultValue) {
                 setStorage(key, defaultValue).then(value => {
@@ -79,7 +83,7 @@ export function openTab(url, active = true) {
     });
 }
 
-export function findTabById(id) {
+export function findTabById(id = 0) {
     return new Promise(resolve => {
         chrome.tabs.get(id, tab => {
             resolve(tab);
@@ -118,4 +122,24 @@ export function sendMessage(type, data) {
 
 export function onMessage(callback) {
     chrome.runtime.onMessage.addListener(callback);
+}
+
+export function setBadge(text = '', color = 'red') {
+    return new Promise(resolve => {
+        chrome.browserAction.setBadgeBackgroundColor(
+            {
+                color,
+            },
+            () => {
+                chrome.browserAction.setBadgeText(
+                    {
+                        text,
+                    },
+                    () => {
+                        resolve();
+                    },
+                );
+            },
+        );
+    });
 }

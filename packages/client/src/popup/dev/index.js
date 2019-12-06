@@ -2,9 +2,7 @@ import './index.scss';
 import {
     debug,
     query,
-    sleep,
     openTab,
-    onMessage,
     getStorage,
     setStorage,
     sendMessage,
@@ -30,8 +28,8 @@ class Popup {
         this.$start = query('.start');
         this.$stop = query('.stop');
 
+        this.init();
         this.bindEvent();
-        this.updateConfig();
         this.updateDebug();
         this.updateRecording();
         storageChange(changes => {
@@ -69,20 +67,8 @@ class Popup {
             this.start();
         });
 
-        this.$stop.addEventListener('click', async () => {
-            await this.stop();
-            await this.close();
-        });
-
-        onMessage(request => {
-            const { type } = request;
-            switch (type) {
-                case 'close':
-                    this.close();
-                    break;
-                default:
-                    break;
-            }
+        this.$stop.addEventListener('click', () => {
+            this.stop();
         });
     }
 
@@ -92,14 +78,19 @@ class Popup {
         await setStorage('config', config);
     }
 
-    async updateConfig() {
-        const config = await getStorage('config');
+    async init() {
+        const recording = await getStorage('recording');
+        const config = (await getStorage('config')) || {};
+        const tab = await findTabById(config.tab);
         if (config) {
             this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
             this.$streamname.value = config.streamname || '';
             this.$socket.value = config.socket || 'http://localhost:8080';
             this.$resolution.value = config.resolution || '1920';
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
+        }
+        if (!recording || !tab) {
+            debug.clean();
         }
     }
 
@@ -111,22 +102,22 @@ class Popup {
 
     async updateRecording() {
         const recording = await getStorage('recording');
-        const config = await getStorage('config');
-        if (recording && config) {
-            const tab = await findTabById(config.tab);
-            if (tab) {
-                this.$container.classList.add('recording');
-                this.$rtmp.disabled = true;
-                this.$streamname.disabled = true;
-                this.$socket.disabled = true;
-                this.$resolution.disabled = true;
-                this.$videoBitsPerSecond.disabled = true;
-            } else {
-                await this.stop();
-                await this.close();
-            }
+        const config = (await getStorage('config')) || {};
+        const tab = await findTabById(config.tab);
+        if (recording && tab) {
+            this.$container.classList.add('recording');
+            this.$rtmp.disabled = true;
+            this.$streamname.disabled = true;
+            this.$socket.disabled = true;
+            this.$resolution.disabled = true;
+            this.$videoBitsPerSecond.disabled = true;
         } else {
-            await debug.clean();
+            this.$container.classList.remove('recording');
+            this.$rtmp.disabled = false;
+            this.$streamname.disabled = false;
+            this.$socket.disabled = false;
+            this.$resolution.disabled = false;
+            this.$videoBitsPerSecond.disabled = false;
         }
     }
 
@@ -170,15 +161,8 @@ class Popup {
 
     async stop() {
         sendMessage('stop');
-    }
-
-    async close() {
-        await debug.log('正在关闭连接...');
-        await sleep(1000);
-        await setStorage('recording', false);
-        await debug.clean();
-        chrome.runtime.reload();
-        window.close();
+        setStorage('recording', false);
+        await debug.log('已停止推流...');
     }
 }
 
