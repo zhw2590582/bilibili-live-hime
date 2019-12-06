@@ -1082,95 +1082,110 @@ var bilibiliLiveHimeBackground = (function () {
 
 	      var _this$config, socket, rtmp, streamname, resolution, videoBitsPerSecond;
 
-	      return regenerator.async(function start$(_context2) {
+	      return regenerator.async(function start$(_context3) {
 	        while (1) {
-	          switch (_context2.prev = _context2.next) {
+	          switch (_context3.prev = _context3.next) {
 	            case 0:
 	              _this$config = this.config, socket = _this$config.socket, rtmp = _this$config.rtmp, streamname = _this$config.streamname, resolution = _this$config.resolution, videoBitsPerSecond = _this$config.videoBitsPerSecond;
-	              _context2.next = 3;
+	              _context3.next = 3;
 	              return regenerator.awrap(debug.log('欢迎使用 Bilibili 直播姬，欢迎反馈问题'));
 
 	            case 3:
-	              _context2.prev = 3;
-	              _context2.next = 6;
+	              _context3.prev = 3;
+	              _context3.next = 6;
 	              return regenerator.awrap(this.connectSocket(socket));
 
 	            case 6:
-	              this.socket = _context2.sent;
-	              _context2.next = 9;
+	              this.socket = _context3.sent;
+	              _context3.next = 9;
 	              return regenerator.awrap(debug.log('建立socket连接成功...'));
 
 	            case 9:
 	              this.socket.emit('rtmp', rtmp + streamname);
-	              this.socket.on('fail', function () {
-	                _this2.stop();
-	              });
-	              this.socket.on('log', function _callee(info) {
+	              this.socket.on('fail', function _callee(info) {
 	                return regenerator.async(function _callee$(_context) {
 	                  while (1) {
 	                    switch (_context.prev = _context.next) {
 	                      case 0:
 	                        _context.next = 2;
-	                        return regenerator.awrap(debug.log(info.trim()));
+	                        return regenerator.awrap(debug.err("socket \u8FD4\u56DE\u9519\u8BEF\uFF1A".concat(info)));
 
 	                      case 2:
+	                        _this2.stop();
+
+	                      case 3:
 	                      case "end":
 	                        return _context.stop();
 	                    }
 	                  }
 	                });
 	              });
-	              _context2.next = 21;
+	              this.socket.on('log', function _callee2(info) {
+	                return regenerator.async(function _callee2$(_context2) {
+	                  while (1) {
+	                    switch (_context2.prev = _context2.next) {
+	                      case 0:
+	                        _context2.next = 2;
+	                        return regenerator.awrap(debug.log(info.trim()));
+
+	                      case 2:
+	                      case "end":
+	                        return _context2.stop();
+	                    }
+	                  }
+	                });
+	              });
+	              _context3.next = 21;
 	              break;
 
 	            case 14:
-	              _context2.prev = 14;
-	              _context2.t0 = _context2["catch"](3);
-	              _context2.next = 18;
-	              return regenerator.awrap(debug.err("\u5EFA\u7ACBsocket\u8FDE\u63A5\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u4E2D\u8F6C\u5730\u5740: ".concat(_context2.t0.message.trim())));
+	              _context3.prev = 14;
+	              _context3.t0 = _context3["catch"](3);
+	              _context3.next = 18;
+	              return regenerator.awrap(debug.err("\u5EFA\u7ACBsocket\u8FDE\u63A5\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u4E2D\u8F6C\u5730\u5740: ".concat(_context3.t0.message.trim())));
 
 	            case 18:
-	              _context2.next = 20;
+	              _context3.next = 20;
 	              return regenerator.awrap(this.stop());
 
 	            case 20:
-	              return _context2.abrupt("return");
+	              return _context3.abrupt("return");
 
 	            case 21:
-	              _context2.prev = 21;
-	              _context2.next = 24;
+	              _context3.prev = 21;
+	              _context3.next = 24;
 	              return regenerator.awrap(this.tabCapture(resolution));
 
 	            case 24:
-	              this.stream = _context2.sent;
-	              _context2.next = 27;
+	              this.stream = _context3.sent;
+	              _context3.next = 27;
 	              return regenerator.awrap(debug.log('获取标签视频流成功...'));
 
 	            case 27:
-	              _context2.next = 36;
+	              _context3.next = 36;
 	              break;
 
 	            case 29:
-	              _context2.prev = 29;
-	              _context2.t1 = _context2["catch"](21);
-	              _context2.next = 33;
+	              _context3.prev = 29;
+	              _context3.t1 = _context3["catch"](21);
+	              _context3.next = 33;
 	              return regenerator.awrap(debug.err('无法获取标签视频流，请重试！'));
 
 	            case 33:
-	              _context2.next = 35;
+	              _context3.next = 35;
 	              return regenerator.awrap(this.stop());
 
 	            case 35:
-	              return _context2.abrupt("return");
+	              return _context3.abrupt("return");
 
 	            case 36:
-	              _context2.prev = 36;
-	              _context2.next = 39;
+	              _context3.prev = 36;
+	              _context3.next = 39;
 	              return regenerator.awrap(this.recorder(this.stream, videoBitsPerSecond));
 
 	            case 39:
-	              this.mediaRecorder = _context2.sent;
-	              _context2.next = 42;
+	              this.mediaRecorder = _context3.sent;
+	              _context3.next = 42;
 	              return regenerator.awrap(debug.log('录制器启动成功...'));
 
 	            case 42:
@@ -1181,26 +1196,26 @@ var bilibiliLiveHimeBackground = (function () {
 	              };
 
 	              this.mediaRecorder.start(1000);
-	              _context2.next = 52;
+	              _context3.next = 52;
 	              break;
 
 	            case 46:
-	              _context2.prev = 46;
-	              _context2.t2 = _context2["catch"](36);
-	              _context2.next = 50;
+	              _context3.prev = 46;
+	              _context3.t2 = _context3["catch"](36);
+	              _context3.next = 50;
 	              return regenerator.awrap(debug.err('无法录制标签的视频流，请重试！'));
 
 	            case 50:
-	              _context2.next = 52;
+	              _context3.next = 52;
 	              return regenerator.awrap(this.stop());
 
 	            case 52:
-	              _context2.next = 54;
+	              _context3.next = 54;
 	              return regenerator.awrap(debug.log('正在推流中，请尽量保持当前标签选中状态'));
 
 	            case 54:
 	            case "end":
-	              return _context2.stop();
+	              return _context3.stop();
 	          }
 	        }
 	      }, null, this, [[3, 14], [21, 29], [36, 46]]);
@@ -1208,9 +1223,9 @@ var bilibiliLiveHimeBackground = (function () {
 	  }, {
 	    key: "stop",
 	    value: function stop() {
-	      return regenerator.async(function stop$(_context3) {
+	      return regenerator.async(function stop$(_context4) {
 	        while (1) {
-	          switch (_context3.prev = _context3.next) {
+	          switch (_context4.prev = _context4.next) {
 	            case 0:
 	              if (this.stream) {
 	                this.stream.getTracks().forEach(function (track) {
@@ -1231,7 +1246,7 @@ var bilibiliLiveHimeBackground = (function () {
 
 	            case 4:
 	            case "end":
-	              return _context3.stop();
+	              return _context4.stop();
 	          }
 	        }
 	      }, null, this);

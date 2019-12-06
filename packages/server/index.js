@@ -26,12 +26,18 @@ console.log(`中转地址：http://localhost:${port}`);
 io.on('connection', function(socket) {
     // rtmp 事件用于告知服务器初始化ffmpeg
     socket.on('rtmp', rtmp => {
+        // 假如已经有 ffmpeg 进程就先停止
         if (ffmpeg) {
-            ffmpeg.stdin.end();
-            ffmpeg.kill('SIGINT');
-            ffmpeg = null;
+            try {
+                ffmpeg.stdin.end();
+                ffmpeg.kill('SIGINT');
+                ffmpeg = null;
+            } catch (err) {
+                console.log(err);
+            }
         }
 
+        // 创建 ffmpeg 进程
         ffmpeg = createFFmpegProcess(rtmp);
 
         // log 事件可以告知浏览器打印消息
@@ -47,8 +53,9 @@ io.on('connection', function(socket) {
 
         ffmpeg.on('close', code => {
             // fail 事件可以告知浏览器关闭推流
-            socket.emit('fail');
-            console.log('ffmpeg进程退出：' + code);
+            const msg = 'ffmpeg进程退出：' + code;
+            socket.emit('fail', msg);
+            console.log(msg);
         });
     });
 
@@ -62,9 +69,25 @@ io.on('connection', function(socket) {
     // disconnect 事件用于告知服务器关闭ffmpeg进程
     socket.on('disconnect', () => {
         if (ffmpeg) {
-            ffmpeg.stdin.end();
-            ffmpeg.kill('SIGINT');
-            ffmpeg = null;
+            try {
+                ffmpeg.stdin.end();
+                ffmpeg.kill('SIGINT');
+                ffmpeg = null;
+            } catch (err) {
+                console.log(err);
+            }
         }
     });
+
+    socket.on('error', err => {
+        console.log(err);
+    });
+});
+
+io.on('error', err => {
+    console.log(err);
+});
+
+process.on('uncaughtException', err => {
+    console.log(err);
 });

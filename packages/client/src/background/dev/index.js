@@ -149,7 +149,8 @@ class Background {
             this.socket = await this.connectSocket(socket);
             await debug.log('建立socket连接成功...');
             this.socket.emit('rtmp', rtmp + streamname);
-            this.socket.on('fail', () => {
+            this.socket.on('fail', async info => {
+                await debug.err(`socket 返回错误：${info}`);
                 this.stop();
             });
             this.socket.on('log', async info => {
