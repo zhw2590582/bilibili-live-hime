@@ -69,6 +69,18 @@ class Popup {
 
         this.$stop.addEventListener('click', () => {
             this.stop();
+            this.close();
+        });
+
+        chrome.runtime.onMessage.addListener(request => {
+            const { type } = request;
+            switch (type) {
+                case 'close':
+                    this.close();
+                    break;
+                default:
+                    break;
+            }
         });
     }
 
@@ -106,7 +118,6 @@ class Popup {
             this.$videoBitsPerSecond.disabled = true;
         } else {
             await debug.clean();
-            await debug.log('欢迎使用 Bilibili 直播姬');
         }
     }
 
@@ -149,9 +160,13 @@ class Popup {
 
     async stop() {
         sendMessage('stop');
+    }
+
+    async close() {
         await setStorage('recording', false);
-        await setStorage('debug', []);
-        await sleep(1000);
+        await debug.log('3秒后关闭连接...');
+        await sleep(3000);
+        await debug.clean();
         chrome.runtime.reload();
         window.close();
     }

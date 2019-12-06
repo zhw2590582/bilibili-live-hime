@@ -1035,9 +1035,21 @@ var bilibiliLiveHimePopup = (function () {
 	              });
 	              this.$stop.addEventListener('click', function () {
 	                _this2.stop();
+
+	                _this2.close();
+	              });
+	              chrome.runtime.onMessage.addListener(function (request) {
+	                var type = request.type;
+
+	                switch (type) {
+	                  case 'close':
+	                    _this2.close();
+
+	                    break;
+	                }
 	              });
 
-	            case 7:
+	            case 8:
 	            case "end":
 	              return _context.stop();
 	          }
@@ -1167,7 +1179,7 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$socket.disabled = true;
 	              this.$resolution.disabled = true;
 	              this.$videoBitsPerSecond.disabled = true;
-	              _context5.next = 16;
+	              _context5.next = 14;
 	              break;
 
 	            case 12:
@@ -1175,10 +1187,6 @@ var bilibiliLiveHimePopup = (function () {
 	              return regenerator.awrap(debug.clean());
 
 	            case 14:
-	              _context5.next = 16;
-	              return regenerator.awrap(debug.log('欢迎使用 Bilibili 直播姬'));
-
-	            case 16:
 	            case "end":
 	              return _context5.stop();
 	          }
@@ -1281,24 +1289,43 @@ var bilibiliLiveHimePopup = (function () {
 	          switch (_context7.prev = _context7.next) {
 	            case 0:
 	              sendMessage('stop');
-	              _context7.next = 3;
+
+	            case 1:
+	            case "end":
+	              return _context7.stop();
+	          }
+	        }
+	      });
+	    }
+	  }, {
+	    key: "close",
+	    value: function close() {
+	      return regenerator.async(function close$(_context8) {
+	        while (1) {
+	          switch (_context8.prev = _context8.next) {
+	            case 0:
+	              _context8.next = 2;
 	              return regenerator.awrap(setStorage('recording', false));
 
-	            case 3:
-	              _context7.next = 5;
-	              return regenerator.awrap(setStorage('debug', []));
+	            case 2:
+	              _context8.next = 4;
+	              return regenerator.awrap(debug.log('3秒后关闭连接...'));
 
-	            case 5:
-	              _context7.next = 7;
-	              return regenerator.awrap(sleep(1000));
+	            case 4:
+	              _context8.next = 6;
+	              return regenerator.awrap(sleep(3000));
 
-	            case 7:
+	            case 6:
+	              _context8.next = 8;
+	              return regenerator.awrap(debug.clean());
+
+	            case 8:
 	              chrome.runtime.reload();
 	              window.close();
 
-	            case 9:
+	            case 10:
 	            case "end":
-	              return _context7.stop();
+	              return _context8.stop();
 	          }
 	        }
 	      });

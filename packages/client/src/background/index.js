@@ -846,49 +846,6 @@ var bilibiliLiveHimeBackground = (function () {
 	});
 	var socket_io_1 = socket_io.io;
 
-	var cspGenerator = createCommonjsModule(function (module, exports) {
-	/*!
-	 * csp-generator.js v1.0.2
-	 * Github: https://github.com/zhw2590582/csp-generator#readme
-	 * (c) 2017-2019 Harvey Zack
-	 * Released under the MIT License.
-	 */
-
-	!function(e,t){module.exports=t();}(commonjsGlobal,function(){var n=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")};function i(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i);}}var e=function(e,t,n){return t&&i(e.prototype,t),n&&i(e,n),e};return function(){function t(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:"";n(this,t),this.csp=this.parse(e);}return e(t,[{key:"parse",value:function(e){return (0<arguments.length&&void 0!==e?e:"").split(";").reduce(function(e,t){var n=t.split(" ").filter(function(e){return e.trim()}),i=n[0],r=n.slice(1);return e[i]=r,e},{})}},{key:"generate",value:function(){var n=this;return Object.keys(this.csp).reduce(function(e,t){return "".concat(e," ").concat(t," ").concat(n.csp[t].join(" "),";")},"").trim()}},{key:"append",value:function(e,t){return this.csp[e]&&-1===this.csp[e].indexOf(t)?this.csp[e].push(t):this.csp[e]=[t],this}},{key:"delete",value:function(e,t){if(t){var n=(this.csp[e]||[]).indexOf(t);-1<n&&this.csp[e].splice(n,1);}else delete this.csp[e];return this}},{key:"get",value:function(e){return this.csp[e]}}]),t}()});
-	});
-
-	var manifest = chrome.runtime.getManifest();
-	chrome.webRequest.onHeadersReceived.addListener(function (details) {
-	  var header = details.responseHeaders.find(function (event) {
-	    var name = event.name.toLowerCase();
-	    return name === 'content-security-policy-report-only' || name === 'content-security-policy';
-	  });
-
-	  if (header && header.value) {
-	    var csp = new cspGenerator(header.value);
-
-	    if (csp.get('worker-src')) {
-	      csp.append('worker-src', 'blob:');
-	    }
-
-	    if (csp.get('script-src')) {
-	      csp.append('script-src', '*.baidu.com');
-	    }
-
-	    if (csp.get('img-src')) {
-	      csp.append('img-src', '*.baidu.com');
-	    }
-
-	    header.value = csp.generate();
-	  }
-
-	  return {
-	    responseHeaders: details.responseHeaders
-	  };
-	}, {
-	  urls: manifest.content_scripts[0].matches
-	}, ['blocking', 'responseHeaders']);
-
 	function objToString(obj) {
 	  switch (typeof obj) {
 	    case "undefined":
@@ -938,54 +895,98 @@ var bilibiliLiveHimeBackground = (function () {
 	    });
 	  });
 	}
-	function log(msg) {
-	  var logs;
-	  return regenerator.async(function log$(_context) {
-	    while (1) {
-	      switch (_context.prev = _context.next) {
-	        case 0:
-	          _context.next = 2;
-	          return regenerator.awrap(getStorage('debug'));
+	var debug = {
+	  log: function log(msg) {
+	    var logs;
+	    return regenerator.async(function log$(_context) {
+	      while (1) {
+	        switch (_context.prev = _context.next) {
+	          case 0:
+	            _context.next = 2;
+	            return regenerator.awrap(getStorage('debug'));
 
-	        case 2:
-	          _context.t0 = _context.sent;
+	          case 2:
+	            _context.t0 = _context.sent;
 
-	          if (_context.t0) {
-	            _context.next = 5;
-	            break;
-	          }
+	            if (_context.t0) {
+	              _context.next = 5;
+	              break;
+	            }
 
-	          _context.t0 = [];
+	            _context.t0 = [];
 
-	        case 5:
-	          logs = _context.t0;
-	          logs.push(objToString_1(msg));
-	          _context.next = 9;
-	          return regenerator.awrap(setStorage('debug', logs));
+	          case 5:
+	            logs = _context.t0;
+	            logs.push({
+	              type: 'log',
+	              data: objToString_1(msg)
+	            });
+	            _context.next = 9;
+	            return regenerator.awrap(setStorage('debug', logs));
 
-	        case 9:
-	        case "end":
-	          return _context.stop();
+	          case 9:
+	          case "end":
+	            return _context.stop();
+	        }
 	      }
-	    }
-	  });
-	}
-	function sendMessageToTab(tabId, type, data) {
-	  chrome.tabs.sendMessage(tabId, {
+	    });
+	  },
+	  err: function err(msg) {
+	    var logs;
+	    return regenerator.async(function err$(_context2) {
+	      while (1) {
+	        switch (_context2.prev = _context2.next) {
+	          case 0:
+	            _context2.next = 2;
+	            return regenerator.awrap(getStorage('debug'));
+
+	          case 2:
+	            _context2.t0 = _context2.sent;
+
+	            if (_context2.t0) {
+	              _context2.next = 5;
+	              break;
+	            }
+
+	            _context2.t0 = [];
+
+	          case 5:
+	            logs = _context2.t0;
+	            logs.push({
+	              type: 'error',
+	              data: objToString_1(msg)
+	            });
+	            _context2.next = 9;
+	            return regenerator.awrap(setStorage('debug', logs));
+
+	          case 9:
+	          case "end":
+	            return _context2.stop();
+	        }
+	      }
+	    });
+	  },
+	  clean: function clean() {
+	    return regenerator.async(function clean$(_context3) {
+	      while (1) {
+	        switch (_context3.prev = _context3.next) {
+	          case 0:
+	            _context3.next = 2;
+	            return regenerator.awrap(setStorage('debug', []));
+
+	          case 2:
+	          case "end":
+	            return _context3.stop();
+	        }
+	      }
+	    });
+	  }
+	};
+	function sendMessage(type, data) {
+	  chrome.runtime.sendMessage({
 	    type: type,
 	    data: data
 	  });
-	}
-	function download(data, name) {
-	  var blob = new Blob(Array.isArray(data) ? data : [data]);
-	  var blobUrl = URL.createObjectURL(blob);
-	  var link = document.createElement('a');
-	  link.href = blobUrl;
-	  link.download = name;
-	  link.style.display = 'none';
-	  document.body.appendChild(link);
-	  link.click();
-	  document.body.removeChild(link);
 	}
 
 	function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -1000,7 +1001,6 @@ var bilibiliLiveHimeBackground = (function () {
 
 	    classCallCheck(this, Background);
 
-	    this.blobs = [];
 	    this.config = null;
 	    this.stream = null;
 	    this.socket = null;
@@ -1026,23 +1026,14 @@ var bilibiliLiveHimeBackground = (function () {
 	  }
 
 	  createClass(Background, [{
-	    key: "sendMessage",
-	    value: function sendMessage(type, data) {
-	      if (this.config.recordId) {
-	        sendMessageToTab(this.config.recordId, type, data);
-	      }
-	    }
-	  }, {
 	    key: "connectSocket",
 	    value: function connectSocket(socketUrl) {
 	      return new Promise(function (revolve, reject) {
 	        var socket = socket_io(socketUrl);
 	        socket.on('connect_error', function (error) {
-	          log("socket \u8FDE\u63A5\u51FA\u9519: ".concat(error.message.trim()));
 	          reject(error);
 	        });
 	        socket.on('connect', function () {
-	          log("socket \u8FDE\u63A5\u6210\u529F");
 	          revolve(socket);
 	        });
 	      });
@@ -1061,8 +1052,7 @@ var bilibiliLiveHimeBackground = (function () {
 	          if (stream) {
 	            revolve(stream);
 	          } else {
-	            log('无法获取标签的视频流');
-	            reject(new Error('无法获取标签的视频流'));
+	            reject();
 	          }
 	        });
 	      });
@@ -1078,8 +1068,7 @@ var bilibiliLiveHimeBackground = (function () {
 	          var mediaRecorder = new MediaRecorder(stream, recorderOptions);
 	          revolve(mediaRecorder);
 	        } else {
-	          log('当前环境不支持录制');
-	          reject(new Error('当前环境不支持录制'));
+	          reject();
 	        }
 	      });
 	    }
@@ -1088,87 +1077,145 @@ var bilibiliLiveHimeBackground = (function () {
 	    value: function start() {
 	      var _this2 = this;
 
-	      var _this$config, timeslice, socketUrl, rtmpUrl, resolution, videoBitsPerSecond, downloadAfterStop;
+	      var _this$config, socket, rtmp, resolution, videoBitsPerSecond;
 
-	      return regenerator.async(function start$(_context) {
+	      return regenerator.async(function start$(_context3) {
 	        while (1) {
-	          switch (_context.prev = _context.next) {
+	          switch (_context3.prev = _context3.next) {
 	            case 0:
-	              _this$config = this.config, timeslice = _this$config.timeslice, socketUrl = _this$config.socketUrl, rtmpUrl = _this$config.rtmpUrl, resolution = _this$config.resolution, videoBitsPerSecond = _this$config.videoBitsPerSecond, downloadAfterStop = _this$config.downloadAfterStop;
-	              _context.next = 3;
-	              return regenerator.awrap(this.connectSocket(socketUrl));
+	              _this$config = this.config, socket = _this$config.socket, rtmp = _this$config.rtmp, resolution = _this$config.resolution, videoBitsPerSecond = _this$config.videoBitsPerSecond;
+	              _context3.next = 3;
+	              return regenerator.awrap(debug.log('欢迎使用 Bilibili 直播姬，欢迎反馈问题'));
 
 	            case 3:
-	              this.socket = _context.sent;
-
-	              if (this.socket) {
-	                _context.next = 6;
-	                break;
-	              }
-
-	              return _context.abrupt("return", this.stop());
+	              _context3.prev = 3;
+	              _context3.next = 6;
+	              return regenerator.awrap(this.connectSocket(socket));
 
 	            case 6:
-	              this.socket.emit('rtmpUrl', rtmpUrl);
-	              this.socket.on('fatal', function (info) {
-	                log("\u670D\u52A1\u5668\u62A5\u9519: ".concat(info.trim()));
+	              this.socket = _context3.sent;
+	              this.socket.emit('rtmp', rtmp);
+	              this.socket.on('err', function _callee(info) {
+	                return regenerator.async(function _callee$(_context) {
+	                  while (1) {
+	                    switch (_context.prev = _context.next) {
+	                      case 0:
+	                        _context.next = 2;
+	                        return regenerator.awrap(debug.err(info.trim()));
 
-	                _this2.stop();
+	                      case 2:
+	                        _context.next = 4;
+	                        return regenerator.awrap(_this2.stop());
+
+	                      case 4:
+	                      case "end":
+	                        return _context.stop();
+	                    }
+	                  }
+	                });
 	              });
-	              _context.next = 10;
-	              return regenerator.awrap(this.tabCapture(resolution));
+	              this.socket.on('log', function _callee2(info) {
+	                return regenerator.async(function _callee2$(_context2) {
+	                  while (1) {
+	                    switch (_context2.prev = _context2.next) {
+	                      case 0:
+	                        _context2.next = 2;
+	                        return regenerator.awrap(debug.log(info.trim()));
 
-	            case 10:
-	              this.stream = _context.sent;
+	                      case 2:
+	                      case "end":
+	                        return _context2.stop();
+	                    }
+	                  }
+	                });
+	              });
+	              _context3.next = 19;
+	              break;
 
-	              if (this.socket) {
-	                _context.next = 13;
-	                break;
-	              }
+	            case 12:
+	              _context3.prev = 12;
+	              _context3.t0 = _context3["catch"](3);
+	              _context3.next = 16;
+	              return regenerator.awrap(debug.err("socket\u8FDE\u63A5\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u4E2D\u8F6C\u5730\u5740: ".concat(_context3.t0.message.trim())));
 
-	              return _context.abrupt("return", this.stop());
-
-	            case 13:
-	              _context.next = 15;
-	              return regenerator.awrap(this.recorder(this.stream, videoBitsPerSecond));
-
-	            case 15:
-	              this.mediaRecorder = _context.sent;
-
-	              if (this.mediaRecorder) {
-	                _context.next = 18;
-	                break;
-	              }
-
-	              return _context.abrupt("return", this.stop());
+	            case 16:
+	              _context3.next = 18;
+	              return regenerator.awrap(this.stop());
 
 	            case 18:
+	              return _context3.abrupt("return");
+
+	            case 19:
+	              _context3.prev = 19;
+	              _context3.next = 22;
+	              return regenerator.awrap(this.tabCapture(resolution));
+
+	            case 22:
+	              this.stream = _context3.sent;
+	              _context3.next = 25;
+	              return regenerator.awrap(debug.log('获取标签的视频流成功'));
+
+	            case 25:
+	              _context3.next = 34;
+	              break;
+
+	            case 27:
+	              _context3.prev = 27;
+	              _context3.t1 = _context3["catch"](19);
+	              _context3.next = 31;
+	              return regenerator.awrap(debug.err('无法获取标签的视频流，请重试'));
+
+	            case 31:
+	              _context3.next = 33;
+	              return regenerator.awrap(this.stop());
+
+	            case 33:
+	              return _context3.abrupt("return");
+
+	            case 34:
+	              _context3.prev = 34;
+	              _context3.next = 37;
+	              return regenerator.awrap(this.recorder(this.stream, videoBitsPerSecond));
+
+	            case 37:
+	              this.mediaRecorder = _context3.sent;
+	              _context3.next = 40;
+	              return regenerator.awrap(debug.log('录制标签的视频流成功'));
+
+	            case 40:
 	              this.mediaRecorder.ondataavailable = function (event) {
 	                if (event.data && event.data.size > 0) {
 	                  _this2.socket.emit('binarystream', event.data);
-
-	                  if (downloadAfterStop) {
-	                    _this2.blobs.push(event.data);
-	                  }
 	                }
 	              };
 
-	              this.mediaRecorder.start(timeslice);
-	              return _context.abrupt("return", this);
+	              this.mediaRecorder.start();
+	              _context3.next = 50;
+	              break;
 
-	            case 21:
+	            case 44:
+	              _context3.prev = 44;
+	              _context3.t2 = _context3["catch"](34);
+	              _context3.next = 48;
+	              return regenerator.awrap(debug.err('无法录制标签的视频流，请重试'));
+
+	            case 48:
+	              _context3.next = 50;
+	              return regenerator.awrap(this.stop());
+
+	            case 50:
 	            case "end":
-	              return _context.stop();
+	              return _context3.stop();
 	          }
 	        }
-	      }, null, this);
+	      }, null, this, [[3, 12], [19, 27], [34, 44]]);
 	    }
 	  }, {
 	    key: "stop",
 	    value: function stop() {
-	      return regenerator.async(function stop$(_context2) {
+	      return regenerator.async(function stop$(_context4) {
 	        while (1) {
-	          switch (_context2.prev = _context2.next) {
+	          switch (_context4.prev = _context4.next) {
 	            case 0:
 	              if (this.stream) {
 	                this.stream.getTracks().forEach(function (track) {
@@ -1185,17 +1232,11 @@ var bilibiliLiveHimeBackground = (function () {
 	                this.mediaRecorder.stop();
 	              }
 
-	              if (this.config.downloadAfterStop && this.blobs.length) {
-	                download(this.blobs, "".concat(Date.now(), ".webm"));
-	                this.blobs = [];
-	              }
+	              sendMessage('close');
 
-	              _context2.next = 6;
-	              return regenerator.awrap(setStorage('recording', false));
-
-	            case 6:
+	            case 4:
 	            case "end":
-	              return _context2.stop();
+	              return _context4.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1204,15 +1245,12 @@ var bilibiliLiveHimeBackground = (function () {
 	    key: "config",
 	    get: function get() {
 	      return {
-	        liveTab: null,
-	        recordId: null,
-	        rtmpUrl: '',
-	        socketUrl: '',
-	        liveUrl: '',
-	        timeslice: 1000,
+	        tab: null,
+	        rtmp: '',
+	        streamname: '',
+	        socket: '',
 	        resolution: 1920,
-	        videoBitsPerSecond: 2500000,
-	        downloadAfterStop: true
+	        videoBitsPerSecond: 2500000
 	      };
 	    }
 	  }, {

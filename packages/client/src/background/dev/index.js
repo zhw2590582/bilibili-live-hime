@@ -1,11 +1,9 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
-import './csp';
-import { log, download, setStorage, sendMessageToTab } from '../../share';
+import { debug, sendMessage } from '../../share';
 
 class Background {
     constructor() {
-        this.blobs = [];
         this.config = null;
         this.stream = null;
         this.socket = null;
@@ -32,15 +30,12 @@ class Background {
 
     static get config() {
         return {
-            liveTab: null,
-            recordId: null,
-            rtmpUrl: '',
-            socketUrl: '',
-            liveUrl: '',
-            timeslice: 1000,
+            tab: null,
+            rtmp: '',
+            streamname: '',
+            socket: '',
             resolution: 1920,
             videoBitsPerSecond: 2500000,
-            downloadAfterStop: true,
         };
     }
 
@@ -98,22 +93,15 @@ class Background {
         };
     }
 
-    sendMessage(type, data) {
-        if (this.config.recordId) {
-            sendMessageToTab(this.config.recordId, type, data);
-        }
-    }
-
     connectSocket(socketUrl) {
         return new Promise((revolve, reject) => {
             const socket = io(socketUrl);
+
             socket.on('connect_error', error => {
-                log(`socket 连接出错: ${error.message.trim()}`);
                 reject(error);
             });
 
             socket.on('connect', () => {
-                log(`socket 连接成功`);
                 revolve(socket);
             });
         });
@@ -127,12 +115,12 @@ class Background {
             captureOptions.videoConstraints.mandatory.minWidth = resolution.width;
             captureOptions.videoConstraints.mandatory.maxHeight = resolution.height;
             captureOptions.videoConstraints.mandatory.minHeight = resolution.height;
+
             chrome.tabCapture.capture(captureOptions, stream => {
                 if (stream) {
                     revolve(stream);
                 } else {
-                    log('无法获取标签的视频流');
-                    reject(new Error('无法获取标签的视频流'));
+                    reject();
                 }
             });
         });
@@ -142,46 +130,59 @@ class Background {
         return new Promise((revolve, reject) => {
             const recorderOptions = Background.RecorderOptions;
             recorderOptions.videoBitsPerSecond = videoBitsPerSecond;
+
             if (MediaRecorder && MediaRecorder.isTypeSupported(recorderOptions.mimeType)) {
                 const mediaRecorder = new MediaRecorder(stream, recorderOptions);
                 revolve(mediaRecorder);
             } else {
-                log('当前环境不支持录制');
-                reject(new Error('当前环境不支持录制'));
+                reject();
             }
         });
     }
 
     async start() {
-        const { timeslice, socketUrl, rtmpUrl, resolution, videoBitsPerSecond, downloadAfterStop } = this.config;
+        const { socket, rtmp, resolution, videoBitsPerSecond } = this.config;
 
-        this.socket = await this.connectSocket(socketUrl);
-        if (!this.socket) return this.stop();
+        await debug.log('欢迎使用 Bilibili 直播姬，欢迎反馈问题');
 
-        this.socket.emit('rtmpUrl', rtmpUrl);
-        this.socket.on('fatal', info => {
-            log(`服务器报错: ${info.trim()}`);
-            this.stop();
-        });
+        try {
+            this.socket = await this.connectSocket(socket);
+            this.socket.emit('rtmp', rtmp);
+            this.socket.on('err', async info => {
+                await debug.err(info.trim());
+                await this.stop();
+            });
+            this.socket.on('log', async info => {
+                await debug.log(info.trim());
+            });
+        } catch (error) {
+            await debug.err(`socket连接失败，请检查中转地址: ${error.message.trim()}`);
+            await this.stop();
+            return;
+        }
 
-        this.stream = await this.tabCapture(resolution);
-        if (!this.socket) return this.stop();
+        try {
+            this.stream = await this.tabCapture(resolution);
+            await debug.log('获取标签的视频流成功');
+        } catch (error) {
+            await debug.err('无法获取标签的视频流，请重试');
+            await this.stop();
+            return;
+        }
 
-        this.mediaRecorder = await this.recorder(this.stream, videoBitsPerSecond);
-        if (!this.mediaRecorder) return this.stop();
-
-        this.mediaRecorder.ondataavailable = event => {
-            if (event.data && event.data.size > 0) {
-                this.socket.emit('binarystream', event.data);
-                if (downloadAfterStop) {
-                    this.blobs.push(event.data);
+        try {
+            this.mediaRecorder = await this.recorder(this.stream, videoBitsPerSecond);
+            await debug.log('录制标签的视频流成功');
+            this.mediaRecorder.ondataavailable = event => {
+                if (event.data && event.data.size > 0) {
+                    this.socket.emit('binarystream', event.data);
                 }
-            }
-        };
-
-        this.mediaRecorder.start(timeslice);
-
-        return this;
+            };
+            this.mediaRecorder.start();
+        } catch (error) {
+            await debug.err('无法录制标签的视频流，请重试');
+            await this.stop();
+        }
     }
 
     async stop() {
@@ -195,11 +196,7 @@ class Background {
         if (this.mediaRecorder) {
             this.mediaRecorder.stop();
         }
-        if (this.config.downloadAfterStop && this.blobs.length) {
-            download(this.blobs, `${Date.now()}.webm`);
-            this.blobs = [];
-        }
-        await setStorage('recording', false);
+        sendMessage('close');
     }
 }
 
