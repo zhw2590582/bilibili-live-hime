@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "哔哩哔哩直播姬 Chrome 扩展服务端",
   "scripts": {
-    "start": "node ./index.js"
+    "start": "npx nodemon ./index.js"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "express": "^4.17.1",
+    "nodemon": "^2.0.1",
     "socket.io": "^2.3.0"
   }
 }

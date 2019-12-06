@@ -1,9 +1,9 @@
 import './index.scss';
 import {
     debug,
-    sleep,
     query,
     openTab,
+    onMessage,
     getStorage,
     setStorage,
     sendMessage,
@@ -44,11 +44,11 @@ class Popup {
 
     async bindEvent() {
         this.$name.addEventListener('click', () => {
-            openTab(`https://chrome.google.com/webstore/detail/${chrome.runtime.id}`, true);
+            openTab(`https://chrome.google.com/webstore/detail/${chrome.runtime.id}`);
         });
 
         this.$feedback.addEventListener('click', () => {
-            openTab('https://github.com/zhw2590582/bilibili-live-hime', true);
+            openTab('https://github.com/zhw2590582/bilibili-live-hime');
         });
 
         this.$rtmp.addEventListener('input', () => {
@@ -67,12 +67,12 @@ class Popup {
             this.start();
         });
 
-        this.$stop.addEventListener('click', () => {
-            this.stop();
-            this.close();
+        this.$stop.addEventListener('click', async () => {
+            await this.stop();
+            await this.close();
         });
 
-        chrome.runtime.onMessage.addListener(request => {
+        onMessage(request => {
             const { type } = request;
             switch (type) {
                 case 'close':
@@ -164,8 +164,6 @@ class Popup {
 
     async close() {
         await setStorage('recording', false);
-        await debug.log('3秒后关闭连接...');
-        await sleep(3000);
         await debug.clean();
         chrome.runtime.reload();
         window.close();

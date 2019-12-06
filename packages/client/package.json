@@ -35,7 +35,6 @@
   },
   "dependencies": {
     "crx-hotreload": "^1.0.4",
-    "csp-generator": "^1.0.2",
     "obj-to-string": "^1.0.1",
     "socket.io-client": "^2.3.0"
   }

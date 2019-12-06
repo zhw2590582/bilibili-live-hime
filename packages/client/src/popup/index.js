@@ -805,12 +805,6 @@ var bilibiliLiveHimePopup = (function () {
 
 	var objToString_1 = objToString;
 
-	function sleep() {
-	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-	  return new Promise(function (resolve) {
-	    return setTimeout(resolve, ms);
-	  });
-	}
 	function query(el) {
 	  var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
 	  return doc.querySelector(el);
@@ -851,7 +845,7 @@ var bilibiliLiveHimePopup = (function () {
 	  chrome.storage.onChanged.addListener(callback);
 	}
 	function openTab(url) {
-	  var active = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	  var active = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 	  return new Promise(function (resolve) {
 	    chrome.tabs.query({}, function (tabs) {
 	      var findTab = tabs.find(function (tab) {
@@ -969,6 +963,9 @@ var bilibiliLiveHimePopup = (function () {
 	    data: data
 	  });
 	}
+	function onMessage(callback) {
+	  chrome.runtime.onMessage.addListener(callback);
+	}
 
 	var Popup =
 	/*#__PURE__*/
@@ -1011,15 +1008,15 @@ var bilibiliLiveHimePopup = (function () {
 	    value: function bindEvent() {
 	      var _this2 = this;
 
-	      return regenerator.async(function bindEvent$(_context) {
+	      return regenerator.async(function bindEvent$(_context2) {
 	        while (1) {
-	          switch (_context.prev = _context.next) {
+	          switch (_context2.prev = _context2.next) {
 	            case 0:
 	              this.$name.addEventListener('click', function () {
-	                openTab("https://chrome.google.com/webstore/detail/".concat(chrome.runtime.id), true);
+	                openTab("https://chrome.google.com/webstore/detail/".concat(chrome.runtime.id));
 	              });
 	              this.$feedback.addEventListener('click', function () {
-	                openTab('https://github.com/zhw2590582/bilibili-live-hime', true);
+	                openTab('https://github.com/zhw2590582/bilibili-live-hime');
 	              });
 	              this.$rtmp.addEventListener('input', function () {
 	                _this2.saveInput('rtmp');
@@ -1033,12 +1030,26 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$start.addEventListener('click', function () {
 	                _this2.start();
 	              });
-	              this.$stop.addEventListener('click', function () {
-	                _this2.stop();
+	              this.$stop.addEventListener('click', function _callee() {
+	                return regenerator.async(function _callee$(_context) {
+	                  while (1) {
+	                    switch (_context.prev = _context.next) {
+	                      case 0:
+	                        _context.next = 2;
+	                        return regenerator.awrap(_this2.stop());
 
-	                _this2.close();
+	                      case 2:
+	                        _context.next = 4;
+	                        return regenerator.awrap(_this2.close());
+
+	                      case 4:
+	                      case "end":
+	                        return _context.stop();
+	                    }
+	                  }
+	                });
 	              });
-	              chrome.runtime.onMessage.addListener(function (request) {
+	              onMessage(function (request) {
 	                var type = request.type;
 
 	                switch (type) {
@@ -1051,7 +1062,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 8:
 	            case "end":
-	              return _context.stop();
+	              return _context2.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1060,32 +1071,32 @@ var bilibiliLiveHimePopup = (function () {
 	    key: "saveInput",
 	    value: function saveInput(name) {
 	      var config;
-	      return regenerator.async(function saveInput$(_context2) {
+	      return regenerator.async(function saveInput$(_context3) {
 	        while (1) {
-	          switch (_context2.prev = _context2.next) {
+	          switch (_context3.prev = _context3.next) {
 	            case 0:
-	              _context2.next = 2;
+	              _context3.next = 2;
 	              return regenerator.awrap(getStorage('config'));
 
 	            case 2:
-	              _context2.t0 = _context2.sent;
+	              _context3.t0 = _context3.sent;
 
-	              if (_context2.t0) {
-	                _context2.next = 5;
+	              if (_context3.t0) {
+	                _context3.next = 5;
 	                break;
 	              }
 
-	              _context2.t0 = {};
+	              _context3.t0 = {};
 
 	            case 5:
-	              config = _context2.t0;
+	              config = _context3.t0;
 	              config[name] = this["$".concat(name)].value.trim();
-	              _context2.next = 9;
+	              _context3.next = 9;
 	              return regenerator.awrap(setStorage('config', config));
 
 	            case 9:
 	            case "end":
-	              return _context2.stop();
+	              return _context3.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1094,15 +1105,15 @@ var bilibiliLiveHimePopup = (function () {
 	    key: "updateConfig",
 	    value: function updateConfig() {
 	      var config;
-	      return regenerator.async(function updateConfig$(_context3) {
+	      return regenerator.async(function updateConfig$(_context4) {
 	        while (1) {
-	          switch (_context3.prev = _context3.next) {
+	          switch (_context4.prev = _context4.next) {
 	            case 0:
-	              _context3.next = 2;
+	              _context4.next = 2;
 	              return regenerator.awrap(getStorage('config'));
 
 	            case 2:
-	              config = _context3.sent;
+	              config = _context4.sent;
 
 	              if (config) {
 	                this.$rtmp.value = config.rtmp || '';
@@ -1114,7 +1125,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 4:
 	            case "end":
-	              return _context3.stop();
+	              return _context4.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1123,25 +1134,25 @@ var bilibiliLiveHimePopup = (function () {
 	    key: "updateDebug",
 	    value: function updateDebug() {
 	      var logs;
-	      return regenerator.async(function updateDebug$(_context4) {
+	      return regenerator.async(function updateDebug$(_context5) {
 	        while (1) {
-	          switch (_context4.prev = _context4.next) {
+	          switch (_context5.prev = _context5.next) {
 	            case 0:
-	              _context4.next = 2;
+	              _context5.next = 2;
 	              return regenerator.awrap(getStorage('debug'));
 
 	            case 2:
-	              _context4.t0 = _context4.sent;
+	              _context5.t0 = _context5.sent;
 
-	              if (_context4.t0) {
-	                _context4.next = 5;
+	              if (_context5.t0) {
+	                _context5.next = 5;
 	                break;
 	              }
 
-	              _context4.t0 = [];
+	              _context5.t0 = [];
 
 	            case 5:
-	              logs = _context4.t0;
+	              logs = _context5.t0;
 	              this.$debug.innerHTML = logs.map(function (item) {
 	                return "<p class=\"".concat(item.type, "\">").concat(item.data, "</p>");
 	              }).join('');
@@ -1149,7 +1160,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 8:
 	            case "end":
-	              return _context4.stop();
+	              return _context5.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1158,18 +1169,18 @@ var bilibiliLiveHimePopup = (function () {
 	    key: "updateRecording",
 	    value: function updateRecording() {
 	      var recording;
-	      return regenerator.async(function updateRecording$(_context5) {
+	      return regenerator.async(function updateRecording$(_context6) {
 	        while (1) {
-	          switch (_context5.prev = _context5.next) {
+	          switch (_context6.prev = _context6.next) {
 	            case 0:
-	              _context5.next = 2;
+	              _context6.next = 2;
 	              return regenerator.awrap(getStorage('recording'));
 
 	            case 2:
-	              recording = _context5.sent;
+	              recording = _context6.sent;
 
 	              if (!recording) {
-	                _context5.next = 12;
+	                _context6.next = 12;
 	                break;
 	              }
 
@@ -1179,16 +1190,16 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$socket.disabled = true;
 	              this.$resolution.disabled = true;
 	              this.$videoBitsPerSecond.disabled = true;
-	              _context5.next = 14;
+	              _context6.next = 14;
 	              break;
 
 	            case 12:
-	              _context5.next = 14;
+	              _context6.next = 14;
 	              return regenerator.awrap(debug.clean());
 
 	            case 14:
 	            case "end":
-	              return _context5.stop();
+	              return _context6.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1197,26 +1208,26 @@ var bilibiliLiveHimePopup = (function () {
 	    key: "start",
 	    value: function start() {
 	      var activeTab, config;
-	      return regenerator.async(function start$(_context6) {
+	      return regenerator.async(function start$(_context7) {
 	        while (1) {
-	          switch (_context6.prev = _context6.next) {
+	          switch (_context7.prev = _context7.next) {
 	            case 0:
-	              _context6.next = 2;
+	              _context7.next = 2;
 	              return regenerator.awrap(getActiveTab());
 
 	            case 2:
-	              activeTab = _context6.sent;
+	              activeTab = _context7.sent;
 
 	              if (activeTab) {
-	                _context6.next = 7;
+	                _context7.next = 7;
 	                break;
 	              }
 
-	              _context6.next = 6;
+	              _context7.next = 6;
 	              return regenerator.awrap(debug.err('未获取到当前激活的标签'));
 
 	            case 6:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 7:
 	              config = {
@@ -1229,46 +1240,46 @@ var bilibiliLiveHimePopup = (function () {
 	              };
 
 	              if (!(!config.rtmp || !/^rtmp:\/\/.+/i.test(config.rtmp))) {
-	                _context6.next = 12;
+	                _context7.next = 12;
 	                break;
 	              }
 
-	              _context6.next = 11;
+	              _context7.next = 11;
 	              return regenerator.awrap(debug.err('请输入正确的rtmp推流地址'));
 
 	            case 11:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 12:
 	              if (config.streamname) {
-	                _context6.next = 16;
+	                _context7.next = 16;
 	                break;
 	              }
 
-	              _context6.next = 15;
+	              _context7.next = 15;
 	              return regenerator.awrap(debug.err('请输入正确的直播码'));
 
 	            case 15:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 16:
 	              if (!(!config.socket || !/^https?:\/\/.+/i.test(config.socket))) {
-	                _context6.next = 20;
+	                _context7.next = 20;
 	                break;
 	              }
 
-	              _context6.next = 19;
+	              _context7.next = 19;
 	              return regenerator.awrap(debug.err('请输入正确的中转地址'));
 
 	            case 19:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 20:
-	              _context6.next = 22;
+	              _context7.next = 22;
 	              return regenerator.awrap(setStorage('recording', true));
 
 	            case 22:
-	              _context6.next = 24;
+	              _context7.next = 24;
 	              return regenerator.awrap(setStorage('config', config));
 
 	            case 24:
@@ -1276,7 +1287,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 25:
 	            case "end":
-	              return _context6.stop();
+	              return _context7.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1284,15 +1295,15 @@ var bilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "stop",
 	    value: function stop() {
-	      return regenerator.async(function stop$(_context7) {
+	      return regenerator.async(function stop$(_context8) {
 	        while (1) {
-	          switch (_context7.prev = _context7.next) {
+	          switch (_context8.prev = _context8.next) {
 	            case 0:
 	              sendMessage('stop');
 
 	            case 1:
 	            case "end":
-	              return _context7.stop();
+	              return _context8.stop();
 	          }
 	        }
 	      });
@@ -1300,32 +1311,24 @@ var bilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "close",
 	    value: function close() {
-	      return regenerator.async(function close$(_context8) {
+	      return regenerator.async(function close$(_context9) {
 	        while (1) {
-	          switch (_context8.prev = _context8.next) {
+	          switch (_context9.prev = _context9.next) {
 	            case 0:
-	              _context8.next = 2;
+	              _context9.next = 2;
 	              return regenerator.awrap(setStorage('recording', false));
 
 	            case 2:
-	              _context8.next = 4;
-	              return regenerator.awrap(debug.log('3秒后关闭连接...'));
-
-	            case 4:
-	              _context8.next = 6;
-	              return regenerator.awrap(sleep(3000));
-
-	            case 6:
-	              _context8.next = 8;
+	              _context9.next = 4;
 	              return regenerator.awrap(debug.clean());
 
-	            case 8:
+	            case 4:
 	              chrome.runtime.reload();
 	              window.close();
 
-	            case 10:
+	            case 6:
 	            case "end":
-	              return _context8.stop();
+	              return _context9.stop();
 	          }
 	        }
 	      });

@@ -1,4 +1,4 @@
-import objToString from 'obj-to-string';
+import ots from 'obj-to-string';
 
 export function sleep(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -55,7 +55,7 @@ export function storageChange(callback) {
     chrome.storage.onChanged.addListener(callback);
 }
 
-export function openTab(url, active = false) {
+export function openTab(url, active = true) {
     return new Promise(resolve => {
         chrome.tabs.query({}, tabs => {
             const findTab = tabs.find(tab => tab.url === url);
@@ -84,7 +84,7 @@ export const debug = {
         const logs = (await getStorage('debug')) || [];
         logs.push({
             type: 'log',
-            data: objToString(msg),
+            data: ots(msg),
         });
         await setStorage('debug', logs);
     },
@@ -92,7 +92,7 @@ export const debug = {
         const logs = (await getStorage('debug')) || [];
         logs.push({
             type: 'error',
-            data: objToString(msg),
+            data: ots(msg),
         });
         await setStorage('debug', logs);
     },
@@ -108,21 +108,6 @@ export function sendMessage(type, data) {
     });
 }
 
-export function sendMessageToTab(tabId, type, data) {
-    chrome.tabs.sendMessage(tabId, {
-        type,
-        data,
-    });
-}
-
-export function download(data, name) {
-    const blob = new Blob(Array.isArray(data) ? data : [data]);
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = name;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+export function onMessage(callback) {
+    chrome.runtime.onMessage.addListener(callback);
 }

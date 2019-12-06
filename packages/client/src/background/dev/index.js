@@ -1,6 +1,6 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
-import { debug, sendMessage } from '../../share';
+import { debug, sendMessage, onMessage } from '../../share';
 
 class Background {
     constructor() {
@@ -9,7 +9,7 @@ class Background {
         this.socket = null;
         this.mediaRecorder = null;
 
-        chrome.runtime.onMessage.addListener(request => {
+        onMessage(request => {
             const { type, data } = request;
             switch (type) {
                 case 'start':
@@ -141,48 +141,50 @@ class Background {
     }
 
     async start() {
-        const { socket, rtmp, resolution, videoBitsPerSecond } = this.config;
+        const { socket, rtmp, streamname, resolution, videoBitsPerSecond } = this.config;
 
         await debug.log('欢迎使用 Bilibili 直播姬，欢迎反馈问题');
 
         try {
             this.socket = await this.connectSocket(socket);
-            this.socket.emit('rtmp', rtmp);
-            this.socket.on('err', async info => {
-                await debug.err(info.trim());
-                await this.stop();
+            await debug.log('建立socket连接成功...');
+            this.socket.emit('rtmp', rtmp + streamname);
+            this.socket.on('fail', () => {
+                this.stop();
             });
             this.socket.on('log', async info => {
                 await debug.log(info.trim());
             });
         } catch (error) {
-            await debug.err(`socket连接失败，请检查中转地址: ${error.message.trim()}`);
+            await debug.err(`建立socket连接失败，请检查中转地址: ${error.message.trim()}`);
             await this.stop();
             return;
         }
 
         try {
             this.stream = await this.tabCapture(resolution);
-            await debug.log('获取标签的视频流成功');
+            await debug.log('获取标签视频流成功...');
         } catch (error) {
-            await debug.err('无法获取标签的视频流，请重试');
+            await debug.err('无法获取标签视频流，请重试！');
             await this.stop();
             return;
         }
 
         try {
             this.mediaRecorder = await this.recorder(this.stream, videoBitsPerSecond);
-            await debug.log('录制标签的视频流成功');
+            await debug.log('录制器启动成功...');
             this.mediaRecorder.ondataavailable = event => {
                 if (event.data && event.data.size > 0) {
                     this.socket.emit('binarystream', event.data);
                 }
             };
-            this.mediaRecorder.start();
+            this.mediaRecorder.start(1000);
         } catch (error) {
-            await debug.err('无法录制标签的视频流，请重试');
+            await debug.err('无法录制标签的视频流，请重试！');
             await this.stop();
         }
+
+        await debug.log('正在推流中，请尽量保持当前标签选中状态');
     }
 
     async stop() {

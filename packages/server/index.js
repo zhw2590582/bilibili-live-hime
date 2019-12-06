@@ -1,9 +1,8 @@
 const io = require('socket.io')(8080);
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const spawn = require('child_process').spawn;
-const exec = require('child_process').exec;
 
-function createFFmpegProcess(rtmpUrl) {
+function createFFmpegProcess(rtmp) {
     return spawn(ffmpegPath, [
         '-re',
         '-i',
@@ -16,25 +15,28 @@ function createFFmpegProcess(rtmpUrl) {
         '192k',
         '-f',
         'flv',
-        rtmpUrl,
+        rtmp,
     ]);
 }
 
 let ffmpeg = null;
 io.on('connection', function(socket) {
-    socket.on('rtmpUrl', rtmpUrl => {
-        ffmpeg = createFFmpegProcess(rtmpUrl);
+    socket.on('rtmp', rtmp => {
+        if (ffmpeg) {
+            ffmpeg.stdin.end();
+            ffmpeg.kill('SIGINT');
+            ffmpeg = null;
+        }
 
-        ffmpeg.stdout.on('data', data => {
-            console.log(String(data));
-        });
+        ffmpeg = createFFmpegProcess(rtmp);
 
-        ffmpeg.stderr.on('data', data => {
-            console.log(String(data));
-        });
+        // log 事件可以在浏览器打印消息
+        socket.emit('log', '创建ffmpeg进程成功');
 
         ffmpeg.on('close', code => {
-            console.log(`子进程退出，退出码 ${code}`);
+            // fail 事件可以在浏览器关闭推流
+            socket.emit('fail');
+            console.log('ffmpeg进程退出：' + code);
         });
     });
 
