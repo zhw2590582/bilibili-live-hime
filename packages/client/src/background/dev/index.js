@@ -151,7 +151,7 @@ class Background {
             this.socket.emit('rtmp', rtmp + streamname);
             this.socket.on('fail', async info => {
                 await debug.err(`socket 返回错误：${info}`);
-                this.stop();
+                await this.stop();
             });
             this.socket.on('log', async info => {
                 await debug.log(info.trim());
