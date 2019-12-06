@@ -1,9 +1,8 @@
 {
     "name": "Bilibili 直播姬",
     "version": "1.0.0",
-    "description": "无需额外软件，就可以一键开启 Bilibili 直播。",
+    "description": "把浏览器页面直播到 Bilibili 直播间",
     "manifest_version": 2,
-    "minimum_chrome_version": "49",
     "background": {
         "scripts": [
             "background/index.js"
