@@ -17,25 +17,25 @@
         </header>
         <section class="config">
             <div class="item">
-                <div class="key">推流地址</div>
+                <div class="key">rtmp地址</div>
                 <div class="value">
-                    <input class="rtmpUrl" type="text" placeholder="rtmp://" maxlength="200">
+                    <input class="rtmp" type="text" placeholder="请输入rtmp地址" maxlength="200">
+                </div>
+            </div>
+            <div class="item">
+                <div class="key">直播码</div>
+                <div class="value">
+                    <input class="streamname" type="text" placeholder="请输入直播码" maxlength="200">
                 </div>
             </div>
             <div class="item">
                 <div class="key">中转地址</div>
                 <div class="value">
-                    <input class="socketUrl" type="text" placeholder="http://" maxlength="200">
+                    <input class="socket" type="text" placeholder="请输入中转地址" maxlength="200">
                 </div>
             </div>
             <div class="item">
-                <div class="key">直播地址</div>
-                <div class="value">
-                    <input class="liveUrl" type="text" placeholder="http://" maxlength="200">
-                </div>
-            </div>
-            <div class="item">
-                <div class="key">视频分辨率</div>
+                <div class="key">分辨率</div>
                 <div class="value">
                     <select class="resolution">
                         <option value="1920" selected>1920P</option>
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <div class="item">
-                <div class="key">视频比特率</div>
+                <div class="key">比特率</div>
                 <div class="value">
                     <select class="videoBitsPerSecond">
                         <option value="1500000">1500kbps</option>

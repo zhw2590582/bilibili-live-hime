@@ -803,7 +803,7 @@ var bilibiliLiveHimePopup = (function () {
 	  }
 	}
 
-	var _objToString_1_0_1_objToString = objToString;
+	var objToString_1 = objToString;
 
 	function sleep() {
 	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
@@ -876,63 +876,95 @@ var bilibiliLiveHimePopup = (function () {
 	    });
 	  });
 	}
-	function log(msg) {
-	  return regenerator.async(function log$(_context2) {
-	    while (1) {
-	      switch (_context2.prev = _context2.next) {
-	        case 0:
-	          return _context2.abrupt("return", new Promise(function _callee(resolve) {
-	            var logs;
-	            return regenerator.async(function _callee$(_context) {
-	              while (1) {
-	                switch (_context.prev = _context.next) {
-	                  case 0:
-	                    msg = msg instanceof Error ? msg.message.trim() : _objToString_1_0_1_objToString(msg);
-	                    _context.next = 3;
-	                    return regenerator.awrap(getStorage('debug'));
+	var debug = {
+	  log: function log(msg) {
+	    var logs;
+	    return regenerator.async(function log$(_context) {
+	      while (1) {
+	        switch (_context.prev = _context.next) {
+	          case 0:
+	            _context.next = 2;
+	            return regenerator.awrap(getStorage('debug'));
 
-	                  case 3:
-	                    _context.t0 = _context.sent;
+	          case 2:
+	            _context.t0 = _context.sent;
 
-	                    if (_context.t0) {
-	                      _context.next = 6;
-	                      break;
-	                    }
+	            if (_context.t0) {
+	              _context.next = 5;
+	              break;
+	            }
 
-	                    _context.t0 = [];
+	            _context.t0 = [];
 
-	                  case 6:
-	                    logs = _context.t0;
-	                    logs.push(msg);
-	                    _context.next = 10;
-	                    return regenerator.awrap(setStorage('debug', logs));
-
-	                  case 10:
-	                    resolve(logs);
-
-	                  case 11:
-	                  case "end":
-	                    return _context.stop();
-	                }
-	              }
+	          case 5:
+	            logs = _context.t0;
+	            logs.push({
+	              type: 'log',
+	              data: objToString_1(msg)
 	            });
-	          }));
+	            _context.next = 9;
+	            return regenerator.awrap(setStorage('debug', logs));
 
-	        case 1:
-	        case "end":
-	          return _context2.stop();
+	          case 9:
+	          case "end":
+	            return _context.stop();
+	        }
 	      }
-	    }
-	  });
-	}
+	    });
+	  },
+	  err: function err(msg) {
+	    var logs;
+	    return regenerator.async(function err$(_context2) {
+	      while (1) {
+	        switch (_context2.prev = _context2.next) {
+	          case 0:
+	            _context2.next = 2;
+	            return regenerator.awrap(getStorage('debug'));
+
+	          case 2:
+	            _context2.t0 = _context2.sent;
+
+	            if (_context2.t0) {
+	              _context2.next = 5;
+	              break;
+	            }
+
+	            _context2.t0 = [];
+
+	          case 5:
+	            logs = _context2.t0;
+	            logs.push({
+	              type: 'error',
+	              data: objToString_1(msg)
+	            });
+	            _context2.next = 9;
+	            return regenerator.awrap(setStorage('debug', logs));
+
+	          case 9:
+	          case "end":
+	            return _context2.stop();
+	        }
+	      }
+	    });
+	  },
+	  clean: function clean() {
+	    return regenerator.async(function clean$(_context3) {
+	      while (1) {
+	        switch (_context3.prev = _context3.next) {
+	          case 0:
+	            _context3.next = 2;
+	            return regenerator.awrap(setStorage('debug', []));
+
+	          case 2:
+	          case "end":
+	            return _context3.stop();
+	        }
+	      }
+	    });
+	  }
+	};
 	function sendMessage(type, data) {
 	  chrome.runtime.sendMessage({
-	    type: type,
-	    data: data
-	  });
-	}
-	function sendMessageToTab(tabId, type, data) {
-	  chrome.tabs.sendMessage(tabId, {
 	    type: type,
 	    data: data
 	  });
@@ -950,90 +982,62 @@ var bilibiliLiveHimePopup = (function () {
 	    this.$container = query('.container');
 	    this.$name = query('.name');
 	    this.$feedback = query('.feedback');
-	    this.$rtmpUrl = query('.rtmpUrl');
-	    this.$socketUrl = query('.socketUrl');
-	    this.$liveUrl = query('.liveUrl');
+	    this.$name.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
+	    this.$rtmp = query('.rtmp');
+	    this.$streamname = query('.streamname');
+	    this.$socket = query('.socket');
 	    this.$resolution = query('.resolution');
 	    this.$videoBitsPerSecond = query('.videoBitsPerSecond');
 	    this.$debug = query('.debug');
 	    this.$start = query('.start');
 	    this.$stop = query('.stop');
-	    this.$name.addEventListener('click', function () {
-	      openTab("https://chrome.google.com/webstore/detail/".concat(chrome.runtime.id));
-	    });
-	    this.$feedback.addEventListener('click', function () {
-	      openTab('https://github.com/zhw2590582/bilibili-live-hime');
-	    });
-	    this.$start.addEventListener('click', function () {
-	      _this.start();
-	    });
-	    this.$stop.addEventListener('click', function () {
-	      _this.stop();
-	    });
-	    this.init();
-	    this.updateLog();
-	    storageChange(function () {
-	      _this.updateLog();
+	    this.bindEvent();
+	    this.updateConfig();
+	    this.updateDebug();
+	    this.updateRecording();
+	    storageChange(function (changes) {
+	      if (changes.debug) {
+	        _this.updateDebug();
+	      }
+
+	      if (changes.recording) {
+	        _this.updateRecording();
+	      }
 	    });
 	  }
 
 	  createClass(Popup, [{
-	    key: "init",
-	    value: function init() {
-	      return regenerator.async(function init$(_context) {
+	    key: "bindEvent",
+	    value: function bindEvent() {
+	      var _this2 = this;
+
+	      return regenerator.async(function bindEvent$(_context) {
 	        while (1) {
 	          switch (_context.prev = _context.next) {
 	            case 0:
-	              _context.next = 2;
-	              return regenerator.awrap(getStorage('recording'));
+	              this.$name.addEventListener('click', function () {
+	                openTab("https://chrome.google.com/webstore/detail/".concat(chrome.runtime.id), true);
+	              });
+	              this.$feedback.addEventListener('click', function () {
+	                openTab('https://github.com/zhw2590582/bilibili-live-hime', true);
+	              });
+	              this.$rtmp.addEventListener('input', function () {
+	                _this2.saveInput('rtmp');
+	              });
+	              this.$streamname.addEventListener('input', function () {
+	                _this2.saveInput('streamname');
+	              });
+	              this.$socket.addEventListener('input', function () {
+	                _this2.saveInput('socket');
+	              });
+	              this.$start.addEventListener('click', function () {
+	                _this2.start();
+	              });
+	              this.$stop.addEventListener('click', function () {
+	                _this2.stop();
+	              });
 
-	            case 2:
-	              this.recording = _context.sent;
-	              _context.next = 5;
-	              return regenerator.awrap(getStorage('config'));
-
-	            case 5:
-	              this.config = _context.sent;
-	              _context.next = 8;
-	              return regenerator.awrap(getStorage('debug'));
-
-	            case 8:
-	              this.debug = _context.sent;
-	              _context.next = 11;
-	              return regenerator.awrap(getActiveTab());
-
-	            case 11:
-	              this.activeTab = _context.sent;
-	              sendMessageToTab(this.activeTab.id, 'record@init');
-	              this.$name.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
-
-	              if (this.config) {
-	                this.$rtmpUrl.value = this.config.rtmpUrl;
-	                this.$socketUrl.value = this.config.socketUrl;
-	                this.$liveUrl.value = this.config.liveUrl;
-	                this.$resolution.value = this.config.resolution;
-	                this.$videoBitsPerSecond.value = this.config.videoBitsPerSecond;
-	              }
-
-	              if (!this.recording) {
-	                _context.next = 24;
-	                break;
-	              }
-
-	              this.$container.classList.add('recording');
-	              this.$rtmpUrl.disabled = true;
-	              this.$socketUrl.disabled = true;
-	              this.$liveUrl.disabled = true;
-	              this.$resolution.disabled = true;
-	              this.$videoBitsPerSecond.disabled = true;
-	              _context.next = 26;
-	              break;
-
-	            case 24:
-	              _context.next = 26;
-	              return regenerator.awrap(setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']));
-
-	            case 26:
+	            case 7:
 	            case "end":
 	              return _context.stop();
 	          }
@@ -1041,104 +1045,33 @@ var bilibiliLiveHimePopup = (function () {
 	      }, null, this);
 	    }
 	  }, {
-	    key: "start",
-	    value: function start() {
-	      var config, liveTab;
-	      return regenerator.async(function start$(_context2) {
+	    key: "saveInput",
+	    value: function saveInput(name) {
+	      var config;
+	      return regenerator.async(function saveInput$(_context2) {
 	        while (1) {
 	          switch (_context2.prev = _context2.next) {
 	            case 0:
-	              config = {
-	                recordId: this.activeTab.id,
-	                rtmpUrl: this.$rtmpUrl.value.trim(),
-	                socketUrl: this.$socketUrl.value.trim(),
-	                liveUrl: this.$liveUrl.value.trim(),
-	                resolution: this.$resolution.value,
-	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
-	              };
+	              _context2.next = 2;
+	              return regenerator.awrap(getStorage('config'));
 
-	              if (!(!config.rtmpUrl || !/^rtmp:\/\/.+/i.test(config.rtmpUrl))) {
+	            case 2:
+	              _context2.t0 = _context2.sent;
+
+	              if (_context2.t0) {
 	                _context2.next = 5;
 	                break;
 	              }
 
-	              _context2.next = 4;
-	              return regenerator.awrap(log('请输入正确的推流地址'));
-
-	            case 4:
-	              return _context2.abrupt("return");
+	              _context2.t0 = {};
 
 	            case 5:
-	              if (!(!config.socketUrl || !/^https?:\/\/.+/i.test(config.socketUrl))) {
-	                _context2.next = 9;
-	                break;
-	              }
-
-	              _context2.next = 8;
-	              return regenerator.awrap(log('请输入正确的中转地址'));
-
-	            case 8:
-	              return _context2.abrupt("return");
-
-	            case 9:
-	              if (!(!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl))) {
-	                _context2.next = 13;
-	                break;
-	              }
-
-	              _context2.next = 12;
-	              return regenerator.awrap(log('请输入正确的直播地址'));
-
-	            case 12:
-	              return _context2.abrupt("return");
-
-	            case 13:
-	              this.$container.classList.add('recording');
-	              this.$rtmpUrl.disabled = true;
-	              this.$socketUrl.disabled = true;
-	              this.$liveUrl.disabled = true;
-	              this.$resolution.disabled = true;
-	              this.$videoBitsPerSecond.disabled = true;
-	              _context2.next = 21;
-	              return regenerator.awrap(setStorage('recording', true));
-
-	            case 21:
-	              _context2.next = 23;
+	              config = _context2.t0;
+	              config[name] = this["$".concat(name)].value.trim();
+	              _context2.next = 9;
 	              return regenerator.awrap(setStorage('config', config));
 
-	            case 23:
-	              _context2.next = 25;
-	              return regenerator.awrap(openTab(config.liveUrl));
-
-	            case 25:
-	              liveTab = _context2.sent;
-
-	              if (!liveTab) {
-	                _context2.next = 36;
-	                break;
-	              }
-
-	              config.config = liveTab.id;
-	              _context2.next = 30;
-	              return regenerator.awrap(log("\u5DF2\u6253\u5F00\u76F4\u64AD\u95F4\uFF1A".concat(config.liveUrl)));
-
-	            case 30:
-	              _context2.next = 32;
-	              return regenerator.awrap(sendMessage('start', config));
-
-	            case 32:
-	              _context2.next = 34;
-	              return regenerator.awrap(log('请保持当前页面选中状态，否则无法推流'));
-
-	            case 34:
-	              _context2.next = 38;
-	              break;
-
-	            case 36:
-	              _context2.next = 38;
-	              return regenerator.awrap(log('无法打开直播地址，请重试'));
-
-	            case 38:
+	            case 9:
 	            case "end":
 	              return _context2.stop();
 	          }
@@ -1146,38 +1079,28 @@ var bilibiliLiveHimePopup = (function () {
 	      }, null, this);
 	    }
 	  }, {
-	    key: "stop",
-	    value: function stop() {
-	      return regenerator.async(function stop$(_context3) {
+	    key: "updateConfig",
+	    value: function updateConfig() {
+	      var config;
+	      return regenerator.async(function updateConfig$(_context3) {
 	        while (1) {
 	          switch (_context3.prev = _context3.next) {
 	            case 0:
-	              this.$container.classList.remove('recording');
-	              _context3.next = 3;
-	              return regenerator.awrap(setStorage('recording', false));
+	              _context3.next = 2;
+	              return regenerator.awrap(getStorage('config'));
 
-	            case 3:
-	              this.$debug.innerHTML = '';
-	              _context3.next = 6;
-	              return regenerator.awrap(sendMessage('stop'));
+	            case 2:
+	              config = _context3.sent;
 
-	            case 6:
-	              _context3.next = 8;
-	              return regenerator.awrap(log('正在关闭推流...'));
+	              if (config) {
+	                this.$rtmp.value = config.rtmp || '';
+	                this.$streamname.value = config.streamname || '';
+	                this.$socket.value = config.socket || '';
+	                this.$resolution.value = config.resolution || '1920';
+	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
+	              }
 
-	            case 8:
-	              _context3.next = 10;
-	              return regenerator.awrap(sleep(3000));
-
-	            case 10:
-	              _context3.next = 12;
-	              return regenerator.awrap(setStorage('debug', []));
-
-	            case 12:
-	              chrome.runtime.reload();
-	              window.close();
-
-	            case 14:
+	            case 4:
 	            case "end":
 	              return _context3.stop();
 	          }
@@ -1185,10 +1108,10 @@ var bilibiliLiveHimePopup = (function () {
 	      }, null, this);
 	    }
 	  }, {
-	    key: "updateLog",
-	    value: function updateLog() {
+	    key: "updateDebug",
+	    value: function updateDebug() {
 	      var logs;
-	      return regenerator.async(function updateLog$(_context4) {
+	      return regenerator.async(function updateDebug$(_context4) {
 	        while (1) {
 	          switch (_context4.prev = _context4.next) {
 	            case 0:
@@ -1208,7 +1131,7 @@ var bilibiliLiveHimePopup = (function () {
 	            case 5:
 	              logs = _context4.t0;
 	              this.$debug.innerHTML = logs.map(function (item) {
-	                return "<p>".concat(item, "</p>");
+	                return "<p class=\"".concat(item.type, "\">").concat(item.data, "</p>");
 	              }).join('');
 	              this.$debug.scrollTo(0, this.$debug.scrollHeight);
 
@@ -1218,6 +1141,167 @@ var bilibiliLiveHimePopup = (function () {
 	          }
 	        }
 	      }, null, this);
+	    }
+	  }, {
+	    key: "updateRecording",
+	    value: function updateRecording() {
+	      var recording;
+	      return regenerator.async(function updateRecording$(_context5) {
+	        while (1) {
+	          switch (_context5.prev = _context5.next) {
+	            case 0:
+	              _context5.next = 2;
+	              return regenerator.awrap(getStorage('recording'));
+
+	            case 2:
+	              recording = _context5.sent;
+
+	              if (!recording) {
+	                _context5.next = 12;
+	                break;
+	              }
+
+	              this.$container.classList.add('recording');
+	              this.$rtmp.disabled = true;
+	              this.$streamname.disabled = true;
+	              this.$socket.disabled = true;
+	              this.$resolution.disabled = true;
+	              this.$videoBitsPerSecond.disabled = true;
+	              _context5.next = 16;
+	              break;
+
+	            case 12:
+	              _context5.next = 14;
+	              return regenerator.awrap(debug.clean());
+
+	            case 14:
+	              _context5.next = 16;
+	              return regenerator.awrap(debug.log('欢迎使用 Bilibili 直播姬'));
+
+	            case 16:
+	            case "end":
+	              return _context5.stop();
+	          }
+	        }
+	      }, null, this);
+	    }
+	  }, {
+	    key: "start",
+	    value: function start() {
+	      var activeTab, config;
+	      return regenerator.async(function start$(_context6) {
+	        while (1) {
+	          switch (_context6.prev = _context6.next) {
+	            case 0:
+	              _context6.next = 2;
+	              return regenerator.awrap(getActiveTab());
+
+	            case 2:
+	              activeTab = _context6.sent;
+
+	              if (activeTab) {
+	                _context6.next = 7;
+	                break;
+	              }
+
+	              _context6.next = 6;
+	              return regenerator.awrap(debug.err('未获取到当前激活的标签'));
+
+	            case 6:
+	              return _context6.abrupt("return");
+
+	            case 7:
+	              config = {
+	                tab: activeTab.id,
+	                rtmp: this.$rtmp.value.trim(),
+	                streamname: this.$streamname.value.trim(),
+	                socket: this.$socket.value.trim(),
+	                resolution: Number(this.$resolution.value),
+	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
+	              };
+
+	              if (!(!config.rtmp || !/^rtmp:\/\/.+/i.test(config.rtmp))) {
+	                _context6.next = 12;
+	                break;
+	              }
+
+	              _context6.next = 11;
+	              return regenerator.awrap(debug.err('请输入正确的rtmp推流地址'));
+
+	            case 11:
+	              return _context6.abrupt("return");
+
+	            case 12:
+	              if (config.streamname) {
+	                _context6.next = 16;
+	                break;
+	              }
+
+	              _context6.next = 15;
+	              return regenerator.awrap(debug.err('请输入正确的直播码'));
+
+	            case 15:
+	              return _context6.abrupt("return");
+
+	            case 16:
+	              if (!(!config.socket || !/^https?:\/\/.+/i.test(config.socket))) {
+	                _context6.next = 20;
+	                break;
+	              }
+
+	              _context6.next = 19;
+	              return regenerator.awrap(debug.err('请输入正确的中转地址'));
+
+	            case 19:
+	              return _context6.abrupt("return");
+
+	            case 20:
+	              _context6.next = 22;
+	              return regenerator.awrap(setStorage('recording', true));
+
+	            case 22:
+	              _context6.next = 24;
+	              return regenerator.awrap(setStorage('config', config));
+
+	            case 24:
+	              sendMessage('start', config);
+
+	            case 25:
+	            case "end":
+	              return _context6.stop();
+	          }
+	        }
+	      }, null, this);
+	    }
+	  }, {
+	    key: "stop",
+	    value: function stop() {
+	      return regenerator.async(function stop$(_context7) {
+	        while (1) {
+	          switch (_context7.prev = _context7.next) {
+	            case 0:
+	              sendMessage('stop');
+	              _context7.next = 3;
+	              return regenerator.awrap(setStorage('recording', false));
+
+	            case 3:
+	              _context7.next = 5;
+	              return regenerator.awrap(setStorage('debug', []));
+
+	            case 5:
+	              _context7.next = 7;
+	              return regenerator.awrap(sleep(1000));
+
+	            case 7:
+	              chrome.runtime.reload();
+	              window.close();
+
+	            case 9:
+	            case "end":
+	              return _context7.stop();
+	          }
+	        }
+	      });
 	    }
 	  }]);
 

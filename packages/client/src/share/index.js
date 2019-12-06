@@ -79,15 +79,27 @@ export function openTab(url, active = false) {
     });
 }
 
-export async function log(msg) {
-    return new Promise(async resolve => {
-        msg = msg instanceof Error ? msg.message.trim() : objToString(msg);
+export const debug = {
+    async log(msg) {
         const logs = (await getStorage('debug')) || [];
-        logs.push(msg);
+        logs.push({
+            type: 'log',
+            data: objToString(msg),
+        });
         await setStorage('debug', logs);
-        resolve(logs);
-    });
-}
+    },
+    async err(msg) {
+        const logs = (await getStorage('debug')) || [];
+        logs.push({
+            type: 'error',
+            data: objToString(msg),
+        });
+        await setStorage('debug', logs);
+    },
+    async clean() {
+        await setStorage('debug', []);
+    },
+};
 
 export function sendMessage(type, data) {
     chrome.runtime.sendMessage({
@@ -103,14 +115,6 @@ export function sendMessageToTab(tabId, type, data) {
     });
 }
 
-export function getLiveTab() {
-    return new Promise(resolve => {
-        chrome.tabCapture.getCapturedTabs(tabs => {
-            resolve(tabs[0]);
-        });
-    });
-}
-
 export function download(data, name) {
     const blob = new Blob(Array.isArray(data) ? data : [data]);
     const blobUrl = URL.createObjectURL(blob);
@@ -121,29 +125,4 @@ export function download(data, name) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-}
-
-export function addScript(url) {
-    return new Promise(resolve => {
-        const $script = document.createElement('script');
-        $script.onload = () => {
-            $script.remove();
-            resolve();
-        };
-        $script.src = url;
-        document.documentElement.appendChild($script);
-    });
-}
-
-export function addStyle(url) {
-    return new Promise(resolve => {
-        const $style = document.createElement('link');
-        $style.rel = 'stylesheet';
-        $style.type = 'text/css';
-        $style.onload = () => {
-            resolve();
-        };
-        $style.href = url;
-        document.head.appendChild($style);
-    });
 }

@@ -57,13 +57,58 @@ body {
                 padding: 5px;
                 height: 100px;
                 overflow: auto;
-                line-height: 1.4;
-                background: #f7f7f7;
-                border: 1px solid #e6e6e6;
+                line-height: 1.5;
+                background: #000;
 
                 p {
                     position: relative;
-                    margin: 0 0 5px;
+                    margin: 0 0 0 10px;
+
+                    &.log {
+                        color: #19d420;
+                        &::before {
+                            content: '';
+                            position: absolute;
+                            top: 5px;
+                            left: -8px;
+                            border-left: 4px solid #19d420;
+                            border-top: 4px solid transparent;
+                            border-bottom: 4px solid transparent;
+                        }
+
+                        &::after {
+                            content: '';
+                            position: absolute;
+                            left: -8px;
+                            top: 6px;
+                            border-left: 3px solid #000;
+                            border-top: 3px solid transparent;
+                            border-bottom: 3px solid transparent;
+                        }
+                    }
+
+                    &.error {
+                        color: red;
+                        &::before {
+                            content: '';
+                            position: absolute;
+                            top: 5px;
+                            left: -8px;
+                            border-left: 4px solid red;
+                            border-top: 4px solid transparent;
+                            border-bottom: 4px solid transparent;
+                        }
+
+                        &::after {
+                            content: '';
+                            position: absolute;
+                            left: -8px;
+                            top: 6px;
+                            border-left: 3px solid #000;
+                            border-top: 3px solid transparent;
+                            border-bottom: 3px solid transparent;
+                        }
+                    }
                 }
             }
         }

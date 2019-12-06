@@ -1,6 +1,6 @@
 import './index.scss';
 import {
-    log,
+    debug,
     sleep,
     query,
     openTab,
@@ -9,7 +9,6 @@ import {
     sendMessage,
     getActiveTab,
     storageChange,
-    sendMessageToTab,
 } from '../../share';
 
 class Popup {
@@ -18,21 +17,50 @@ class Popup {
         this.$container = query('.container');
         this.$name = query('.name');
         this.$feedback = query('.feedback');
-        this.$rtmpUrl = query('.rtmpUrl');
-        this.$socketUrl = query('.socketUrl');
-        this.$liveUrl = query('.liveUrl');
+        this.$name.textContent = `${this.manifest.name} ${this.manifest.version}`;
+
+        this.$rtmp = query('.rtmp');
+        this.$streamname = query('.streamname');
+        this.$socket = query('.socket');
         this.$resolution = query('.resolution');
         this.$videoBitsPerSecond = query('.videoBitsPerSecond');
         this.$debug = query('.debug');
         this.$start = query('.start');
         this.$stop = query('.stop');
 
+        this.bindEvent();
+        this.updateConfig();
+        this.updateDebug();
+        this.updateRecording();
+        storageChange(changes => {
+            if (changes.debug) {
+                this.updateDebug();
+            }
+            if (changes.recording) {
+                this.updateRecording();
+            }
+        });
+    }
+
+    async bindEvent() {
         this.$name.addEventListener('click', () => {
-            openTab(`https://chrome.google.com/webstore/detail/${chrome.runtime.id}`);
+            openTab(`https://chrome.google.com/webstore/detail/${chrome.runtime.id}`, true);
         });
 
         this.$feedback.addEventListener('click', () => {
-            openTab('https://github.com/zhw2590582/bilibili-live-hime');
+            openTab('https://github.com/zhw2590582/bilibili-live-hime', true);
+        });
+
+        this.$rtmp.addEventListener('input', () => {
+            this.saveInput('rtmp');
+        });
+
+        this.$streamname.addEventListener('input', () => {
+            this.saveInput('streamname');
+        });
+
+        this.$socket.addEventListener('input', () => {
+            this.saveInput('socket');
         });
 
         this.$start.addEventListener('click', () => {
@@ -42,102 +70,90 @@ class Popup {
         this.$stop.addEventListener('click', () => {
             this.stop();
         });
-
-        this.init();
-        this.updateLog();
-        storageChange(() => {
-            this.updateLog();
-        });
     }
 
-    async init() {
-        this.recording = await getStorage('recording');
-        this.config = await getStorage('config');
-        this.debug = await getStorage('debug');
-        this.activeTab = await getActiveTab();
-        sendMessageToTab(this.activeTab.id, 'record@init');
-        this.$name.textContent = `${this.manifest.name} ${this.manifest.version}`;
+    async saveInput(name) {
+        const config = (await getStorage('config')) || {};
+        config[name] = this[`$${name}`].value.trim();
+        await setStorage('config', config);
+    }
 
-        if (this.config) {
-            this.$rtmpUrl.value = this.config.rtmpUrl;
-            this.$socketUrl.value = this.config.socketUrl;
-            this.$liveUrl.value = this.config.liveUrl;
-            this.$resolution.value = this.config.resolution;
-            this.$videoBitsPerSecond.value = this.config.videoBitsPerSecond;
+    async updateConfig() {
+        const config = await getStorage('config');
+        if (config) {
+            this.$rtmp.value = config.rtmp || '';
+            this.$streamname.value = config.streamname || '';
+            this.$socket.value = config.socket || '';
+            this.$resolution.value = config.resolution || '1920';
+            this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
         }
+    }
 
-        if (this.recording) {
+    async updateDebug() {
+        const logs = (await getStorage('debug')) || [];
+        this.$debug.innerHTML = logs.map(item => `<p class="${item.type}">${item.data}</p>`).join('');
+        this.$debug.scrollTo(0, this.$debug.scrollHeight);
+    }
+
+    async updateRecording() {
+        const recording = await getStorage('recording');
+        if (recording) {
             this.$container.classList.add('recording');
-            this.$rtmpUrl.disabled = true;
-            this.$socketUrl.disabled = true;
-            this.$liveUrl.disabled = true;
+            this.$rtmp.disabled = true;
+            this.$streamname.disabled = true;
+            this.$socket.disabled = true;
             this.$resolution.disabled = true;
             this.$videoBitsPerSecond.disabled = true;
         } else {
-            await setStorage('debug', ['欢迎使用 Bilibili 直播姬，遇到任何问题都可以通过右上角按钮反馈给作者']);
+            await debug.clean();
+            await debug.log('欢迎使用 Bilibili 直播姬');
         }
     }
 
     async start() {
+        const activeTab = await getActiveTab();
+
+        if (!activeTab) {
+            await debug.err('未获取到当前激活的标签');
+            return;
+        }
+
         const config = {
-            recordId: this.activeTab.id,
-            rtmpUrl: this.$rtmpUrl.value.trim(),
-            socketUrl: this.$socketUrl.value.trim(),
-            liveUrl: this.$liveUrl.value.trim(),
-            resolution: this.$resolution.value,
+            tab: activeTab.id,
+            rtmp: this.$rtmp.value.trim(),
+            streamname: this.$streamname.value.trim(),
+            socket: this.$socket.value.trim(),
+            resolution: Number(this.$resolution.value),
             videoBitsPerSecond: Number(this.$videoBitsPerSecond.value),
         };
 
-        if (!config.rtmpUrl || !/^rtmp:\/\/.+/i.test(config.rtmpUrl)) {
-            await log('请输入正确的推流地址');
+        if (!config.rtmp || !/^rtmp:\/\/.+/i.test(config.rtmp)) {
+            await debug.err('请输入正确的rtmp推流地址');
             return;
         }
 
-        if (!config.socketUrl || !/^https?:\/\/.+/i.test(config.socketUrl)) {
-            await log('请输入正确的中转地址');
+        if (!config.streamname) {
+            await debug.err('请输入正确的直播码');
             return;
         }
 
-        if (!config.liveUrl || !/^https?:\/\/.+/i.test(config.liveUrl)) {
-            await log('请输入正确的直播地址');
+        if (!config.socket || !/^https?:\/\/.+/i.test(config.socket)) {
+            await debug.err('请输入正确的中转地址');
             return;
         }
 
-        this.$container.classList.add('recording');
-        this.$rtmpUrl.disabled = true;
-        this.$socketUrl.disabled = true;
-        this.$liveUrl.disabled = true;
-        this.$resolution.disabled = true;
-        this.$videoBitsPerSecond.disabled = true;
         await setStorage('recording', true);
         await setStorage('config', config);
-        const liveTab = await openTab(config.liveUrl);
-        if (liveTab) {
-            config.config = liveTab.id;
-            await log(`已打开直播间：${config.liveUrl}`);
-            await sendMessage('start', config);
-            await log('请保持当前页面选中状态，否则无法推流');
-        } else {
-            await log('无法打开直播地址，请重试');
-        }
+        sendMessage('start', config);
     }
 
     async stop() {
-        this.$container.classList.remove('recording');
+        sendMessage('stop');
         await setStorage('recording', false);
-        this.$debug.innerHTML = '';
-        await sendMessage('stop');
-        await log('正在关闭推流...');
-        await sleep(3000);
         await setStorage('debug', []);
+        await sleep(1000);
         chrome.runtime.reload();
         window.close();
-    }
-
-    async updateLog() {
-        const logs = (await getStorage('debug')) || [];
-        this.$debug.innerHTML = logs.map(item => `<p>${item}</p>`).join('');
-        this.$debug.scrollTo(0, this.$debug.scrollHeight);
     }
 }
 
