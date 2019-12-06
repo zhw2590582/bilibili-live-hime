@@ -22,7 +22,6 @@
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-import": "^2.18.2",
     "node-sass": "^4.13.0",
-    "puppeteer-crx": "^1.0.6",
     "rollup": "^1.27.8",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
@@ -36,6 +35,7 @@
   "dependencies": {
     "crx-hotreload": "^1.0.4",
     "obj-to-string": "^1.0.1",
+    "puppeteer-crx": "^1.0.6",
     "socket.io-client": "^2.3.0"
   }
 }
