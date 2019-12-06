@@ -35,6 +35,12 @@ npm i bilibili-live-hime-server
 npm start
 ```
 
+也可以指定端口：
+
+```bash
+npm start 3000
+```
+
 ## 使用
 
 安装好`Chrome`扩展，假如服务端已经在运行情况下，就可以打开你想直播的浏览器页面，然后在扩展填好基本的直播信息(如下图)就可以开播了。
