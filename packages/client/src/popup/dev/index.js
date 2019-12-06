@@ -91,6 +91,7 @@ class Popup {
         }
         if (!recording || !tab) {
             debug.clean();
+            setStorage('recording', false);
         }
     }
 

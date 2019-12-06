@@ -1127,6 +1127,7 @@ var bilibiliLiveHimePopup = (function () {
 
 	              if (!recording || !tab) {
 	                debug.clean();
+	                setStorage('recording', false);
 	              }
 
 	            case 14:
