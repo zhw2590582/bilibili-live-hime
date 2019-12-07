@@ -63,6 +63,14 @@ class Popup {
             this.saveInput('socket');
         });
 
+        this.$resolution.addEventListener('change', () => {
+            this.saveInput('resolution');
+        });
+
+        this.$videoBitsPerSecond.addEventListener('change', () => {
+            this.saveInput('videoBitsPerSecond');
+        });
+
         this.$start.addEventListener('click', () => {
             this.start();
         });

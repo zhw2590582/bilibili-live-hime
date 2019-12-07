@@ -1035,6 +1035,12 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$socket.addEventListener('input', function () {
 	                _this2.saveInput('socket');
 	              });
+	              this.$resolution.addEventListener('change', function () {
+	                _this2.saveInput('resolution');
+	              });
+	              this.$videoBitsPerSecond.addEventListener('change', function () {
+	                _this2.saveInput('videoBitsPerSecond');
+	              });
 	              this.$start.addEventListener('click', function () {
 	                _this2.start();
 	              });
@@ -1042,7 +1048,7 @@ var bilibiliLiveHimePopup = (function () {
 	                _this2.stop();
 	              });
 
-	            case 7:
+	            case 9:
 	            case "end":
 	              return _context.stop();
 	          }
