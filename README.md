@@ -51,16 +51,21 @@ npm start 3000
 
 ## 支持
 
-只列出常见的平台，请注意有的平台是`rtmp地址`和`直播码`是写在一起的，你要自己把它拆开填写如：`rtmp://***/{直播码}`，而且要注意之间的斜杆`/`不能漏掉。
+只列出常见的平台，请注意有的平台是`rtmp地址`和`直播码`是写在一起的，而且要注意之间的斜杆`/`不能漏掉，你要自己把它拆开填写如：
 
-| 直播平台 | 获取直播码                                                                                                                         |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| B 站直播 | [https://link.bilibili.com/p/center/index#/my-room/start-live](https://link.bilibili.com/p/center/index#/my-room/start-live)       |
-| 斗鱼直播 | [https://mp.douyu.com/live/main](https://mp.douyu.com/live/main)                                                                   |
-| 虎牙直播 | [https://i.huya.com/index.php?m=ProfileSetting#ktylts](https://i.huya.com/index.php?m=ProfileSetting#ktylts)                       |
-| 战旗直播 | [https://www.zhanqi.tv/user/anchor/flowSetting](https://www.zhanqi.tv/user/anchor/flowSetting)                                     |
-| twitch   | [https://stream.twitch.tv/ingests/](https://stream.twitch.tv/ingests/)                                                             |
-| twitch   | [https://dashboard.twitch.tv/settings/channel#stream-preferences](https://dashboard.twitch.tv/settings/channel#stream-preferences) |
+```bash
+rtmp://***/{直播码}
+```
+
+| 直播平台     | 获取直播码                                                                                                                         |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| B 站直播     | [https://link.bilibili.com/p/center/index#/my-room/start-live](https://link.bilibili.com/p/center/index#/my-room/start-live)       |
+| 斗鱼直播     | [https://mp.douyu.com/live/main](https://mp.douyu.com/live/main)                                                                   |
+| 虎牙直播     | [https://i.huya.com/index.php?m=ProfileSetting#ktylts](https://i.huya.com/index.php?m=ProfileSetting#ktylts)                       |
+| 战旗直播     | [https://www.zhanqi.tv/user/anchor/flowSetting](https://www.zhanqi.tv/user/anchor/flowSetting)                                     |
+| Twitch 直播  | [https://stream.twitch.tv/ingests/](https://stream.twitch.tv/ingests/)                                                             |
+| Twitch 直播  | [https://dashboard.twitch.tv/settings/channel#stream-preferences](https://dashboard.twitch.tv/settings/channel#stream-preferences) |
+| YouTube 直播 | [https://www.youtube.com/live_dashboard](https://www.youtube.com/live_dashboard)                                                   |
 
 ## 捐助
 
