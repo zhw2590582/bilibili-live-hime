@@ -4,8 +4,8 @@ class Injected {
     constructor() {
         this.getChatHistoryList().then(chatHistoryList => {
             const observer = new MutationObserver(mutationsList => {
-                if (mutationsList.length === 1) {
-                    const addedNodes = Array.from(mutationsList[0].addedNodes);
+                mutationsList.forEach(mutations => {
+                    const addedNodes = Array.from(mutations.addedNodes || []);
                     addedNodes.forEach(item => {
                         // 弹幕
                         if (item.classList.contains('danmaku-item')) {
@@ -48,6 +48,10 @@ class Injected {
                                     type: GUARD,
                                     data: {
                                         uid: null,
+                                        uname: item.dataset('.username').innerText.trim(),
+                                        action: '购买',
+                                        gift: '舰长',
+                                        count: item.querySelector('.count').innerText.trim(),
                                     },
                                 });
                             } catch (error) {
@@ -55,7 +59,7 @@ class Injected {
                             }
                         }
                     });
-                }
+                });
             });
             observer.observe(chatHistoryList, { childList: true });
         });

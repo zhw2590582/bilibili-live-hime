@@ -39,8 +39,8 @@ var BilibiliLiveHimeInjected = (function () {
 
       this.getChatHistoryList().then(function (chatHistoryList) {
         var observer = new MutationObserver(function (mutationsList) {
-          if (mutationsList.length === 1) {
-            var addedNodes = Array.from(mutationsList[0].addedNodes);
+          mutationsList.forEach(function (mutations) {
+            var addedNodes = Array.from(mutations.addedNodes || []);
             addedNodes.forEach(function (item) {
               // 弹幕
               if (item.classList.contains('danmaku-item')) {
@@ -80,14 +80,18 @@ var BilibiliLiveHimeInjected = (function () {
                   window.postMessage({
                     type: GUARD,
                     data: {
-                      uid: null
+                      uid: null,
+                      uname: item.dataset('.username').innerText.trim(),
+                      action: '购买',
+                      gift: '舰长',
+                      count: item.querySelector('.count').innerText.trim()
                     }
                   });
                 } catch (error) {//
                 }
               }
             });
-          }
+          });
         });
         observer.observe(chatHistoryList, {
           childList: true
