@@ -1,6 +1,6 @@
 import './index.scss';
 import { onMessage } from '../../share';
-import { DANMU, GIFT } from '../../share/constant';
+import { DANMU, GIFT, GUARD } from '../../share/constant';
 
 class Content {
     constructor() {
@@ -13,11 +13,14 @@ class Content {
         window.BilibiliLiveHimeContentInit = true;
         onMessage(request => {
             const { type, data } = request;
+            window.postMessage(request);
             console.log(JSON.stringify(data));
             switch (type) {
                 case DANMU:
                     break;
                 case GIFT:
+                    break;
+                case GUARD:
                     break;
                 default:
                     break;

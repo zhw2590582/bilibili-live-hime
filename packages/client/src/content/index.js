@@ -781,6 +781,7 @@ var BilibiliLiveHimeContent = (function () {
         onMessage(function (request) {
           var type = request.type,
               data = request.data;
+          window.postMessage(request);
           console.log(JSON.stringify(data));
         });
       }

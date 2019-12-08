@@ -64,7 +64,7 @@ var BilibiliLiveHimeInjected = (function () {
                     type: GIFT,
                     data: {
                       uid: null,
-                      uname: item.dataset('.username').innerText.trim(),
+                      uname: item.querySelector('.username').innerText.trim(),
                       action: item.querySelector('.action').innerText.trim(),
                       gift: item.querySelector('.gift-name').innerText.trim(),
                       count: item.querySelector('.count').innerText.trim()
@@ -81,7 +81,7 @@ var BilibiliLiveHimeInjected = (function () {
                     type: GUARD,
                     data: {
                       uid: null,
-                      uname: item.dataset('.username').innerText.trim(),
+                      uname: item.querySelector('.username').innerText.trim(),
                       action: '购买',
                       gift: '舰长',
                       count: item.querySelector('.count').innerText.trim()
