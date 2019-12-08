@@ -1,7 +1,7 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
 import { debug, setBadge, setStorage, onMessage, storageChange, sendMessageToTab } from '../../share';
-import { START, STOP, DANMU, GIFT } from '../../share/constant';
+import { START, STOP, DANMU, GIFT, GUARD } from '../../share/constant';
 
 class Background {
     constructor() {
@@ -25,6 +25,7 @@ class Background {
                     break;
                 case DANMU:
                 case GIFT:
+                case GUARD:
                     if (this.config && sender) {
                         const { activeTab, liveTab } = this.config;
                         const { tab } = sender;

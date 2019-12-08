@@ -28,6 +28,8 @@ var BilibiliLiveHimeInjected = (function () {
   var createClass = _createClass;
 
   var DANMU = 'DANMU';
+  var GIFT = 'GIFT';
+  var GUARD = 'GUARD';
 
   var Injected =
   /*#__PURE__*/
@@ -35,52 +37,89 @@ var BilibiliLiveHimeInjected = (function () {
     function Injected() {
       classCallCheck(this, Injected);
 
-      this.getPlayer().then(function (player) {
-        Object.defineProperty(player, 'getVisibilityStatus', {
-          value: function value() {
-            return true;
+      this.getChatHistoryList().then(function (chatHistoryList) {
+        var observer = new MutationObserver(function (mutationsList) {
+          if (mutationsList.length === 1) {
+            var addedNodes = Array.from(mutationsList[0].addedNodes);
+            addedNodes.forEach(function (item) {
+              // 弹幕
+              if (item.classList.contains('danmaku-item')) {
+                try {
+                  window.postMessage({
+                    type: DANMU,
+                    data: {
+                      uid: item.dataset.uid,
+                      uname: item.dataset.uname,
+                      danmaku: item.dataset.danmaku
+                    }
+                  });
+                } catch (error) {//
+                }
+              } // 礼物
+
+
+              if (item.classList.contains('gift-item')) {
+                try {
+                  window.postMessage({
+                    type: GIFT,
+                    data: {
+                      uid: null,
+                      uname: item.dataset('.username').innerText.trim(),
+                      action: item.querySelector('.action').innerText.trim(),
+                      gift: item.querySelector('.gift-name').innerText.trim(),
+                      count: item.querySelector('.count').innerText.trim()
+                    }
+                  });
+                } catch (error) {//
+                }
+              } // 上船
+
+
+              if (item.classList.contains('guard-buy')) {
+                try {
+                  window.postMessage({
+                    type: GUARD,
+                    data: {
+                      uid: null
+                    }
+                  });
+                } catch (error) {//
+                }
+              }
+            });
           }
         });
-        var addDanmaku = player.addDanmaku;
-
-        player.addDanmaku = function f() {
-          for (var _len = arguments.length, arg = new Array(_len), _key = 0; _key < _len; _key++) {
-            arg[_key] = arguments[_key];
-          }
-
-          var result = addDanmaku.call.apply(addDanmaku, [this].concat(arg));
-          window.postMessage({
-            type: DANMU,
-            data: arg[0]
-          });
-          return result;
-        };
-      });
-      this.getChatHistoryList().then(function (chatHistoryList) {
-        console.log(chatHistoryList);
+        observer.observe(chatHistoryList, {
+          childList: true
+        });
       });
       this.getPenuryGiftMsg().then(function (penuryGiftMsg) {
-        console.log(penuryGiftMsg);
+        var observer = new MutationObserver(function (mutationsList) {
+          if (mutationsList.length === 1) {
+            var addedNodes = Array.from(mutationsList[0].addedNodes);
+            addedNodes.forEach(function (item) {
+              try {
+                window.postMessage({
+                  type: GIFT,
+                  data: {
+                    uname: item.querySelector('.username').innerText.trim(),
+                    action: item.querySelector('.action').innerText.trim(),
+                    gift: item.querySelector('.gift-name').innerText.trim(),
+                    count: item.querySelector('.count').innerText.trim()
+                  }
+                });
+              } catch (error) {//
+              }
+            });
+          }
+        });
+        observer.observe(penuryGiftMsg, {
+          childList: true
+        });
       });
     }
 
     createClass(Injected, [{
-      key: "getPlayer",
-      value: function getPlayer() {
-        return new Promise(function (resolve) {
-          (function loop() {
-            if (!window.EmbedPlayer || !window.EmbedPlayer.playerInstance) {
-              setTimeout(loop, 1000);
-            } else if (window.EmbedPlayer.playerInstance.play) {
-              var instance = window.EmbedPlayer.playerInstance.play();
-              resolve(instance);
-            } else {
-              setTimeout(loop, 1000);
-            }
-          })();
-        });
-      }
-    }, {
       key: "getChatHistoryList",
       value: function getChatHistoryList() {
         return new Promise(function (resolve) {

@@ -1014,6 +1014,7 @@ var BilibiliLiveHimeBackground = (function () {
 	var STOP = 'STOP';
 	var DANMU = 'DANMU';
 	var GIFT = 'GIFT';
+	var GUARD = 'GUARD';
 
 	function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -1050,6 +1051,7 @@ var BilibiliLiveHimeBackground = (function () {
 
 	        case DANMU:
 	        case GIFT:
+	        case GUARD:
 	          if (_this.config && sender) {
 	            var _this$config = _this.config,
 	                activeTab = _this$config.activeTab,

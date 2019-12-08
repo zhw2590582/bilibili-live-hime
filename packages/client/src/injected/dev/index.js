@@ -1,44 +1,87 @@
-import { DANMU, GIFT } from '../../share/constant';
+import { DANMU, GIFT, GUARD } from '../../share/constant';
 
 class Injected {
     constructor() {
-        this.getPlayer().then(player => {
-            Object.defineProperty(player, 'getVisibilityStatus', {
-                value: () => true,
-            });
-
-            const { addDanmaku } = player;
-            player.addDanmaku = function f(...arg) {
-                const result = addDanmaku.call(this, ...arg);
-                window.postMessage({
-                    type: DANMU,
-                    data: arg[0],
-                });
-                return result;
-            };
-        });
-
         this.getChatHistoryList().then(chatHistoryList => {
-            console.log(chatHistoryList);
+            const observer = new MutationObserver(mutationsList => {
+                if (mutationsList.length === 1) {
+                    const addedNodes = Array.from(mutationsList[0].addedNodes);
+                    addedNodes.forEach(item => {
+                        // 弹幕
+                        if (item.classList.contains('danmaku-item')) {
+                            try {
+                                window.postMessage({
+                                    type: DANMU,
+                                    data: {
+                                        uid: item.dataset.uid,
+                                        uname: item.dataset.uname,
+                                        danmaku: item.dataset.danmaku,
+                                    },
+                                });
+                            } catch (error) {
+                                //
+                            }
+                        }
+
+                        // 礼物
+                        if (item.classList.contains('gift-item')) {
+                            try {
+                                window.postMessage({
+                                    type: GIFT,
+                                    data: {
+                                        uid: null,
+                                        uname: item.dataset('.username').innerText.trim(),
+                                        action: item.querySelector('.action').innerText.trim(),
+                                        gift: item.querySelector('.gift-name').innerText.trim(),
+                                        count: item.querySelector('.count').innerText.trim(),
+                                    },
+                                });
+                            } catch (error) {
+                                //
+                            }
+                        }
+
+                        // 上船
+                        if (item.classList.contains('guard-buy')) {
+                            try {
+                                window.postMessage({
+                                    type: GUARD,
+                                    data: {
+                                        uid: null,
+                                    },
+                                });
+                            } catch (error) {
+                                //
+                            }
+                        }
+                    });
+                }
+            });
+            observer.observe(chatHistoryList, { childList: true });
         });
 
         this.getPenuryGiftMsg().then(penuryGiftMsg => {
-            console.log(penuryGiftMsg);
-        });
-    }
-
-    getPlayer() {
-        return new Promise(resolve => {
-            (function loop() {
-                if (!window.EmbedPlayer || !window.EmbedPlayer.playerInstance) {
-                    setTimeout(loop, 1000);
-                } else if (window.EmbedPlayer.playerInstance.play) {
-                    const instance = window.EmbedPlayer.playerInstance.play();
-                    resolve(instance);
-                } else {
-                    setTimeout(loop, 1000);
+            const observer = new MutationObserver(mutationsList => {
+                if (mutationsList.length === 1) {
+                    const addedNodes = Array.from(mutationsList[0].addedNodes);
+                    addedNodes.forEach(item => {
+                        try {
+                            window.postMessage({
+                                type: GIFT,
+                                data: {
+                                    uname: item.querySelector('.username').innerText.trim(),
+                                    action: item.querySelector('.action').innerText.trim(),
+                                    gift: item.querySelector('.gift-name').innerText.trim(),
+                                    count: item.querySelector('.count').innerText.trim(),
+                                },
+                            });
+                        } catch (error) {
+                            //
+                        }
+                    });
                 }
-            })();
+            });
+            observer.observe(penuryGiftMsg, { childList: true });
         });
     }
 
