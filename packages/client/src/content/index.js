@@ -9,6 +9,24 @@ var BilibiliLiveHimeContent = (function () {
 
   var classCallCheck = _classCallCheck;
 
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  var createClass = _createClass;
+
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
@@ -745,24 +763,41 @@ var BilibiliLiveHimeContent = (function () {
     chrome.runtime.onMessage.addListener(callback);
   }
 
-  var Content = function Content() {
-    classCallCheck(this, Content);
+  var Content =
+  /*#__PURE__*/
+  function () {
+    function Content() {
+      classCallCheck(this, Content);
 
-    onMessage(function (request) {
-      var type = request.type,
-          data = request.data;
-
-      switch (type) {
-        case 'danmu':
-          console.log(data);
-          break;
-
-        case 'gift':
-          console.log(data);
-          break;
+      if (!window.BilibiliLiveHimeContentInit) {
+        this.init();
       }
-    });
-  };
+    }
+
+    createClass(Content, [{
+      key: "init",
+      value: function init() {
+        window.BilibiliLiveHimeContentInit = true;
+        onMessage(function (request) {
+          console.log(request);
+          var type = request.type,
+              data = request.data;
+
+          switch (type) {
+            case 'danmu':
+              console.log(data);
+              break;
+
+            case 'gift':
+              console.log(data);
+              break;
+          }
+        });
+      }
+    }]);
+
+    return Content;
+  }();
 
   var index = new Content();
 

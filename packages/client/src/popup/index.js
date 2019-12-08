@@ -1105,7 +1105,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "init",
 	    value: function init() {
-	      var recording, config, tab;
+	      var recording, config, activeTab;
 	      return regenerator.async(function init$(_context3) {
 	        while (1) {
 	          switch (_context3.prev = _context3.next) {
@@ -1131,10 +1131,10 @@ var BilibiliLiveHimePopup = (function () {
 	            case 8:
 	              config = _context3.t0;
 	              _context3.next = 11;
-	              return regenerator.awrap(findTabById(config.tab));
+	              return regenerator.awrap(findTabById(config.activeTab));
 
 	            case 11:
-	              tab = _context3.sent;
+	              activeTab = _context3.sent;
 
 	              if (config) {
 	                this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
@@ -1145,7 +1145,7 @@ var BilibiliLiveHimePopup = (function () {
 	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
 	              }
 
-	              if (!recording || !tab) {
+	              if (!recording || !activeTab) {
 	                debug.clean();
 	                setStorage('recording', false);
 	              }
@@ -1195,7 +1195,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "updateRecording",
 	    value: function updateRecording() {
-	      var recording, config, tab;
+	      var recording, config, activeTab;
 	      return regenerator.async(function updateRecording$(_context5) {
 	        while (1) {
 	          switch (_context5.prev = _context5.next) {
@@ -1221,12 +1221,12 @@ var BilibiliLiveHimePopup = (function () {
 	            case 8:
 	              config = _context5.t0;
 	              _context5.next = 11;
-	              return regenerator.awrap(findTabById(config.tab));
+	              return regenerator.awrap(findTabById(config.activeTab));
 
 	            case 11:
-	              tab = _context5.sent;
+	              activeTab = _context5.sent;
 
-	              if (recording && tab) {
+	              if (recording && activeTab) {
 	                this.$container.classList.add('recording');
 	                this.$rtmp.disabled = true;
 	                this.$streamname.disabled = true;

@@ -1053,10 +1053,9 @@ var BilibiliLiveHimeBackground = (function () {
 	                activeTab = _this$config.activeTab,
 	                liveTab = _this$config.liveTab;
 	            var tab = sender.tab;
-	            console.log(activeTab, liveTab, tab.id);
 
 	            if (activeTab && liveTab && tab && liveTab === tab.id) {
-	              sendMessageToTab(_this.config.activeTab, request);
+	              sendMessageToTab(activeTab, request);
 	            }
 	          }
 

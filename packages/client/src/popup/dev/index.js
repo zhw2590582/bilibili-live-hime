@@ -95,7 +95,7 @@ class Popup {
     async init() {
         const recording = await getStorage('recording');
         const config = (await getStorage('config')) || {};
-        const tab = await findTabById(config.tab);
+        const activeTab = await findTabById(config.activeTab);
         if (config) {
             this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
             this.$streamname.value = config.streamname || '';
@@ -104,7 +104,7 @@ class Popup {
             this.$resolution.value = config.resolution || '1920';
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
         }
-        if (!recording || !tab) {
+        if (!recording || !activeTab) {
             debug.clean();
             setStorage('recording', false);
         }
@@ -119,8 +119,8 @@ class Popup {
     async updateRecording() {
         const recording = await getStorage('recording');
         const config = (await getStorage('config')) || {};
-        const tab = await findTabById(config.tab);
-        if (recording && tab) {
+        const activeTab = await findTabById(config.activeTab);
+        if (recording && activeTab) {
             this.$container.classList.add('recording');
             this.$rtmp.disabled = true;
             this.$streamname.disabled = true;

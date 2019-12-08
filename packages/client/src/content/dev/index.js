@@ -3,7 +3,15 @@ import { onMessage } from '../../share';
 
 class Content {
     constructor() {
+        if (!window.BilibiliLiveHimeContentInit) {
+            this.init();
+        }
+    }
+
+    init() {
+        window.BilibiliLiveHimeContentInit = true;
         onMessage(request => {
+            console.log(request);
             const { type, data } = request;
             switch (type) {
                 case 'danmu':

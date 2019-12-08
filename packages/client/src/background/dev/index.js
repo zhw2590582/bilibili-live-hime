@@ -27,9 +27,8 @@ class Background {
                     if (this.config && sender) {
                         const { activeTab, liveTab } = this.config;
                         const { tab } = sender;
-                        console.log(activeTab, liveTab, tab.id);
                         if (activeTab && liveTab && tab && liveTab === tab.id) {
-                            sendMessageToTab(this.config.activeTab, request);
+                            sendMessageToTab(activeTab, request);
                         }
                     }
                     break;
