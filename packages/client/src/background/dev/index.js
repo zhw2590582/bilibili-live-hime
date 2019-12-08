@@ -1,7 +1,27 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
 import { debug, setBadge, setStorage, onMessage, storageChange, sendMessageToTab } from '../../share';
-import { START, STOP, DANMU, GIFT, GUARD } from '../../share/constant';
+import {
+    START,
+    STOP,
+    DANMU,
+    GIFT,
+    GUARD,
+    LOG,
+    RECORDING,
+    FAIL,
+    RTMP,
+    STREAM_DISCONNECT,
+    BINARY_STREAM,
+    ON,
+    SOCKET_SUCCESS,
+    SOCKET_FAIL,
+    TAB_VIDEO_STREAM_SUCCESS,
+    TAB_VIDEO_STREAM_FAIL,
+    RECORDER_SUCCESS,
+    RECORDER_FAIL,
+    PUSH_STREAM_ING,
+} from '../../share/constant';
 
 class Background {
     constructor() {
@@ -42,7 +62,7 @@ class Background {
         storageChange(async changes => {
             if (changes.recording) {
                 if (changes.recording.newValue) {
-                    setBadge('ON');
+                    setBadge(ON);
                 } else {
                     setBadge('');
                 }
@@ -166,49 +186,49 @@ class Background {
 
         try {
             this.socket = await this.connectSocket(socket);
-            await debug.log('建立socket连接成功');
-            this.socket.emit('rtmp', rtmp + streamname);
-            this.socket.on('fail', async info => {
+            await debug.log(SOCKET_SUCCESS);
+            this.socket.emit(RTMP, rtmp + streamname);
+            this.socket.on(FAIL, async info => {
                 await debug.err(info);
                 await this.stop();
             });
-            this.socket.on('log', async info => {
+            this.socket.on(LOG, async info => {
                 await debug.log(info);
             });
         } catch (error) {
-            await debug.err(`建立socket连接失败: ${error.message.trim()}`);
+            await debug.err(`${SOCKET_FAIL}: ${error.message.trim()}`);
             await this.stop();
             return;
         }
 
         try {
             this.stream = await this.tabCapture(resolution);
-            await debug.log('获取标签视频流成功');
+            await debug.log(TAB_VIDEO_STREAM_SUCCESS);
         } catch (error) {
-            await debug.err('无法获取标签视频流，请重试！');
+            await debug.err(TAB_VIDEO_STREAM_FAIL);
             await this.stop();
             return;
         }
 
         try {
             this.mediaRecorder = await this.recorder(this.stream, videoBitsPerSecond);
-            await debug.log('录制器启动成功');
+            await debug.log(RECORDER_SUCCESS);
             this.mediaRecorder.ondataavailable = event => {
                 if (event.data && event.data.size > 0) {
-                    this.socket.emit('binarystream', event.data);
+                    this.socket.emit(BINARY_STREAM, event.data);
                 }
             };
             this.mediaRecorder.start(1000);
         } catch (error) {
-            await debug.err('无法录制标签的视频流，请重试！');
+            await debug.err(RECORDER_FAIL);
             await this.stop();
         }
 
-        await debug.log('正在推流中...');
+        await debug.log(PUSH_STREAM_ING);
     }
 
     async stop() {
-        setStorage('recording', false);
+        setStorage(RECORDING, false);
         this.config = Background.config;
 
         if (this.stream) {
@@ -216,7 +236,7 @@ class Background {
         }
 
         if (this.socket) {
-            this.socket.emit('disconnect');
+            this.socket.emit(STREAM_DISCONNECT);
             this.socket.close();
         }
 

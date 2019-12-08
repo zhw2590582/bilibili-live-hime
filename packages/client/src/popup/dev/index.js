@@ -11,7 +11,22 @@ import {
     findTabById,
     storageChange,
 } from '../../share';
-import { START, STOP } from '../../share/constant';
+import {
+    START,
+    STOP,
+    RECORDING,
+    CONFIG,
+    DEBUG,
+    BLH,
+    CAN_NOT_FIND_TAB,
+    RTMP_ERROR,
+    STREAM_NAME_ERROR,
+    SOCKET_ERROR,
+    BILIBILI_LIVE_ERROR,
+    OPEN_SUCCESS,
+    CURRENT_PAGE,
+    PUSH_STREAM_END,
+} from '../../share/constant';
 
 class Popup {
     constructor() {
@@ -88,14 +103,14 @@ class Popup {
     }
 
     async saveInput(name) {
-        const config = (await getStorage('config')) || {};
+        const config = (await getStorage(CONFIG)) || {};
         config[name] = this[`$${name}`].value.trim();
-        await setStorage('config', config);
+        await setStorage(CONFIG, config);
     }
 
     async init() {
-        const recording = await getStorage('recording');
-        const config = (await getStorage('config')) || {};
+        const recording = await getStorage(RECORDING);
+        const config = (await getStorage(CONFIG)) || {};
         const activeTab = await findTabById(config.activeTab);
         if (config) {
             this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
@@ -107,22 +122,22 @@ class Popup {
         }
         if (!recording || !activeTab) {
             debug.clean();
-            setStorage('recording', false);
+            setStorage(RECORDING, false);
         }
     }
 
     async updateDebug() {
-        const logs = (await getStorage('debug')) || [];
+        const logs = (await getStorage(DEBUG)) || [];
         this.$debug.innerHTML = logs.map(item => `<p class="${item.type}">${item.data}</p>`).join('');
         this.$debug.scrollTo(0, this.$debug.scrollHeight);
     }
 
     async updateRecording() {
-        const recording = await getStorage('recording');
-        const config = (await getStorage('config')) || {};
+        const recording = await getStorage(RECORDING);
+        const config = (await getStorage(CONFIG)) || {};
         const activeTab = await findTabById(config.activeTab);
         if (recording && activeTab) {
-            this.$container.classList.add('recording');
+            this.$container.classList.add(RECORDING);
             this.$rtmp.disabled = true;
             this.$streamname.disabled = true;
             this.$socket.disabled = true;
@@ -130,7 +145,7 @@ class Popup {
             this.$resolution.disabled = true;
             this.$videoBitsPerSecond.disabled = true;
         } else {
-            this.$container.classList.remove('recording');
+            this.$container.classList.remove(RECORDING);
             this.$rtmp.disabled = false;
             this.$streamname.disabled = false;
             this.$socket.disabled = false;
@@ -144,7 +159,7 @@ class Popup {
         const activeTab = await getActiveTab();
 
         if (!activeTab) {
-            await debug.err('未获取到当前激活的标签');
+            await debug.err(CAN_NOT_FIND_TAB);
             return;
         }
 
@@ -159,39 +174,39 @@ class Popup {
         };
 
         if (!config.rtmp || !/^rtmp:\/\/.+/i.test(config.rtmp)) {
-            await debug.err('请输入正确的rtmp推流地址');
+            await debug.err(RTMP_ERROR);
             return;
         }
 
         if (!config.streamname) {
-            await debug.err('请输入正确的直播码');
+            await debug.err(STREAM_NAME_ERROR);
             return;
         }
 
         if (!config.socket || !/^https?:\/\/.+/i.test(config.socket)) {
-            await debug.err('请输入正确的中转地址');
+            await debug.err(SOCKET_ERROR);
             return;
         }
 
         if (config.live) {
             if (!/^https?:\/\/live\.bilibili\.com/i.test(config.live)) {
-                await debug.err('不是有效B站直播间地址');
+                await debug.err(BILIBILI_LIVE_ERROR);
                 return;
             }
             const url = new URL(config.live);
-            url.searchParams.append('blh', 1);
+            url.searchParams.append(BLH, 1);
             const liveTab = await openTab(url.href, false);
             if (liveTab) {
-                await debug.log('打开直播间页面成功，保持该页面打开既可以获取弹幕');
+                await debug.log(OPEN_SUCCESS);
                 config.liveTab = liveTab.id;
             }
         }
 
         await injected('content/index.js');
         await injected('content/index.css');
-        await debug.log(`当前页面：${activeTab.title}`);
-        await setStorage('recording', true);
-        await setStorage('config', config);
+        await debug.log(`${CURRENT_PAGE}：${activeTab.title}`);
+        await setStorage(RECORDING, true);
+        await setStorage(CONFIG, config);
         sendMessage({
             type: START,
             data: config,
@@ -202,8 +217,8 @@ class Popup {
         sendMessage({
             type: STOP,
         });
-        setStorage('recording', false);
-        await debug.log('已停止推流...');
+        setStorage(RECORDING, false);
+        await debug.log(PUSH_STREAM_END);
     }
 }
 

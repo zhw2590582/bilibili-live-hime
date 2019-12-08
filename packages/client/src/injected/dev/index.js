@@ -1,8 +1,8 @@
-import { DANMU, GIFT, GUARD } from '../../share/constant';
+import { DANMU, GIFT, GUARD, BLH } from '../../share/constant';
 
 class Injected {
     constructor() {
-        if (window.location.href.includes('blh=1')) {
+        if (window.location.href.includes(BLH)) {
             this.init();
         }
     }

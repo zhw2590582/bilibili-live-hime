@@ -1,4 +1,5 @@
 import ots from 'obj-to-string';
+import { DEBUG, LOG, ERROR } from './constant';
 
 export function sleep(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -93,23 +94,23 @@ export function findTabById(id = 0) {
 
 export const debug = {
     async log(msg) {
-        const logs = (await getStorage('debug')) || [];
+        const logs = (await getStorage(DEBUG)) || [];
         logs.push({
-            type: 'log',
+            type: LOG,
             data: ots(msg),
         });
-        await setStorage('debug', logs);
+        await setStorage(DEBUG, logs);
     },
     async err(msg) {
-        const logs = (await getStorage('debug')) || [];
+        const logs = (await getStorage(DEBUG)) || [];
         logs.push({
-            type: 'error',
+            type: ERROR,
             data: ots(msg),
         });
-        await setStorage('debug', logs);
+        await setStorage(DEBUG, logs);
     },
     async clean() {
-        await setStorage('debug', []);
+        await setStorage(DEBUG, []);
     },
 };
 
