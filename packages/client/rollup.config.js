@@ -11,11 +11,11 @@ const cssnano = require('cssnano');
 const { name, version, homepage } = require('./package.json');
 
 const isProd = process.env.NODE_ENV === 'production';
-module.exports = ['background', 'popup'].map(item => {
+module.exports = ['background', 'popup', 'content'].map(item => {
     return {
         input: `src/${item}/dev/index.js`,
         output: {
-            name: `bilibiliLiveHime${item[0].toUpperCase()}${item.slice(1)}`,
+            name: `BilibiliLiveHime${item[0].toUpperCase()}${item.slice(1)}`,
             file: isProd ? `dist/${name}/${item}/index.js` : `src/${item}/index.js`,
             format: 'iife',
             sourcemap: !isProd,

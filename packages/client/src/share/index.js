@@ -143,3 +143,31 @@ export function setBadge(text = '', color = 'red') {
         );
     });
 }
+
+export function injected(tabId, file, code) {
+    return new Promise(resolve => {
+        chrome.tabs.executeScript(
+            tabId,
+            {
+                file,
+                runAt: 'document_start',
+            },
+            () => {
+                if (code) {
+                    chrome.tabs.executeScript(
+                        tabId,
+                        {
+                            code,
+                            runAt: 'document_start',
+                        },
+                        () => {
+                            resolve();
+                        },
+                    );
+                } else {
+                    resolve();
+                }
+            },
+        );
+    });
+}

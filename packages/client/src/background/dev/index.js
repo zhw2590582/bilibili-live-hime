@@ -40,7 +40,8 @@ class Background {
 
     static get config() {
         return {
-            tab: null,
+            activeTab: null,
+            liveTab: null,
             rtmp: '',
             streamname: '',
             socket: '',

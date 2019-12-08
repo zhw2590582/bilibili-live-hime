@@ -1,4 +1,4 @@
-var bilibiliLiveHimeBackground = (function () {
+var BilibiliLiveHimeBackground = (function () {
 	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -1287,7 +1287,8 @@ var bilibiliLiveHimeBackground = (function () {
 	    key: "config",
 	    get: function get() {
 	      return {
-	        tab: null,
+	        activeTab: null,
+	        liveTab: null,
 	        rtmp: '',
 	        streamname: '',
 	        socket: '',

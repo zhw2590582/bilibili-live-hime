@@ -3,6 +3,7 @@ import {
     debug,
     query,
     openTab,
+    injected,
     getStorage,
     setStorage,
     sendMessage,
@@ -22,6 +23,7 @@ class Popup {
         this.$rtmp = query('.rtmp');
         this.$streamname = query('.streamname');
         this.$socket = query('.socket');
+        this.$live = query('.live');
         this.$resolution = query('.resolution');
         this.$videoBitsPerSecond = query('.videoBitsPerSecond');
         this.$debug = query('.debug');
@@ -63,6 +65,10 @@ class Popup {
             this.saveInput('socket');
         });
 
+        this.$live.addEventListener('input', () => {
+            this.saveInput('live');
+        });
+
         this.$resolution.addEventListener('change', () => {
             this.saveInput('resolution');
         });
@@ -94,6 +100,7 @@ class Popup {
             this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
             this.$streamname.value = config.streamname || '';
             this.$socket.value = config.socket || 'http://localhost:8080';
+            this.$live.value = config.live || '';
             this.$resolution.value = config.resolution || '1920';
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
         }
@@ -118,6 +125,7 @@ class Popup {
             this.$rtmp.disabled = true;
             this.$streamname.disabled = true;
             this.$socket.disabled = true;
+            this.$live.disabled = true;
             this.$resolution.disabled = true;
             this.$videoBitsPerSecond.disabled = true;
         } else {
@@ -125,6 +133,7 @@ class Popup {
             this.$rtmp.disabled = false;
             this.$streamname.disabled = false;
             this.$socket.disabled = false;
+            this.$live.disabled = false;
             this.$resolution.disabled = false;
             this.$videoBitsPerSecond.disabled = false;
         }
@@ -139,10 +148,11 @@ class Popup {
         }
 
         const config = {
-            tab: activeTab.id,
+            activeTab: activeTab.id,
             rtmp: this.$rtmp.value.trim(),
             streamname: this.$streamname.value.trim(),
             socket: this.$socket.value.trim(),
+            live: this.$live.value.trim(),
             resolution: Number(this.$resolution.value),
             videoBitsPerSecond: Number(this.$videoBitsPerSecond.value),
         };
@@ -162,6 +172,21 @@ class Popup {
             return;
         }
 
+        if (config.live) {
+            if (!/^https?:\/\/live\.bilibili\.com/i.test(config.live)) {
+                await debug.err('不是有效bilibili直播间地址');
+                return;
+            }
+            const liveTab = await openTab(config.live, false);
+            if (liveTab) {
+                await debug.log('打开直播间页面成功，保持该页面打开既可以获取弹幕');
+                config.liveTab = liveTab.id;
+                await injected(liveTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("live")');
+            }
+        }
+
+        await injected(activeTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("active")');
+        await injected(activeTab.id, 'content/index.css');
         await debug.log(`当前页面：${activeTab.title}`);
         await setStorage('recording', true);
         await setStorage('config', config);

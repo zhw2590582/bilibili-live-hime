@@ -1,4 +1,4 @@
-var bilibiliLiveHimePopup = (function () {
+var BilibiliLiveHimePopup = (function () {
 	'use strict';
 
 	function createCommonjsModule(fn, module) {
@@ -974,6 +974,25 @@ var bilibiliLiveHimePopup = (function () {
 	    data: data
 	  });
 	}
+	function injected(tabId, file, code) {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.executeScript(tabId, {
+	      file: file,
+	      runAt: 'document_start'
+	    }, function () {
+	      if (code) {
+	        chrome.tabs.executeScript(tabId, {
+	          code: code,
+	          runAt: 'document_start'
+	        }, function () {
+	          resolve();
+	        });
+	      } else {
+	        resolve();
+	      }
+	    });
+	  });
+	}
 
 	var Popup =
 	/*#__PURE__*/
@@ -991,6 +1010,7 @@ var bilibiliLiveHimePopup = (function () {
 	    this.$rtmp = query('.rtmp');
 	    this.$streamname = query('.streamname');
 	    this.$socket = query('.socket');
+	    this.$live = query('.live');
 	    this.$resolution = query('.resolution');
 	    this.$videoBitsPerSecond = query('.videoBitsPerSecond');
 	    this.$debug = query('.debug');
@@ -1035,6 +1055,9 @@ var bilibiliLiveHimePopup = (function () {
 	              this.$socket.addEventListener('input', function () {
 	                _this2.saveInput('socket');
 	              });
+	              this.$live.addEventListener('input', function () {
+	                _this2.saveInput('live');
+	              });
 	              this.$resolution.addEventListener('change', function () {
 	                _this2.saveInput('resolution');
 	              });
@@ -1048,7 +1071,7 @@ var bilibiliLiveHimePopup = (function () {
 	                _this2.stop();
 	              });
 
-	            case 9:
+	            case 10:
 	            case "end":
 	              return _context.stop();
 	          }
@@ -1127,6 +1150,7 @@ var bilibiliLiveHimePopup = (function () {
 	                this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
 	                this.$streamname.value = config.streamname || '';
 	                this.$socket.value = config.socket || 'http://localhost:8080';
+	                this.$live.value = config.live || '';
 	                this.$resolution.value = config.resolution || '1920';
 	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
 	              }
@@ -1217,6 +1241,7 @@ var bilibiliLiveHimePopup = (function () {
 	                this.$rtmp.disabled = true;
 	                this.$streamname.disabled = true;
 	                this.$socket.disabled = true;
+	                this.$live.disabled = true;
 	                this.$resolution.disabled = true;
 	                this.$videoBitsPerSecond.disabled = true;
 	              } else {
@@ -1224,6 +1249,7 @@ var bilibiliLiveHimePopup = (function () {
 	                this.$rtmp.disabled = false;
 	                this.$streamname.disabled = false;
 	                this.$socket.disabled = false;
+	                this.$live.disabled = false;
 	                this.$resolution.disabled = false;
 	                this.$videoBitsPerSecond.disabled = false;
 	              }
@@ -1238,7 +1264,7 @@ var bilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "start",
 	    value: function start() {
-	      var activeTab, config;
+	      var activeTab, config, liveTab;
 	      return regenerator.async(function start$(_context6) {
 	        while (1) {
 	          switch (_context6.prev = _context6.next) {
@@ -1262,10 +1288,11 @@ var bilibiliLiveHimePopup = (function () {
 
 	            case 7:
 	              config = {
-	                tab: activeTab.id,
+	                activeTab: activeTab.id,
 	                rtmp: this.$rtmp.value.trim(),
 	                streamname: this.$streamname.value.trim(),
 	                socket: this.$socket.value.trim(),
+	                live: this.$live.value.trim(),
 	                resolution: Number(this.$resolution.value),
 	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
 	              };
@@ -1306,21 +1333,66 @@ var bilibiliLiveHimePopup = (function () {
 	              return _context6.abrupt("return");
 
 	            case 20:
-	              _context6.next = 22;
-	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
+	              if (!config.live) {
+	                _context6.next = 34;
+	                break;
+	              }
 
-	            case 22:
+	              if (/^https?:\/\/live\.bilibili\.com/i.test(config.live)) {
+	                _context6.next = 25;
+	                break;
+	              }
+
 	              _context6.next = 24;
-	              return regenerator.awrap(setStorage('recording', true));
+	              return regenerator.awrap(debug.err('不是有效bilibili直播间地址'));
 
 	            case 24:
-	              _context6.next = 26;
-	              return regenerator.awrap(setStorage('config', config));
+	              return _context6.abrupt("return");
 
-	            case 26:
-	              sendMessage('start', config);
+	            case 25:
+	              _context6.next = 27;
+	              return regenerator.awrap(openTab(config.live, false));
 
 	            case 27:
+	              liveTab = _context6.sent;
+
+	              if (!liveTab) {
+	                _context6.next = 34;
+	                break;
+	              }
+
+	              _context6.next = 31;
+	              return regenerator.awrap(debug.log('打开直播间页面成功，保持该页面打开既可以获取弹幕'));
+
+	            case 31:
+	              config.liveTab = liveTab.id;
+	              _context6.next = 34;
+	              return regenerator.awrap(injected(liveTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("live")'));
+
+	            case 34:
+	              _context6.next = 36;
+	              return regenerator.awrap(injected(activeTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("active")'));
+
+	            case 36:
+	              _context6.next = 38;
+	              return regenerator.awrap(injected(activeTab.id, 'content/index.css'));
+
+	            case 38:
+	              _context6.next = 40;
+	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
+
+	            case 40:
+	              _context6.next = 42;
+	              return regenerator.awrap(setStorage('recording', true));
+
+	            case 42:
+	              _context6.next = 44;
+	              return regenerator.awrap(setStorage('config', config));
+
+	            case 44:
+	              sendMessage('start', config);
+
+	            case 45:
 	            case "end":
 	              return _context6.stop();
 	          }
