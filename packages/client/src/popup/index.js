@@ -1254,7 +1254,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "start",
 	    value: function start() {
-	      var activeTab, config, liveTab;
+	      var activeTab, config, url, liveTab;
 	      return regenerator.async(function start$(_context6) {
 	        while (1) {
 	          switch (_context6.prev = _context6.next) {
@@ -1324,7 +1324,7 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 20:
 	              if (!config.live) {
-	                _context6.next = 32;
+	                _context6.next = 34;
 	                break;
 	              }
 
@@ -1340,50 +1340,52 @@ var BilibiliLiveHimePopup = (function () {
 	              return _context6.abrupt("return");
 
 	            case 25:
-	              _context6.next = 27;
-	              return regenerator.awrap(openTab(config.live, false));
+	              url = new URL(config.live);
+	              url.searchParams.append('blh', 1);
+	              _context6.next = 29;
+	              return regenerator.awrap(openTab(url.href, false));
 
-	            case 27:
+	            case 29:
 	              liveTab = _context6.sent;
 
 	              if (!liveTab) {
-	                _context6.next = 32;
+	                _context6.next = 34;
 	                break;
 	              }
 
-	              _context6.next = 31;
+	              _context6.next = 33;
 	              return regenerator.awrap(debug.log('打开直播间页面成功，保持该页面打开既可以获取弹幕'));
 
-	            case 31:
+	            case 33:
 	              config.liveTab = liveTab.id;
-
-	            case 32:
-	              _context6.next = 34;
-	              return regenerator.awrap(injected('content/index.js'));
 
 	            case 34:
 	              _context6.next = 36;
-	              return regenerator.awrap(injected('content/index.css'));
+	              return regenerator.awrap(injected('content/index.js'));
 
 	            case 36:
 	              _context6.next = 38;
-	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
+	              return regenerator.awrap(injected('content/index.css'));
 
 	            case 38:
 	              _context6.next = 40;
-	              return regenerator.awrap(setStorage('recording', true));
+	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
 
 	            case 40:
 	              _context6.next = 42;
-	              return regenerator.awrap(setStorage('config', config));
+	              return regenerator.awrap(setStorage('recording', true));
 
 	            case 42:
+	              _context6.next = 44;
+	              return regenerator.awrap(setStorage('config', config));
+
+	            case 44:
 	              sendMessage({
 	                type: START,
 	                data: config
 	              });
 
-	            case 43:
+	            case 45:
 	            case "end":
 	              return _context6.stop();
 	          }

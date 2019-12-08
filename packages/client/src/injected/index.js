@@ -37,33 +37,83 @@ var BilibiliLiveHimeInjected = (function () {
     function Injected() {
       classCallCheck(this, Injected);
 
-      this.getChatHistoryList().then(function (chatHistoryList) {
-        var observer = new MutationObserver(function (mutationsList) {
-          mutationsList.forEach(function (mutations) {
-            var addedNodes = Array.from(mutations.addedNodes || []);
-            addedNodes.forEach(function (item) {
-              // 弹幕
-              if (item.classList.contains('danmaku-item')) {
-                try {
-                  window.postMessage({
-                    type: DANMU,
-                    data: {
-                      uid: item.dataset.uid,
-                      uname: item.dataset.uname,
-                      danmaku: item.dataset.danmaku
-                    }
-                  });
-                } catch (error) {//
+      if (window.location.href.includes('blh=1')) {
+        this.init();
+      }
+    }
+
+    createClass(Injected, [{
+      key: "init",
+      value: function init() {
+        this.getChatHistoryList().then(function (chatHistoryList) {
+          var observer = new MutationObserver(function (mutationsList) {
+            mutationsList.forEach(function (mutations) {
+              var addedNodes = Array.from(mutations.addedNodes || []);
+              addedNodes.forEach(function (item) {
+                // 弹幕
+                if (item.classList.contains('danmaku-item')) {
+                  try {
+                    window.postMessage({
+                      type: DANMU,
+                      data: {
+                        uid: item.dataset.uid,
+                        uname: item.dataset.uname,
+                        danmaku: item.dataset.danmaku
+                      }
+                    });
+                  } catch (error) {//
+                  }
+                } // 礼物
+
+
+                if (item.classList.contains('gift-item')) {
+                  try {
+                    window.postMessage({
+                      type: GIFT,
+                      data: {
+                        uid: null,
+                        uname: item.querySelector('.username').innerText.trim(),
+                        action: item.querySelector('.action').innerText.trim(),
+                        gift: item.querySelector('.gift-name').innerText.trim(),
+                        count: item.querySelector('.count').innerText.trim()
+                      }
+                    });
+                  } catch (error) {//
+                  }
+                } // 上船
+
+
+                if (item.classList.contains('guard-buy')) {
+                  try {
+                    window.postMessage({
+                      type: GUARD,
+                      data: {
+                        uid: null,
+                        uname: item.querySelector('.username').innerText.trim(),
+                        action: '购买',
+                        gift: '舰长',
+                        count: item.querySelector('.count').innerText.trim()
+                      }
+                    });
+                  } catch (error) {//
+                  }
                 }
-              } // 礼物
-
-
-              if (item.classList.contains('gift-item')) {
+              });
+            });
+          });
+          observer.observe(chatHistoryList, {
+            childList: true
+          });
+        });
+        this.getPenuryGiftMsg().then(function (penuryGiftMsg) {
+          var observer = new MutationObserver(function (mutationsList) {
+            mutationsList.forEach(function (mutations) {
+              var addedNodes = Array.from(mutations.addedNodes || []);
+              addedNodes.forEach(function (item) {
                 try {
                   window.postMessage({
                     type: GIFT,
                     data: {
-                      uid: null,
                       uname: item.querySelector('.username').innerText.trim(),
                       action: item.querySelector('.action').innerText.trim(),
                       gift: item.querySelector('.gift-name').innerText.trim(),
@@ -72,58 +122,15 @@ var BilibiliLiveHimeInjected = (function () {
                   });
                 } catch (error) {//
                 }
-              } // 上船
-
-
-              if (item.classList.contains('guard-buy')) {
-                try {
-                  window.postMessage({
-                    type: GUARD,
-                    data: {
-                      uid: null,
-                      uname: item.querySelector('.username').innerText.trim(),
-                      action: '购买',
-                      gift: '舰长',
-                      count: item.querySelector('.count').innerText.trim()
-                    }
-                  });
-                } catch (error) {//
-                }
-              }
+              });
             });
           });
-        });
-        observer.observe(chatHistoryList, {
-          childList: true
-        });
-      });
-      this.getPenuryGiftMsg().then(function (penuryGiftMsg) {
-        var observer = new MutationObserver(function (mutationsList) {
-          mutationsList.forEach(function (mutations) {
-            var addedNodes = Array.from(mutations.addedNodes || []);
-            addedNodes.forEach(function (item) {
-              try {
-                window.postMessage({
-                  type: GIFT,
-                  data: {
-                    uname: item.querySelector('.username').innerText.trim(),
-                    action: item.querySelector('.action').innerText.trim(),
-                    gift: item.querySelector('.gift-name').innerText.trim(),
-                    count: item.querySelector('.count').innerText.trim()
-                  }
-                });
-              } catch (error) {//
-              }
-            });
+          observer.observe(penuryGiftMsg, {
+            childList: true
           });
         });
-        observer.observe(penuryGiftMsg, {
-          childList: true
-        });
-      });
-    }
-
-    createClass(Injected, [{
+      }
+    }, {
       key: "getChatHistoryList",
       value: function getChatHistoryList() {
         return new Promise(function (resolve) {

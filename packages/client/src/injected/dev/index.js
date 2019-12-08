@@ -2,6 +2,12 @@ import { DANMU, GIFT, GUARD } from '../../share/constant';
 
 class Injected {
     constructor() {
+        if (window.location.href.includes('blh=1')) {
+            this.init();
+        }
+    }
+
+    init() {
         this.getChatHistoryList().then(chatHistoryList => {
             const observer = new MutationObserver(mutationsList => {
                 mutationsList.forEach(mutations => {

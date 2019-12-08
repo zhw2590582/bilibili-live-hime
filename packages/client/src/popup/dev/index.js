@@ -178,7 +178,9 @@ class Popup {
                 await debug.err('不是有效B站直播间地址');
                 return;
             }
-            const liveTab = await openTab(config.live, false);
+            const url = new URL(config.live);
+            url.searchParams.append('blh', 1);
+            const liveTab = await openTab(url.href, false);
             if (liveTab) {
                 await debug.log('打开直播间页面成功，保持该页面打开既可以获取弹幕');
                 config.liveTab = liveTab.id;
