@@ -779,19 +779,9 @@ var BilibiliLiveHimeContent = (function () {
       value: function init() {
         window.BilibiliLiveHimeContentInit = true;
         onMessage(function (request) {
-          console.log(request);
           var type = request.type,
               data = request.data;
-
-          switch (type) {
-            case 'danmu':
-              console.log(data);
-              break;
-
-            case 'gift':
-              console.log(data);
-              break;
-          }
+          console.log(JSON.stringify(data));
         });
       }
     }]);

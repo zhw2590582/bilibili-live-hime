@@ -27,6 +27,8 @@ var BilibiliLiveHimeInjected = (function () {
 
   var createClass = _createClass;
 
+  var DANMU = 'DANMU';
+
   var Injected =
   /*#__PURE__*/
   function () {
@@ -34,20 +36,31 @@ var BilibiliLiveHimeInjected = (function () {
       classCallCheck(this, Injected);
 
       this.getPlayer().then(function (player) {
-        var add = player.components.danmaku.add;
+        Object.defineProperty(player, 'getVisibilityStatus', {
+          value: function value() {
+            return true;
+          }
+        });
+        var addDanmaku = player.addDanmaku;
 
-        player.components.danmaku.add = function f() {
+        player.addDanmaku = function f() {
           for (var _len = arguments.length, arg = new Array(_len), _key = 0; _key < _len; _key++) {
             arg[_key] = arguments[_key];
           }
 
-          var result = add.call.apply(add, [this].concat(arg));
+          var result = addDanmaku.call.apply(addDanmaku, [this].concat(arg));
           window.postMessage({
-            type: 'danmu',
+            type: DANMU,
             data: arg[0]
           });
           return result;
         };
+      });
+      this.getChatHistoryList().then(function (chatHistoryList) {
+        console.log(chatHistoryList);
+      });
+      this.getPenuryGiftMsg().then(function (penuryGiftMsg) {
+        console.log(penuryGiftMsg);
       });
     }
 
@@ -63,6 +76,36 @@ var BilibiliLiveHimeInjected = (function () {
               resolve(instance);
             } else {
               setTimeout(loop, 1000);
+            }
+          })();
+        });
+      }
+    }, {
+      key: "getChatHistoryList",
+      value: function getChatHistoryList() {
+        return new Promise(function (resolve) {
+          (function loop() {
+            var chatHistoryList = document.getElementById('chat-history-list');
+
+            if (!chatHistoryList) {
+              setTimeout(loop, 1000);
+            } else {
+              resolve(chatHistoryList);
+            }
+          })();
+        });
+      }
+    }, {
+      key: "getPenuryGiftMsg",
+      value: function getPenuryGiftMsg() {
+        return new Promise(function (resolve) {
+          (function loop() {
+            var penuryGiftMsg = document.getElementById('penury-gift-msg');
+
+            if (!penuryGiftMsg) {
+              setTimeout(loop, 1000);
+            } else {
+              resolve(penuryGiftMsg);
             }
           })();
         });

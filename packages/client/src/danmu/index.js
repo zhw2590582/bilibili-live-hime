@@ -21,7 +21,10 @@ var BilibiliLiveHimeDanmu = (function () {
 
     document.documentElement.appendChild($script);
     window.addEventListener('message', function (event) {
-      chrome.runtime.sendMessage(event.data);
+      try {
+        chrome.runtime.sendMessage(event.data);
+      } catch (error) {//
+      }
     });
   };
 

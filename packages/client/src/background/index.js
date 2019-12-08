@@ -991,11 +991,8 @@ var BilibiliLiveHimeBackground = (function () {
 	function onMessage(callback) {
 	  chrome.runtime.onMessage.addListener(callback);
 	}
-	function sendMessageToTab(tabId, type, data) {
-	  chrome.tabs.sendMessage(tabId, {
-	    type: type,
-	    data: data
-	  });
+	function sendMessageToTab(tabId, data) {
+	  chrome.tabs.sendMessage(tabId, data);
 	}
 	function setBadge() {
 	  var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -1012,6 +1009,11 @@ var BilibiliLiveHimeBackground = (function () {
 	    });
 	  });
 	}
+
+	var START = 'START';
+	var STOP = 'STOP';
+	var DANMU = 'DANMU';
+	var GIFT = 'GIFT';
 
 	function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -1034,20 +1036,20 @@ var BilibiliLiveHimeBackground = (function () {
 	          data = request.data;
 
 	      switch (type) {
-	        case 'start':
+	        case START:
 	          _this.config = _objectSpread({}, Background.config, {}, data);
 
 	          _this.start();
 
 	          break;
 
-	        case 'stop':
+	        case STOP:
 	          _this.stop();
 
 	          break;
 
-	        case 'danmu':
-	        case 'gift':
+	        case DANMU:
+	        case GIFT:
 	          if (_this.config && sender) {
 	            var _this$config = _this.config,
 	                activeTab = _this$config.activeTab,

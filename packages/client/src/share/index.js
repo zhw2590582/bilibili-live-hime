@@ -113,22 +113,16 @@ export const debug = {
     },
 };
 
-export function sendMessage(type, data) {
-    chrome.runtime.sendMessage({
-        type,
-        data,
-    });
+export function sendMessage(data) {
+    chrome.runtime.sendMessage(data);
 }
 
 export function onMessage(callback) {
     chrome.runtime.onMessage.addListener(callback);
 }
 
-export function sendMessageToTab(tabId, type, data) {
-    chrome.tabs.sendMessage(tabId, {
-        type,
-        data,
-    });
+export function sendMessageToTab(tabId, data) {
+    chrome.tabs.sendMessage(tabId, data);
 }
 
 export function setBadge(text = '', color = 'red') {

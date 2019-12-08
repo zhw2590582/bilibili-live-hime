@@ -11,6 +11,7 @@ import {
     findTabById,
     storageChange,
 } from '../../share';
+import { START, STOP } from '../../share/constant';
 
 class Popup {
     constructor() {
@@ -189,11 +190,16 @@ class Popup {
         await debug.log(`当前页面：${activeTab.title}`);
         await setStorage('recording', true);
         await setStorage('config', config);
-        sendMessage('start', config);
+        sendMessage({
+            type: START,
+            data: config,
+        });
     }
 
     async stop() {
-        sendMessage('stop');
+        sendMessage({
+            type: STOP,
+        });
         setStorage('recording', false);
         await debug.log('已停止推流...');
     }

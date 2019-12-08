@@ -968,11 +968,8 @@ var BilibiliLiveHimePopup = (function () {
 	    });
 	  }
 	};
-	function sendMessage(type, data) {
-	  chrome.runtime.sendMessage({
-	    type: type,
-	    data: data
-	  });
+	function sendMessage(data) {
+	  chrome.runtime.sendMessage(data);
 	}
 	function injected(file) {
 	  return new Promise(function (resolve) {
@@ -983,6 +980,9 @@ var BilibiliLiveHimePopup = (function () {
 	    });
 	  });
 	}
+
+	var START = 'START';
+	var STOP = 'STOP';
 
 	var Popup =
 	/*#__PURE__*/
@@ -1378,7 +1378,10 @@ var BilibiliLiveHimePopup = (function () {
 	              return regenerator.awrap(setStorage('config', config));
 
 	            case 42:
-	              sendMessage('start', config);
+	              sendMessage({
+	                type: START,
+	                data: config
+	              });
 
 	            case 43:
 	            case "end":
@@ -1394,7 +1397,9 @@ var BilibiliLiveHimePopup = (function () {
 	        while (1) {
 	          switch (_context7.prev = _context7.next) {
 	            case 0:
-	              sendMessage('stop');
+	              sendMessage({
+	                type: STOP
+	              });
 	              setStorage('recording', false);
 	              _context7.next = 4;
 	              return regenerator.awrap(debug.log('已停止推流...'));

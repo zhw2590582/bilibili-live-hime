@@ -6,7 +6,11 @@ class Danmu {
         document.documentElement.appendChild($script);
 
         window.addEventListener('message', event => {
-            chrome.runtime.sendMessage(event.data);
+            try {
+                chrome.runtime.sendMessage(event.data);
+            } catch (error) {
+                //
+            }
         });
     }
 }
