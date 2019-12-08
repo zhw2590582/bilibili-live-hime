@@ -1,15 +1,15 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
-import { debug, setBadge, setStorage, onMessage, storageChange } from '../../share';
+import { debug, setBadge, setStorage, onMessage, storageChange, sendMessageToTab } from '../../share';
 
 class Background {
     constructor() {
-        this.config = null;
         this.stream = null;
         this.socket = null;
         this.mediaRecorder = null;
+        this.config = Background.config;
 
-        onMessage(request => {
+        onMessage((request, sender) => {
             const { type, data } = request;
             switch (type) {
                 case 'start':
@@ -21,6 +21,17 @@ class Background {
                     break;
                 case 'stop':
                     this.stop();
+                    break;
+                case 'danmu':
+                case 'gift':
+                    if (this.config && sender) {
+                        const { activeTab, liveTab } = this.config;
+                        const { tab } = sender;
+                        console.log(activeTab, liveTab, tab.id);
+                        if (activeTab && liveTab && tab && liveTab === tab.id) {
+                            sendMessageToTab(this.config.activeTab, request);
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -197,6 +208,7 @@ class Background {
 
     async stop() {
         setStorage('recording', false);
+        this.config = Background.config;
 
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());

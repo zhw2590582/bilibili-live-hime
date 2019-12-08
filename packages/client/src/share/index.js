@@ -124,6 +124,13 @@ export function onMessage(callback) {
     chrome.runtime.onMessage.addListener(callback);
 }
 
+export function sendMessageToTab(tabId, type, data) {
+    chrome.tabs.sendMessage(tabId, {
+        type,
+        data,
+    });
+}
+
 export function setBadge(text = '', color = 'red') {
     return new Promise(resolve => {
         chrome.browserAction.setBadgeBackgroundColor(
@@ -144,29 +151,14 @@ export function setBadge(text = '', color = 'red') {
     });
 }
 
-export function injected(tabId, file, code) {
+export function injected(file) {
     return new Promise(resolve => {
         chrome.tabs.executeScript(
-            tabId,
             {
                 file,
-                runAt: 'document_start',
             },
             () => {
-                if (code) {
-                    chrome.tabs.executeScript(
-                        tabId,
-                        {
-                            code,
-                            runAt: 'document_start',
-                        },
-                        () => {
-                            resolve();
-                        },
-                    );
-                } else {
-                    resolve();
-                }
+                resolve();
             },
         );
     });

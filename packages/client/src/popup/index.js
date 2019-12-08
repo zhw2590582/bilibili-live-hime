@@ -974,22 +974,12 @@ var BilibiliLiveHimePopup = (function () {
 	    data: data
 	  });
 	}
-	function injected(tabId, file, code) {
+	function injected(file) {
 	  return new Promise(function (resolve) {
-	    chrome.tabs.executeScript(tabId, {
-	      file: file,
-	      runAt: 'document_start'
+	    chrome.tabs.executeScript({
+	      file: file
 	    }, function () {
-	      if (code) {
-	        chrome.tabs.executeScript(tabId, {
-	          code: code,
-	          runAt: 'document_start'
-	        }, function () {
-	          resolve();
-	        });
-	      } else {
-	        resolve();
-	      }
+	      resolve();
 	    });
 	  });
 	}
@@ -1334,7 +1324,7 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 20:
 	              if (!config.live) {
-	                _context6.next = 34;
+	                _context6.next = 32;
 	                break;
 	              }
 
@@ -1344,7 +1334,7 @@ var BilibiliLiveHimePopup = (function () {
 	              }
 
 	              _context6.next = 24;
-	              return regenerator.awrap(debug.err('不是有效bilibili直播间地址'));
+	              return regenerator.awrap(debug.err('不是有效B站直播间地址'));
 
 	            case 24:
 	              return _context6.abrupt("return");
@@ -1357,7 +1347,7 @@ var BilibiliLiveHimePopup = (function () {
 	              liveTab = _context6.sent;
 
 	              if (!liveTab) {
-	                _context6.next = 34;
+	                _context6.next = 32;
 	                break;
 	              }
 
@@ -1366,33 +1356,31 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 31:
 	              config.liveTab = liveTab.id;
+
+	            case 32:
 	              _context6.next = 34;
-	              return regenerator.awrap(injected(liveTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("live")'));
+	              return regenerator.awrap(injected('content/index.js'));
 
 	            case 34:
 	              _context6.next = 36;
-	              return regenerator.awrap(injected(activeTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("active")'));
+	              return regenerator.awrap(injected('content/index.css'));
 
 	            case 36:
 	              _context6.next = 38;
-	              return regenerator.awrap(injected(activeTab.id, 'content/index.css'));
+	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
 
 	            case 38:
 	              _context6.next = 40;
-	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
+	              return regenerator.awrap(setStorage('recording', true));
 
 	            case 40:
 	              _context6.next = 42;
-	              return regenerator.awrap(setStorage('recording', true));
-
-	            case 42:
-	              _context6.next = 44;
 	              return regenerator.awrap(setStorage('config', config));
 
-	            case 44:
+	            case 42:
 	              sendMessage('start', config);
 
-	            case 45:
+	            case 43:
 	            case "end":
 	              return _context6.stop();
 	          }

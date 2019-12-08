@@ -174,19 +174,18 @@ class Popup {
 
         if (config.live) {
             if (!/^https?:\/\/live\.bilibili\.com/i.test(config.live)) {
-                await debug.err('不是有效bilibili直播间地址');
+                await debug.err('不是有效B站直播间地址');
                 return;
             }
             const liveTab = await openTab(config.live, false);
             if (liveTab) {
                 await debug.log('打开直播间页面成功，保持该页面打开既可以获取弹幕');
                 config.liveTab = liveTab.id;
-                await injected(liveTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("live")');
             }
         }
 
-        await injected(activeTab.id, 'content/index.js', 'new BilibiliLiveHimeContent("active")');
-        await injected(activeTab.id, 'content/index.css');
+        await injected('content/index.js');
+        await injected('content/index.css');
         await debug.log(`当前页面：${activeTab.title}`);
         await setStorage('recording', true);
         await setStorage('config', config);
