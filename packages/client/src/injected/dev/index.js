@@ -66,8 +66,8 @@ class Injected {
 
         this.getPenuryGiftMsg().then(penuryGiftMsg => {
             const observer = new MutationObserver(mutationsList => {
-                if (mutationsList.length === 1) {
-                    const addedNodes = Array.from(mutationsList[0].addedNodes);
+                mutationsList.forEach(mutations => {
+                    const addedNodes = Array.from(mutations.addedNodes || []);
                     addedNodes.forEach(item => {
                         try {
                             window.postMessage({
@@ -83,7 +83,7 @@ class Injected {
                             //
                         }
                     });
-                }
+                });
             });
             observer.observe(penuryGiftMsg, { childList: true });
         });

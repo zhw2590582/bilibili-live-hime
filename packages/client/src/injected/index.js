@@ -99,8 +99,8 @@ var BilibiliLiveHimeInjected = (function () {
       });
       this.getPenuryGiftMsg().then(function (penuryGiftMsg) {
         var observer = new MutationObserver(function (mutationsList) {
-          if (mutationsList.length === 1) {
-            var addedNodes = Array.from(mutationsList[0].addedNodes);
+          mutationsList.forEach(function (mutations) {
+            var addedNodes = Array.from(mutations.addedNodes || []);
             addedNodes.forEach(function (item) {
               try {
                 window.postMessage({
@@ -115,7 +115,7 @@ var BilibiliLiveHimeInjected = (function () {
               } catch (error) {//
               }
             });
-          }
+          });
         });
         observer.observe(penuryGiftMsg, {
           childList: true
