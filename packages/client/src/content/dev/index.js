@@ -138,7 +138,10 @@ class Content {
             );
         }
         if (!this.isHover) {
-            this.$danmu.scrollTo(0, this.$danmu.scrollHeight);
+            clearTimeout(this.danmuTimer);
+            this.danmuTimer = setTimeout(() => {
+                this.$danmu.scrollTo(0, this.$danmu.scrollHeight);
+            }, 100);
         }
     }
 
@@ -161,7 +164,10 @@ class Content {
             );
         }
         if (!this.isHover) {
-            this.$gift.scrollTo(0, this.$gift.scrollHeight);
+            clearTimeout(this.giftTimer);
+            this.giftTimer = setTimeout(() => {
+                this.$gift.scrollTo(0, this.$gift.scrollHeight);
+            }, 100);
         }
     }
 

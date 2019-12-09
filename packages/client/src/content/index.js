@@ -143,6 +143,8 @@ var BilibiliLiveHimeContent = (function () {
     }, {
       key: "addDanmu",
       value: function addDanmu(danmu) {
+        var _this2 = this;
+
         var children = this.$danmuInner.children;
 
         if (children.length > 50) {
@@ -155,33 +157,39 @@ var BilibiliLiveHimeContent = (function () {
         }
 
         if (!this.isHover) {
-          this.$danmu.scrollTo(0, this.$danmu.scrollHeight);
+          clearTimeout(this.danmuTimer);
+          this.danmuTimer = setTimeout(function () {
+            _this2.$danmu.scrollTo(0, _this2.$danmu.scrollHeight);
+          }, 100);
         }
       }
     }, {
       key: "addGift",
       value: function addGift(gift) {
+        var _this3 = this;
+
         var children = this.$giftInner.children;
 
         if (children.length > 50) {
           var child = children[0];
           query('.blh-gift-uname', child).innerText = "".concat(gift.uname, ":");
-          query('.blh-gift-action', child).innerText = gift.action;
-          query('.blh-gift-gift', child).innerText = gift.gift;
-          query('.blh-gift-count', child).innerText = gift.count;
+          query('.blh-gift-text', child).innerText = "".concat(gift.action, " ").concat(gift.gift, " ").concat(gift.count);
           this.$giftInner.appendChild(child);
         } else {
-          this.$giftInner.insertAdjacentHTML('beforeend', "\n                <div class=\"blh-gift-item\">\n                    <span class=\"blh-gift-uname\">".concat(gift.uname, ":</span>\n                    <span class=\"blh-gift-action\">").concat(gift.action, "</span>\n                    <span class=\"blh-gift-gift\">").concat(gift.gift, "</span>\n                    <span class=\"blh-gift-count\">").concat(gift.count, "</span>\n                </div>\n            "));
+          this.$giftInner.insertAdjacentHTML('beforeend', "\n                <div class=\"blh-gift-item\">\n                    <span class=\"blh-gift-uname\">".concat(gift.uname, ":</span>\n                    <span class=\"blh-gift-text\">").concat(gift.action, " ").concat(gift.gift, " ").concat(gift.count, "</span>\n                </div>\n            "));
         }
 
         if (!this.isHover) {
-          this.$gift.scrollTo(0, this.$gift.scrollHeight);
+          clearTimeout(this.giftTimer);
+          this.giftTimer = setTimeout(function () {
+            _this3.$gift.scrollTo(0, _this3.$gift.scrollHeight);
+          }, 100);
         }
       }
     }, {
       key: "receiveDanmu",
       value: function receiveDanmu() {
-        var _this2 = this;
+        var _this4 = this;
 
         if (!chrome) return;
         chrome.runtime.onMessage.addListener(function (request) {
@@ -191,13 +199,13 @@ var BilibiliLiveHimeContent = (function () {
 
           switch (type) {
             case DANMU:
-              _this2.addDanmu(data);
+              _this4.addDanmu(data);
 
               break;
 
             case GIFT:
             case GUARD:
-              _this2.addGift(data);
+              _this4.addGift(data);
 
               break;
           }

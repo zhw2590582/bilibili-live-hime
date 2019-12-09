@@ -871,7 +871,7 @@ var BilibiliLiveHimeBackground = (function () {
 	  }
 	}
 
-	var objToString_1 = objToString;
+	var _objToString_1_0_1_objToString = objToString;
 
 	var START = 'start';
 	var STOP = 'stop';
@@ -950,7 +950,7 @@ var BilibiliLiveHimeBackground = (function () {
 	            logs = _context.t0;
 	            logs.push({
 	              type: LOG,
-	              data: objToString_1(msg)
+	              data: _objToString_1_0_1_objToString(msg)
 	            });
 	            _context.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -985,7 +985,7 @@ var BilibiliLiveHimeBackground = (function () {
 	            logs = _context2.t0;
 	            logs.push({
 	              type: ERROR,
-	              data: objToString_1(msg)
+	              data: _objToString_1_0_1_objToString(msg)
 	            });
 	            _context2.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -1050,14 +1050,14 @@ var BilibiliLiveHimeBackground = (function () {
 	    this.stream = null;
 	    this.socket = null;
 	    this.mediaRecorder = null;
-	    this.config = Background.config;
+	    this.config = Background.Config;
 	    onMessage(function (request, sender) {
 	      var type = request.type,
 	          data = request.data;
 
 	      switch (type) {
 	        case START:
-	          _this.config = _objectSpread({}, Background.config, {}, data);
+	          _this.config = _objectSpread({}, Background.Config, {}, data);
 
 	          _this.start();
 
@@ -1304,7 +1304,7 @@ var BilibiliLiveHimeBackground = (function () {
 	          switch (_context5.prev = _context5.next) {
 	            case 0:
 	              setStorage(RECORDING, false);
-	              this.config = Background.config;
+	              this.config = Background.Config;
 
 	              if (this.stream) {
 	                this.stream.getTracks().forEach(function (track) {
@@ -1329,7 +1329,7 @@ var BilibiliLiveHimeBackground = (function () {
 	      }, null, this);
 	    }
 	  }], [{
-	    key: "config",
+	    key: "Config",
 	    get: function get() {
 	      return {
 	        rtmp: '',
