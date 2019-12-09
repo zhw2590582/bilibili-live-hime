@@ -2,25 +2,24 @@ import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
 import { debug, setBadge, setStorage, onMessage, storageChange, sendMessageToTab } from '../../share';
 import {
-    START,
-    STOP,
-    DANMU,
-    GIFT,
-    GUARD,
     LOG,
-    RECORDING,
     FAIL,
     RTMP,
-    STREAM_DISCONNECT,
-    BINARY_STREAM,
-    ON,
-    SOCKET_SUCCESS,
+    STOP,
+    GIFT,
+    START,
+    DANMU,
+    GUARD,
+    RECORDING,
     SOCKET_FAIL,
-    TAB_VIDEO_STREAM_SUCCESS,
-    TAB_VIDEO_STREAM_FAIL,
-    RECORDER_SUCCESS,
+    BINARY_STREAM,
     RECORDER_FAIL,
+    SOCKET_SUCCESS,
     PUSH_STREAM_ING,
+    RECORDER_SUCCESS,
+    STREAM_DISCONNECT,
+    TAB_VIDEO_STREAM_FAIL,
+    TAB_VIDEO_STREAM_SUCCESS,
 } from '../../share/constant';
 
 class Background {
@@ -62,7 +61,7 @@ class Background {
         storageChange(async changes => {
             if (changes.recording) {
                 if (changes.recording.newValue) {
-                    setBadge(ON);
+                    setBadge('ON');
                 } else {
                     setBadge('');
                 }
@@ -72,11 +71,11 @@ class Background {
 
     static get config() {
         return {
-            activeTab: null,
-            liveTab: null,
             rtmp: '',
-            streamname: '',
             socket: '',
+            liveTab: null,
+            streamname: '',
+            activeTab: null,
             resolution: 1920,
             videoBitsPerSecond: 2500000,
         };

@@ -803,7 +803,31 @@ var BilibiliLiveHimePopup = (function () {
 	  }
 	}
 
-	var _objToString_1_0_1_objToString = objToString;
+	var objToString_1 = objToString;
+
+	var START = 'start';
+	var STOP = 'stop';
+	var CONFIG = 'config';
+	var RECORDING = 'recording';
+	var DEBUG = 'debug';
+	var LOG = 'log';
+	var ERROR = 'error';
+	var BLH = 'blh';
+	var CAN_NOT_FIND_TAB = '未获取到当前激活的标签';
+	var RTMP_ERROR = '请输入正确的rtmp推流地址';
+	var STREAM_NAME_ERROR = '请输入正确的直播码';
+	var SOCKET_ERROR = '请输入正确的中转地址';
+	var LIVE_ROOM_ERROR = '不是有效B站直播间地址';
+	var OPEN_SUCCESS = '打开直播间页面成功，保持该页面打开既可以获取弹幕';
+	var CURRENT_PAGE = '当前页面';
+	var PUSH_STREAM_END = '已停止推流...';
+	var DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
+	var DEFAULT_SOCKET = 'http://localhost:8080';
+	var DEFAULT_RESOLUTION = '1920';
+	var DEFAULT_BITSPER = '2500000';
+	var REG_RTMP = /^rtmp:\/\/.+/i;
+	var REG_HTTP = /^https?:\/\/.+/i;
+	var REG_LIVE = /^https?:\/\/live\.bilibili\.com/i;
 
 	function query(el) {
 	  var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
@@ -876,9 +900,13 @@ var BilibiliLiveHimePopup = (function () {
 	function findTabById() {
 	  var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 	  return new Promise(function (resolve) {
-	    chrome.tabs.get(id, function (tab) {
-	      resolve(tab);
-	    });
+	    try {
+	      chrome.tabs.get(id, function (tab) {
+	        resolve(tab);
+	      });
+	    } catch (error) {
+	      resolve();
+	    }
 	  });
 	}
 	var debug = {
@@ -889,7 +917,7 @@ var BilibiliLiveHimePopup = (function () {
 	        switch (_context.prev = _context.next) {
 	          case 0:
 	            _context.next = 2;
-	            return regenerator.awrap(getStorage('debug'));
+	            return regenerator.awrap(getStorage(DEBUG));
 
 	          case 2:
 	            _context.t0 = _context.sent;
@@ -904,11 +932,11 @@ var BilibiliLiveHimePopup = (function () {
 	          case 5:
 	            logs = _context.t0;
 	            logs.push({
-	              type: 'log',
-	              data: _objToString_1_0_1_objToString(msg)
+	              type: LOG,
+	              data: objToString_1(msg)
 	            });
 	            _context.next = 9;
-	            return regenerator.awrap(setStorage('debug', logs));
+	            return regenerator.awrap(setStorage(DEBUG, logs));
 
 	          case 9:
 	          case "end":
@@ -924,7 +952,7 @@ var BilibiliLiveHimePopup = (function () {
 	        switch (_context2.prev = _context2.next) {
 	          case 0:
 	            _context2.next = 2;
-	            return regenerator.awrap(getStorage('debug'));
+	            return regenerator.awrap(getStorage(DEBUG));
 
 	          case 2:
 	            _context2.t0 = _context2.sent;
@@ -939,11 +967,11 @@ var BilibiliLiveHimePopup = (function () {
 	          case 5:
 	            logs = _context2.t0;
 	            logs.push({
-	              type: 'error',
-	              data: _objToString_1_0_1_objToString(msg)
+	              type: ERROR,
+	              data: objToString_1(msg)
 	            });
 	            _context2.next = 9;
-	            return regenerator.awrap(setStorage('debug', logs));
+	            return regenerator.awrap(setStorage(DEBUG, logs));
 
 	          case 9:
 	          case "end":
@@ -958,7 +986,7 @@ var BilibiliLiveHimePopup = (function () {
 	        switch (_context3.prev = _context3.next) {
 	          case 0:
 	            _context3.next = 2;
-	            return regenerator.awrap(setStorage('debug', []));
+	            return regenerator.awrap(setStorage(DEBUG, []));
 
 	          case 2:
 	          case "end":
@@ -980,9 +1008,6 @@ var BilibiliLiveHimePopup = (function () {
 	    });
 	  });
 	}
-
-	var START = 'START';
-	var STOP = 'STOP';
 
 	var Popup =
 	/*#__PURE__*/
@@ -1011,11 +1036,11 @@ var BilibiliLiveHimePopup = (function () {
 	    this.updateDebug();
 	    this.updateRecording();
 	    storageChange(function (changes) {
-	      if (changes.debug) {
+	      if (changes[DEBUG]) {
 	        _this.updateDebug();
 	      }
 
-	      if (changes.recording) {
+	      if (changes[RECORDING]) {
 	        _this.updateRecording();
 	      }
 	    });
@@ -1077,7 +1102,7 @@ var BilibiliLiveHimePopup = (function () {
 	          switch (_context2.prev = _context2.next) {
 	            case 0:
 	              _context2.next = 2;
-	              return regenerator.awrap(getStorage('config'));
+	              return regenerator.awrap(getStorage(CONFIG));
 
 	            case 2:
 	              _context2.t0 = _context2.sent;
@@ -1093,7 +1118,7 @@ var BilibiliLiveHimePopup = (function () {
 	              config = _context2.t0;
 	              config[name] = this["$".concat(name)].value.trim();
 	              _context2.next = 9;
-	              return regenerator.awrap(setStorage('config', config));
+	              return regenerator.awrap(setStorage(CONFIG, config));
 
 	            case 9:
 	            case "end":
@@ -1111,12 +1136,12 @@ var BilibiliLiveHimePopup = (function () {
 	          switch (_context3.prev = _context3.next) {
 	            case 0:
 	              _context3.next = 2;
-	              return regenerator.awrap(getStorage('recording'));
+	              return regenerator.awrap(getStorage(RECORDING));
 
 	            case 2:
 	              recording = _context3.sent;
 	              _context3.next = 5;
-	              return regenerator.awrap(getStorage('config'));
+	              return regenerator.awrap(getStorage(CONFIG));
 
 	            case 5:
 	              _context3.t0 = _context3.sent;
@@ -1137,17 +1162,17 @@ var BilibiliLiveHimePopup = (function () {
 	              activeTab = _context3.sent;
 
 	              if (config) {
-	                this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
+	                this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
 	                this.$streamname.value = config.streamname || '';
-	                this.$socket.value = config.socket || 'http://localhost:8080';
+	                this.$socket.value = config.socket || DEFAULT_SOCKET;
 	                this.$live.value = config.live || '';
-	                this.$resolution.value = config.resolution || '1920';
-	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
+	                this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
+	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_BITSPER;
 	              }
 
 	              if (!recording || !activeTab) {
 	                debug.clean();
-	                setStorage('recording', false);
+	                setStorage(RECORDING, false);
 	              }
 
 	            case 14:
@@ -1166,7 +1191,7 @@ var BilibiliLiveHimePopup = (function () {
 	          switch (_context4.prev = _context4.next) {
 	            case 0:
 	              _context4.next = 2;
-	              return regenerator.awrap(getStorage('debug'));
+	              return regenerator.awrap(getStorage(DEBUG));
 
 	            case 2:
 	              _context4.t0 = _context4.sent;
@@ -1201,12 +1226,12 @@ var BilibiliLiveHimePopup = (function () {
 	          switch (_context5.prev = _context5.next) {
 	            case 0:
 	              _context5.next = 2;
-	              return regenerator.awrap(getStorage('recording'));
+	              return regenerator.awrap(getStorage(RECORDING));
 
 	            case 2:
 	              recording = _context5.sent;
 	              _context5.next = 5;
-	              return regenerator.awrap(getStorage('config'));
+	              return regenerator.awrap(getStorage(CONFIG));
 
 	            case 5:
 	              _context5.t0 = _context5.sent;
@@ -1227,7 +1252,7 @@ var BilibiliLiveHimePopup = (function () {
 	              activeTab = _context5.sent;
 
 	              if (recording && activeTab) {
-	                this.$container.classList.add('recording');
+	                this.$container.classList.add(RECORDING);
 	                this.$rtmp.disabled = true;
 	                this.$streamname.disabled = true;
 	                this.$socket.disabled = true;
@@ -1235,7 +1260,7 @@ var BilibiliLiveHimePopup = (function () {
 	                this.$resolution.disabled = true;
 	                this.$videoBitsPerSecond.disabled = true;
 	              } else {
-	                this.$container.classList.remove('recording');
+	                this.$container.classList.remove(RECORDING);
 	                this.$rtmp.disabled = false;
 	                this.$streamname.disabled = false;
 	                this.$socket.disabled = false;
@@ -1271,7 +1296,7 @@ var BilibiliLiveHimePopup = (function () {
 	              }
 
 	              _context6.next = 6;
-	              return regenerator.awrap(debug.err('未获取到当前激活的标签'));
+	              return regenerator.awrap(debug.err(CAN_NOT_FIND_TAB));
 
 	            case 6:
 	              return _context6.abrupt("return");
@@ -1287,13 +1312,13 @@ var BilibiliLiveHimePopup = (function () {
 	                videoBitsPerSecond: Number(this.$videoBitsPerSecond.value)
 	              };
 
-	              if (!(!config.rtmp || !/^rtmp:\/\/.+/i.test(config.rtmp))) {
+	              if (!(!config.rtmp || !REG_RTMP.test(config.rtmp))) {
 	                _context6.next = 12;
 	                break;
 	              }
 
 	              _context6.next = 11;
-	              return regenerator.awrap(debug.err('请输入正确的rtmp推流地址'));
+	              return regenerator.awrap(debug.err(RTMP_ERROR));
 
 	            case 11:
 	              return _context6.abrupt("return");
@@ -1305,43 +1330,43 @@ var BilibiliLiveHimePopup = (function () {
 	              }
 
 	              _context6.next = 15;
-	              return regenerator.awrap(debug.err('请输入正确的直播码'));
+	              return regenerator.awrap(debug.err(STREAM_NAME_ERROR));
 
 	            case 15:
 	              return _context6.abrupt("return");
 
 	            case 16:
-	              if (!(!config.socket || !/^https?:\/\/.+/i.test(config.socket))) {
+	              if (!(!config.socket || !REG_HTTP.test(config.socket))) {
 	                _context6.next = 20;
 	                break;
 	              }
 
 	              _context6.next = 19;
-	              return regenerator.awrap(debug.err('请输入正确的中转地址'));
+	              return regenerator.awrap(debug.err(SOCKET_ERROR));
 
 	            case 19:
 	              return _context6.abrupt("return");
 
 	            case 20:
 	              if (!config.live) {
-	                _context6.next = 34;
+	                _context6.next = 38;
 	                break;
 	              }
 
-	              if (/^https?:\/\/live\.bilibili\.com/i.test(config.live)) {
+	              if (REG_LIVE.test(config.live)) {
 	                _context6.next = 25;
 	                break;
 	              }
 
 	              _context6.next = 24;
-	              return regenerator.awrap(debug.err('不是有效B站直播间地址'));
+	              return regenerator.awrap(debug.err(LIVE_ROOM_ERROR));
 
 	            case 24:
 	              return _context6.abrupt("return");
 
 	            case 25:
 	              url = new URL(config.live);
-	              url.searchParams.append('blh', 1);
+	              url.searchParams.append(BLH, 1);
 	              _context6.next = 29;
 	              return regenerator.awrap(openTab(url.href, false));
 
@@ -1349,17 +1374,15 @@ var BilibiliLiveHimePopup = (function () {
 	              liveTab = _context6.sent;
 
 	              if (!liveTab) {
-	                _context6.next = 34;
+	                _context6.next = 38;
 	                break;
 	              }
 
 	              _context6.next = 33;
-	              return regenerator.awrap(debug.log('打开直播间页面成功，保持该页面打开既可以获取弹幕'));
+	              return regenerator.awrap(debug.log(OPEN_SUCCESS));
 
 	            case 33:
 	              config.liveTab = liveTab.id;
-
-	            case 34:
 	              _context6.next = 36;
 	              return regenerator.awrap(injected('content/index.js'));
 
@@ -1369,15 +1392,15 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 38:
 	              _context6.next = 40;
-	              return regenerator.awrap(debug.log("\u5F53\u524D\u9875\u9762\uFF1A".concat(activeTab.title)));
+	              return regenerator.awrap(debug.log("".concat(CURRENT_PAGE, "\uFF1A").concat(activeTab.title)));
 
 	            case 40:
 	              _context6.next = 42;
-	              return regenerator.awrap(setStorage('recording', true));
+	              return regenerator.awrap(setStorage(RECORDING, true));
 
 	            case 42:
 	              _context6.next = 44;
-	              return regenerator.awrap(setStorage('config', config));
+	              return regenerator.awrap(setStorage(CONFIG, config));
 
 	            case 44:
 	              sendMessage({
@@ -1402,9 +1425,9 @@ var BilibiliLiveHimePopup = (function () {
 	              sendMessage({
 	                type: STOP
 	              });
-	              setStorage('recording', false);
+	              setStorage(RECORDING, false);
 	              _context7.next = 4;
-	              return regenerator.awrap(debug.log('已停止推流...'));
+	              return regenerator.awrap(debug.log(PUSH_STREAM_END));
 
 	            case 4:
 	            case "end":

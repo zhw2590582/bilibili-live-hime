@@ -27,9 +27,10 @@ var BilibiliLiveHimeInjected = (function () {
 
   var createClass = _createClass;
 
-  var DANMU = 'DANMU';
-  var GIFT = 'GIFT';
-  var GUARD = 'GUARD';
+  var DANMU = 'danmu';
+  var GIFT = 'gift';
+  var GUARD = 'guard';
+  var BLH = 'blh';
 
   var Injected =
   /*#__PURE__*/
@@ -37,7 +38,7 @@ var BilibiliLiveHimeInjected = (function () {
     function Injected() {
       classCallCheck(this, Injected);
 
-      if (window.location.href.includes('blh=1')) {
+      if (window.location.href.includes(BLH)) {
         this.init();
       }
     }

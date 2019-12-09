@@ -871,7 +871,28 @@ var BilibiliLiveHimeBackground = (function () {
 	  }
 	}
 
-	var _objToString_1_0_1_objToString = objToString;
+	var objToString_1 = objToString;
+
+	var START = 'start';
+	var STOP = 'stop';
+	var DANMU = 'danmu';
+	var GIFT = 'gift';
+	var GUARD = 'guard';
+	var RECORDING = 'recording';
+	var DEBUG = 'debug';
+	var LOG = 'log';
+	var ERROR = 'error';
+	var FAIL = 'fail';
+	var RTMP = 'rtmp';
+	var STREAM_DISCONNECT = 'stream_disconnect';
+	var BINARY_STREAM = 'binary_stream';
+	var SOCKET_SUCCESS = '建立socket连接成功';
+	var SOCKET_FAIL = '建立socket连接失败';
+	var TAB_VIDEO_STREAM_SUCCESS = '获取标签视频流成功';
+	var TAB_VIDEO_STREAM_FAIL = '无法获取标签视频流，请重试！';
+	var RECORDER_SUCCESS = '录制器启动成功';
+	var RECORDER_FAIL = '无法录制标签的视频流，请重试！';
+	var PUSH_STREAM_ING = '正在推流中...';
 
 	function has(result, key) {
 	  return Object.prototype.hasOwnProperty.call(result, key);
@@ -909,7 +930,7 @@ var BilibiliLiveHimeBackground = (function () {
 	        switch (_context.prev = _context.next) {
 	          case 0:
 	            _context.next = 2;
-	            return regenerator.awrap(getStorage('debug'));
+	            return regenerator.awrap(getStorage(DEBUG));
 
 	          case 2:
 	            _context.t0 = _context.sent;
@@ -924,11 +945,11 @@ var BilibiliLiveHimeBackground = (function () {
 	          case 5:
 	            logs = _context.t0;
 	            logs.push({
-	              type: 'log',
-	              data: _objToString_1_0_1_objToString(msg)
+	              type: LOG,
+	              data: objToString_1(msg)
 	            });
 	            _context.next = 9;
-	            return regenerator.awrap(setStorage('debug', logs));
+	            return regenerator.awrap(setStorage(DEBUG, logs));
 
 	          case 9:
 	          case "end":
@@ -944,7 +965,7 @@ var BilibiliLiveHimeBackground = (function () {
 	        switch (_context2.prev = _context2.next) {
 	          case 0:
 	            _context2.next = 2;
-	            return regenerator.awrap(getStorage('debug'));
+	            return regenerator.awrap(getStorage(DEBUG));
 
 	          case 2:
 	            _context2.t0 = _context2.sent;
@@ -959,11 +980,11 @@ var BilibiliLiveHimeBackground = (function () {
 	          case 5:
 	            logs = _context2.t0;
 	            logs.push({
-	              type: 'error',
-	              data: _objToString_1_0_1_objToString(msg)
+	              type: ERROR,
+	              data: objToString_1(msg)
 	            });
 	            _context2.next = 9;
-	            return regenerator.awrap(setStorage('debug', logs));
+	            return regenerator.awrap(setStorage(DEBUG, logs));
 
 	          case 9:
 	          case "end":
@@ -978,7 +999,7 @@ var BilibiliLiveHimeBackground = (function () {
 	        switch (_context3.prev = _context3.next) {
 	          case 0:
 	            _context3.next = 2;
-	            return regenerator.awrap(setStorage('debug', []));
+	            return regenerator.awrap(setStorage(DEBUG, []));
 
 	          case 2:
 	          case "end":
@@ -1009,12 +1030,6 @@ var BilibiliLiveHimeBackground = (function () {
 	    });
 	  });
 	}
-
-	var START = 'START';
-	var STOP = 'STOP';
-	var DANMU = 'DANMU';
-	var GIFT = 'GIFT';
-	var GUARD = 'GUARD';
 
 	function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -1154,11 +1169,11 @@ var BilibiliLiveHimeBackground = (function () {
 	            case 4:
 	              this.socket = _context4.sent;
 	              _context4.next = 7;
-	              return regenerator.awrap(debug.log('建立socket连接成功'));
+	              return regenerator.awrap(debug.log(SOCKET_SUCCESS));
 
 	            case 7:
-	              this.socket.emit('rtmp', rtmp + streamname);
-	              this.socket.on('fail', function _callee2(info) {
+	              this.socket.emit(RTMP, rtmp + streamname);
+	              this.socket.on(FAIL, function _callee2(info) {
 	                return regenerator.async(function _callee2$(_context2) {
 	                  while (1) {
 	                    switch (_context2.prev = _context2.next) {
@@ -1177,7 +1192,7 @@ var BilibiliLiveHimeBackground = (function () {
 	                  }
 	                });
 	              });
-	              this.socket.on('log', function _callee3(info) {
+	              this.socket.on(LOG, function _callee3(info) {
 	                return regenerator.async(function _callee3$(_context3) {
 	                  while (1) {
 	                    switch (_context3.prev = _context3.next) {
@@ -1199,7 +1214,7 @@ var BilibiliLiveHimeBackground = (function () {
 	              _context4.prev = 12;
 	              _context4.t0 = _context4["catch"](1);
 	              _context4.next = 16;
-	              return regenerator.awrap(debug.err("\u5EFA\u7ACBsocket\u8FDE\u63A5\u5931\u8D25: ".concat(_context4.t0.message.trim())));
+	              return regenerator.awrap(debug.err("".concat(SOCKET_FAIL, ": ").concat(_context4.t0.message.trim())));
 
 	            case 16:
 	              _context4.next = 18;
@@ -1216,7 +1231,7 @@ var BilibiliLiveHimeBackground = (function () {
 	            case 22:
 	              this.stream = _context4.sent;
 	              _context4.next = 25;
-	              return regenerator.awrap(debug.log('获取标签视频流成功'));
+	              return regenerator.awrap(debug.log(TAB_VIDEO_STREAM_SUCCESS));
 
 	            case 25:
 	              _context4.next = 34;
@@ -1226,7 +1241,7 @@ var BilibiliLiveHimeBackground = (function () {
 	              _context4.prev = 27;
 	              _context4.t1 = _context4["catch"](19);
 	              _context4.next = 31;
-	              return regenerator.awrap(debug.err('无法获取标签视频流，请重试！'));
+	              return regenerator.awrap(debug.err(TAB_VIDEO_STREAM_FAIL));
 
 	            case 31:
 	              _context4.next = 33;
@@ -1243,12 +1258,12 @@ var BilibiliLiveHimeBackground = (function () {
 	            case 37:
 	              this.mediaRecorder = _context4.sent;
 	              _context4.next = 40;
-	              return regenerator.awrap(debug.log('录制器启动成功'));
+	              return regenerator.awrap(debug.log(RECORDER_SUCCESS));
 
 	            case 40:
 	              this.mediaRecorder.ondataavailable = function (event) {
 	                if (event.data && event.data.size > 0) {
-	                  _this2.socket.emit('binarystream', event.data);
+	                  _this2.socket.emit(BINARY_STREAM, event.data);
 	                }
 	              };
 
@@ -1260,7 +1275,7 @@ var BilibiliLiveHimeBackground = (function () {
 	              _context4.prev = 44;
 	              _context4.t2 = _context4["catch"](34);
 	              _context4.next = 48;
-	              return regenerator.awrap(debug.err('无法录制标签的视频流，请重试！'));
+	              return regenerator.awrap(debug.err(RECORDER_FAIL));
 
 	            case 48:
 	              _context4.next = 50;
@@ -1268,7 +1283,7 @@ var BilibiliLiveHimeBackground = (function () {
 
 	            case 50:
 	              _context4.next = 52;
-	              return regenerator.awrap(debug.log('正在推流中...'));
+	              return regenerator.awrap(debug.log(PUSH_STREAM_ING));
 
 	            case 52:
 	            case "end":
@@ -1284,7 +1299,7 @@ var BilibiliLiveHimeBackground = (function () {
 	        while (1) {
 	          switch (_context5.prev = _context5.next) {
 	            case 0:
-	              setStorage('recording', false);
+	              setStorage(RECORDING, false);
 	              this.config = Background.config;
 
 	              if (this.stream) {
@@ -1294,7 +1309,7 @@ var BilibiliLiveHimeBackground = (function () {
 	              }
 
 	              if (this.socket) {
-	                this.socket.emit('disconnect');
+	                this.socket.emit(STREAM_DISCONNECT);
 	                this.socket.close();
 	              }
 
@@ -1313,11 +1328,11 @@ var BilibiliLiveHimeBackground = (function () {
 	    key: "config",
 	    get: function get() {
 	      return {
-	        activeTab: null,
-	        liveTab: null,
 	        rtmp: '',
-	        streamname: '',
 	        socket: '',
+	        liveTab: null,
+	        streamname: '',
+	        activeTab: null,
 	        resolution: 1920,
 	        videoBitsPerSecond: 2500000
 	      };

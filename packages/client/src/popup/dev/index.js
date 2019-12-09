@@ -7,25 +7,32 @@ import {
     getStorage,
     setStorage,
     sendMessage,
-    getActiveTab,
     findTabById,
+    getActiveTab,
     storageChange,
 } from '../../share';
 import {
-    START,
-    STOP,
-    RECORDING,
-    CONFIG,
-    DEBUG,
     BLH,
-    CAN_NOT_FIND_TAB,
+    STOP,
+    START,
+    DEBUG,
+    CONFIG,
+    REG_RTMP,
+    REG_HTTP,
+    REG_LIVE,
+    RECORDING,
     RTMP_ERROR,
-    STREAM_NAME_ERROR,
+    DEFAULT_RTMP,
     SOCKET_ERROR,
-    BILIBILI_LIVE_ERROR,
     OPEN_SUCCESS,
     CURRENT_PAGE,
+    DEFAULT_SOCKET,
+    DEFAULT_BITSPER,
     PUSH_STREAM_END,
+    LIVE_ROOM_ERROR,
+    CAN_NOT_FIND_TAB,
+    STREAM_NAME_ERROR,
+    DEFAULT_RESOLUTION,
 } from '../../share/constant';
 
 class Popup {
@@ -51,10 +58,10 @@ class Popup {
         this.updateDebug();
         this.updateRecording();
         storageChange(changes => {
-            if (changes.debug) {
+            if (changes[DEBUG]) {
                 this.updateDebug();
             }
-            if (changes.recording) {
+            if (changes[RECORDING]) {
                 this.updateRecording();
             }
         });
@@ -113,12 +120,12 @@ class Popup {
         const config = (await getStorage(CONFIG)) || {};
         const activeTab = await findTabById(config.activeTab);
         if (config) {
-            this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
+            this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
             this.$streamname.value = config.streamname || '';
-            this.$socket.value = config.socket || 'http://localhost:8080';
+            this.$socket.value = config.socket || DEFAULT_SOCKET;
             this.$live.value = config.live || '';
-            this.$resolution.value = config.resolution || '1920';
-            this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
+            this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
+            this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_BITSPER;
         }
         if (!recording || !activeTab) {
             debug.clean();
@@ -173,7 +180,7 @@ class Popup {
             videoBitsPerSecond: Number(this.$videoBitsPerSecond.value),
         };
 
-        if (!config.rtmp || !/^rtmp:\/\/.+/i.test(config.rtmp)) {
+        if (!config.rtmp || !REG_RTMP.test(config.rtmp)) {
             await debug.err(RTMP_ERROR);
             return;
         }
@@ -183,14 +190,14 @@ class Popup {
             return;
         }
 
-        if (!config.socket || !/^https?:\/\/.+/i.test(config.socket)) {
+        if (!config.socket || !REG_HTTP.test(config.socket)) {
             await debug.err(SOCKET_ERROR);
             return;
         }
 
         if (config.live) {
-            if (!/^https?:\/\/live\.bilibili\.com/i.test(config.live)) {
-                await debug.err(BILIBILI_LIVE_ERROR);
+            if (!REG_LIVE.test(config.live)) {
+                await debug.err(LIVE_ROOM_ERROR);
                 return;
             }
             const url = new URL(config.live);
@@ -199,11 +206,11 @@ class Popup {
             if (liveTab) {
                 await debug.log(OPEN_SUCCESS);
                 config.liveTab = liveTab.id;
+                await injected('content/index.js');
+                await injected('content/index.css');
             }
         }
 
-        await injected('content/index.js');
-        await injected('content/index.css');
         await debug.log(`${CURRENT_PAGE}：${activeTab.title}`);
         await setStorage(RECORDING, true);
         await setStorage(CONFIG, config);
