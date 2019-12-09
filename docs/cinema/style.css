@@ -1,0 +1,33 @@
+body,
+html {
+    height: 100%;
+}
+
+body {
+    font-family: Hiragino Sans GB, Microsoft YaHei, \5fae\8f6f\96c5\9ed1, tahoma, arial, simsun, \5b8b\4f53;
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    color: #ccc;
+    background: #000;
+}
+
+*,
+:after,
+:before {
+    box-sizing: border-box;
+}
+
+.artplayer-app {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
