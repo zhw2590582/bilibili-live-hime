@@ -3,13 +3,38 @@ import {
     debug,
     query,
     openTab,
+    insertCSS,
     getStorage,
     setStorage,
     sendMessage,
-    getActiveTab,
     findTabById,
+    getActiveTab,
     storageChange,
+    injectedScript,
 } from '../../share';
+import {
+    BLH,
+    STOP,
+    START,
+    DEBUG,
+    CONFIG,
+    REG_RTMP,
+    REG_HTTP,
+    REG_LIVE,
+    RECORDING,
+    RTMP_ERROR,
+    DEFAULT_RTMP,
+    SOCKET_ERROR,
+    OPEN_SUCCESS,
+    CURRENT_PAGE,
+    DEFAULT_SOCKET,
+    DEFAULT_BITSPER,
+    PUSH_STREAM_END,
+    LIVE_ROOM_ERROR,
+    CAN_NOT_FIND_TAB,
+    STREAM_NAME_ERROR,
+    DEFAULT_RESOLUTION,
+} from '../../share/constant';
 
 class Popup {
     constructor() {
@@ -22,6 +47,7 @@ class Popup {
         this.$rtmp = query('.rtmp');
         this.$streamname = query('.streamname');
         this.$socket = query('.socket');
+        this.$live = query('.live');
         this.$resolution = query('.resolution');
         this.$videoBitsPerSecond = query('.videoBitsPerSecond');
         this.$debug = query('.debug');
@@ -33,10 +59,10 @@ class Popup {
         this.updateDebug();
         this.updateRecording();
         storageChange(changes => {
-            if (changes.debug) {
+            if (changes[DEBUG]) {
                 this.updateDebug();
             }
-            if (changes.recording) {
+            if (changes[RECORDING]) {
                 this.updateRecording();
             }
         });
@@ -63,6 +89,10 @@ class Popup {
             this.saveInput('socket');
         });
 
+        this.$live.addEventListener('input', () => {
+            this.saveInput('live');
+        });
+
         this.$resolution.addEventListener('change', () => {
             this.saveInput('resolution');
         });
@@ -81,50 +111,53 @@ class Popup {
     }
 
     async saveInput(name) {
-        const config = (await getStorage('config')) || {};
+        const config = (await getStorage(CONFIG)) || {};
         config[name] = this[`$${name}`].value.trim();
-        await setStorage('config', config);
+        await setStorage(CONFIG, config);
     }
 
     async init() {
-        const recording = await getStorage('recording');
-        const config = (await getStorage('config')) || {};
-        const tab = await findTabById(config.tab);
+        const recording = await getStorage(RECORDING);
+        const config = (await getStorage(CONFIG)) || {};
+        const activeTab = await findTabById(config.activeTab);
         if (config) {
-            this.$rtmp.value = config.rtmp || 'rtmp://bvc.live-send.acg.tv/live-bvc/';
+            this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
             this.$streamname.value = config.streamname || '';
-            this.$socket.value = config.socket || 'http://localhost:8080';
-            this.$resolution.value = config.resolution || '1920';
-            this.$videoBitsPerSecond.value = config.videoBitsPerSecond || '2500000';
+            this.$socket.value = config.socket || DEFAULT_SOCKET;
+            this.$live.value = config.live || '';
+            this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
+            this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_BITSPER;
         }
-        if (!recording || !tab) {
+        if (!recording || !activeTab) {
             debug.clean();
-            setStorage('recording', false);
+            setStorage(RECORDING, false);
         }
     }
 
     async updateDebug() {
-        const logs = (await getStorage('debug')) || [];
+        const logs = (await getStorage(DEBUG)) || [];
         this.$debug.innerHTML = logs.map(item => `<p class="${item.type}">${item.data}</p>`).join('');
         this.$debug.scrollTo(0, this.$debug.scrollHeight);
     }
 
     async updateRecording() {
-        const recording = await getStorage('recording');
-        const config = (await getStorage('config')) || {};
-        const tab = await findTabById(config.tab);
-        if (recording && tab) {
-            this.$container.classList.add('recording');
+        const recording = await getStorage(RECORDING);
+        const config = (await getStorage(CONFIG)) || {};
+        const activeTab = await findTabById(config.activeTab);
+        if (recording && activeTab) {
+            this.$container.classList.add(RECORDING);
             this.$rtmp.disabled = true;
             this.$streamname.disabled = true;
             this.$socket.disabled = true;
+            this.$live.disabled = true;
             this.$resolution.disabled = true;
             this.$videoBitsPerSecond.disabled = true;
         } else {
-            this.$container.classList.remove('recording');
+            this.$container.classList.remove(RECORDING);
             this.$rtmp.disabled = false;
             this.$streamname.disabled = false;
             this.$socket.disabled = false;
+            this.$live.disabled = false;
             this.$resolution.disabled = false;
             this.$videoBitsPerSecond.disabled = false;
         }
@@ -134,44 +167,66 @@ class Popup {
         const activeTab = await getActiveTab();
 
         if (!activeTab) {
-            await debug.err('未获取到当前激活的标签');
+            await debug.err(CAN_NOT_FIND_TAB);
             return;
         }
 
         const config = {
-            tab: activeTab.id,
+            activeTab: activeTab.id,
             rtmp: this.$rtmp.value.trim(),
             streamname: this.$streamname.value.trim(),
             socket: this.$socket.value.trim(),
+            live: this.$live.value.trim(),
             resolution: Number(this.$resolution.value),
             videoBitsPerSecond: Number(this.$videoBitsPerSecond.value),
         };
 
-        if (!config.rtmp || !/^rtmp:\/\/.+/i.test(config.rtmp)) {
-            await debug.err('请输入正确的rtmp推流地址');
+        if (!config.rtmp || !REG_RTMP.test(config.rtmp)) {
+            await debug.err(RTMP_ERROR);
             return;
         }
 
         if (!config.streamname) {
-            await debug.err('请输入正确的直播码');
+            await debug.err(STREAM_NAME_ERROR);
             return;
         }
 
-        if (!config.socket || !/^https?:\/\/.+/i.test(config.socket)) {
-            await debug.err('请输入正确的中转地址');
+        if (!config.socket || !REG_HTTP.test(config.socket)) {
+            await debug.err(SOCKET_ERROR);
             return;
         }
 
-        await debug.log(`当前页面：${activeTab.title}`);
-        await setStorage('recording', true);
-        await setStorage('config', config);
-        sendMessage('start', config);
+        if (config.live) {
+            if (!REG_LIVE.test(config.live)) {
+                await debug.err(LIVE_ROOM_ERROR);
+                return;
+            }
+            const url = new URL(config.live);
+            url.searchParams.append(BLH, 1);
+            const liveTab = await openTab(url.href, false);
+            if (liveTab) {
+                await debug.log(OPEN_SUCCESS);
+                config.liveTab = liveTab.id;
+                await injectedScript('content/index.js');
+                await insertCSS('content/index.css');
+            }
+        }
+
+        await debug.log(`${CURRENT_PAGE}：${activeTab.title}`);
+        await setStorage(RECORDING, true);
+        await setStorage(CONFIG, config);
+        sendMessage({
+            type: START,
+            data: config,
+        });
     }
 
     async stop() {
-        sendMessage('stop');
-        setStorage('recording', false);
-        await debug.log('已停止推流...');
+        sendMessage({
+            type: STOP,
+        });
+        setStorage(RECORDING, false);
+        await debug.log(PUSH_STREAM_END);
     }
 }
 

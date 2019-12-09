@@ -1,4 +1,5 @@
 import ots from 'obj-to-string';
+import { DEBUG, LOG, ERROR } from './constant';
 
 export function sleep(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -93,35 +94,36 @@ export function findTabById(id = 0) {
 
 export const debug = {
     async log(msg) {
-        const logs = (await getStorage('debug')) || [];
+        const logs = (await getStorage(DEBUG)) || [];
         logs.push({
-            type: 'log',
+            type: LOG,
             data: ots(msg),
         });
-        await setStorage('debug', logs);
+        await setStorage(DEBUG, logs);
     },
     async err(msg) {
-        const logs = (await getStorage('debug')) || [];
+        const logs = (await getStorage(DEBUG)) || [];
         logs.push({
-            type: 'error',
+            type: ERROR,
             data: ots(msg),
         });
-        await setStorage('debug', logs);
+        await setStorage(DEBUG, logs);
     },
     async clean() {
-        await setStorage('debug', []);
+        await setStorage(DEBUG, []);
     },
 };
 
-export function sendMessage(type, data) {
-    chrome.runtime.sendMessage({
-        type,
-        data,
-    });
+export function sendMessage(data) {
+    chrome.runtime.sendMessage(data);
 }
 
 export function onMessage(callback) {
     chrome.runtime.onMessage.addListener(callback);
+}
+
+export function sendMessageToTab(tabId, data) {
+    chrome.tabs.sendMessage(tabId, data);
 }
 
 export function setBadge(text = '', color = 'red') {
@@ -139,6 +141,32 @@ export function setBadge(text = '', color = 'red') {
                         resolve();
                     },
                 );
+            },
+        );
+    });
+}
+
+export function injectedScript(file) {
+    return new Promise(resolve => {
+        chrome.tabs.executeScript(
+            {
+                file,
+            },
+            () => {
+                resolve();
+            },
+        );
+    });
+}
+
+export function insertCSS(file) {
+    return new Promise(resolve => {
+        chrome.tabs.insertCSS(
+            {
+                file,
+            },
+            () => {
+                resolve();
             },
         );
     });

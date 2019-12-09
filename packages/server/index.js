@@ -59,15 +59,15 @@ io.on('connection', function(socket) {
         });
     });
 
-    // binarystream 事件用于告知服务器接收数据流
-    socket.on('binarystream', data => {
+    // binary_stream 事件用于告知服务器接收数据流
+    socket.on('binary_stream', data => {
         if (ffmpeg) {
             ffmpeg.stdin.write(data);
         }
     });
 
-    // disconnect 事件用于告知服务器关闭ffmpeg进程
-    socket.on('disconnect', () => {
+    // stream_disconnect 事件用于告知服务器关闭ffmpeg进程
+    socket.on('stream_disconnect', () => {
         if (ffmpeg) {
             try {
                 ffmpeg.stdin.end();
