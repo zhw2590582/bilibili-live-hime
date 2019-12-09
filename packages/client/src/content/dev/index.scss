@@ -76,7 +76,8 @@
                     color: #cae8ff;
                 }
                 .blh-danmu-text {
-                    word-wrap: break-word;
+                    white-space: normal;
+                    word-break: break-all;
                 }
             }
         }
