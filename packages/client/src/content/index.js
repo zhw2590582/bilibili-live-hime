@@ -65,6 +65,10 @@ var BilibiliLiveHimeContent = (function () {
         this.$footer = query('.blh-footer', this.$danmuku);
         this.$headL.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
         document.body.appendChild(this.$danmuku);
+        this.$icon = document.createElement('div');
+        this.$icon.classList.add('blh-danmuku-icon');
+        this.$icon.textContent = '弹';
+        document.body.appendChild(this.$icon);
       }
     }, {
       key: "eventBind",
@@ -128,7 +132,12 @@ var BilibiliLiveHimeContent = (function () {
           }
         });
         this.$headR.addEventListener('click', function () {
-          _this.$danmuku.classList.add('blh-hidden');
+          _this.$danmuku.style.display = 'none';
+          _this.$icon.style.display = 'block';
+        });
+        this.$icon.addEventListener('click', function () {
+          _this.$danmuku.style.display = 'block';
+          _this.$icon.style.display = 'none';
         });
       }
     }, {

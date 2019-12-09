@@ -31,11 +31,7 @@
     -webkit-font-smoothing: antialiased !important;
     line-height: 1;
     color: #fff;
-    background-color: rgba(0, 0, 0, 0.5);
-
-    &.blh-hidden {
-        display: none;
-    }
+    background-color: rgba(0, 0, 0, 0.6);
 
     .blh-header {
         display: flex;
@@ -109,4 +105,26 @@
         height: 10px;
         cursor: ns-resize;
     }
+}
+
+.blh-danmuku-icon {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 10px;
+    right: 10px;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    line-height: 25px;
+    font-size: 13px;
+    user-select: none;
+    font-family: Hiragino Sans GB, Microsoft YaHei, \5fae\8f6f\96c5\9ed1, tahoma, arial, simsun, \5b8b\4f53;
+    text-size-adjust: 100% !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    cursor: pointer;
+    opacity: 0.2;
+    color: #fff;
+    background-color: #000;
 }

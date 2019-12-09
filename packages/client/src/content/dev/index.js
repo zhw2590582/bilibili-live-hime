@@ -40,6 +40,11 @@ class Content {
         this.$footer = query('.blh-footer', this.$danmuku);
         this.$headL.textContent = `${this.manifest.name} ${this.manifest.version}`;
         document.body.appendChild(this.$danmuku);
+
+        this.$icon = document.createElement('div');
+        this.$icon.classList.add('blh-danmuku-icon');
+        this.$icon.textContent = '弹';
+        document.body.appendChild(this.$icon);
     }
 
     eventBind() {
@@ -104,7 +109,13 @@ class Content {
         });
 
         this.$headR.addEventListener('click', () => {
-            this.$danmuku.classList.add('blh-hidden');
+            this.$danmuku.style.display = 'none';
+            this.$icon.style.display = 'block';
+        });
+
+        this.$icon.addEventListener('click', () => {
+            this.$danmuku.style.display = 'block';
+            this.$icon.style.display = 'none';
         });
     }
 
