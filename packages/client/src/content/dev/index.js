@@ -147,9 +147,7 @@ class Content {
         if (children.length > 50) {
             const child = children[0];
             query('.blh-gift-uname', child).innerText = `${gift.uname}:`;
-            query('.blh-gift-action', child).innerText = gift.action;
-            query('.blh-gift-gift', child).innerText = gift.gift;
-            query('.blh-gift-count', child).innerText = gift.count;
+            query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} ${gift.count}`;
             this.$giftInner.appendChild(child);
         } else {
             this.$giftInner.insertAdjacentHTML(
