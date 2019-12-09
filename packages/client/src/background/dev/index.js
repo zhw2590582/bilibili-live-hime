@@ -59,8 +59,8 @@ class Background {
         });
 
         storageChange(async changes => {
-            if (changes.recording) {
-                if (changes.recording.newValue) {
+            if (changes[RECORDING]) {
+                if (changes[RECORDING].newValue) {
                     setBadge('ON');
                 } else {
                     setBadge('');
