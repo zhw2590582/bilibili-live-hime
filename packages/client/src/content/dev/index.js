@@ -157,9 +157,7 @@ class Content {
                 `
                 <div class="blh-gift-item">
                     <span class="blh-gift-uname">${gift.uname}:</span>
-                    <span class="blh-gift-action">${gift.action}</span>
-                    <span class="blh-gift-gift">${gift.gift}</span>
-                    <span class="blh-gift-count">${gift.count}</span>
+                    <span class="blh-gift-text">${gift.action} ${gift.gift} ${gift.count}</span>
                 </div>
             `,
             );
