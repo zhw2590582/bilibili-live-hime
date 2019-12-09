@@ -31,14 +31,14 @@ class Background {
         this.stream = null;
         this.socket = null;
         this.mediaRecorder = null;
-        this.config = Background.config;
+        this.config = Background.Config;
 
         onMessage((request, sender) => {
             const { type, data } = request;
             switch (type) {
                 case START:
                     this.config = {
-                        ...Background.config,
+                        ...Background.Config,
                         ...data,
                     };
                     this.start();
@@ -73,7 +73,7 @@ class Background {
         });
     }
 
-    static get config() {
+    static get Config() {
         return {
             rtmp: '',
             socket: '',
@@ -232,7 +232,7 @@ class Background {
 
     async stop() {
         setStorage(RECORDING, false);
-        this.config = Background.config;
+        this.config = Background.Config;
 
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
