@@ -21,7 +21,7 @@ class Injected {
                                     data: {
                                         uid: item.dataset.uid,
                                         uname: item.dataset.uname,
-                                        danmaku: item.dataset.danmaku,
+                                        text: item.dataset.danmaku,
                                     },
                                 });
                             } catch (error) {

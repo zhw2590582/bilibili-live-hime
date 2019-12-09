@@ -900,13 +900,9 @@ var BilibiliLiveHimePopup = (function () {
 	function findTabById() {
 	  var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 	  return new Promise(function (resolve) {
-	    try {
-	      chrome.tabs.get(id, function (tab) {
-	        resolve(tab);
-	      });
-	    } catch (error) {
-	      resolve();
-	    }
+	    chrome.tabs.get(id, function (tab) {
+	      resolve(tab);
+	    });
 	  });
 	}
 	var debug = {
@@ -999,9 +995,18 @@ var BilibiliLiveHimePopup = (function () {
 	function sendMessage(data) {
 	  chrome.runtime.sendMessage(data);
 	}
-	function injected(file) {
+	function injectedScript(file) {
 	  return new Promise(function (resolve) {
 	    chrome.tabs.executeScript({
+	      file: file
+	    }, function () {
+	      resolve();
+	    });
+	  });
+	}
+	function insertCSS(file) {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.insertCSS({
 	      file: file
 	    }, function () {
 	      resolve();
@@ -1384,11 +1389,11 @@ var BilibiliLiveHimePopup = (function () {
 	            case 33:
 	              config.liveTab = liveTab.id;
 	              _context6.next = 36;
-	              return regenerator.awrap(injected('content/index.js'));
+	              return regenerator.awrap(injectedScript('content/index.js'));
 
 	            case 36:
 	              _context6.next = 38;
-	              return regenerator.awrap(injected('content/index.css'));
+	              return regenerator.awrap(insertCSS('content/index.css'));
 
 	            case 38:
 	              _context6.next = 40;

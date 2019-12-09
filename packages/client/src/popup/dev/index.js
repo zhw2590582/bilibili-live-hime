@@ -3,13 +3,14 @@ import {
     debug,
     query,
     openTab,
-    injected,
+    insertCSS,
     getStorage,
     setStorage,
     sendMessage,
     findTabById,
     getActiveTab,
     storageChange,
+    injectedScript,
 } from '../../share';
 import {
     BLH,
@@ -206,8 +207,8 @@ class Popup {
             if (liveTab) {
                 await debug.log(OPEN_SUCCESS);
                 config.liveTab = liveTab.id;
-                await injected('content/index.js');
-                await injected('content/index.css');
+                await injectedScript('content/index.js');
+                await insertCSS('content/index.css');
             }
         }
 

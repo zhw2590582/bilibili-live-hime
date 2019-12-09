@@ -1,0 +1,108 @@
+.blh-danmuku {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    ::-webkit-scrollbar {
+        display: block !important;
+        width: 5px !important;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #ccc !important;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #eee !important;
+    }
+
+    position: fixed;
+    z-index: 9999;
+    top: 10px;
+    right: 10px;
+    width: 280px;
+    font-size: 13px;
+    user-select: none;
+    font-family: Hiragino Sans GB, Microsoft YaHei, \5fae\8f6f\96c5\9ed1, tahoma, arial, simsun, \5b8b\4f53;
+    text-size-adjust: 100% !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    line-height: 1;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    &.blh-hidden {
+        display: none;
+    }
+
+    .blh-header {
+        display: flex;
+        height: 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+        .blh-header-l {
+            flex: 1;
+            cursor: move;
+        }
+
+        .blh-header-r {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 20px;
+            font-size: 15px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    }
+
+    .blh-danmu {
+        padding: 10px;
+        min-height: 100px;
+        height: 500px;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+        .blh-danmu-inner {
+            .blh-danmu-item {
+                text-align: left;
+                line-height: 1.4;
+                margin-bottom: 10px;
+                text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+                .blh-danmu-uname {
+                    color: #cae8ff;
+                }
+                .blh-danmu-text {
+                    word-wrap: break-word;
+                }
+            }
+        }
+    }
+
+    .blh-gift {
+        padding: 10px;
+        height: 100px;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+
+        .blh-gift-inner {
+            .blh-gift-item {
+                text-align: left;
+                line-height: 1.4;
+                margin-bottom: 10px;
+                text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+                .blh-gift-uname {
+                    color: #cae8ff;
+                }
+            }
+        }
+    }
+
+    .blh-footer {
+        height: 10px;
+        cursor: ns-resize;
+    }
+}

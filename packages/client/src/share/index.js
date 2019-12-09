@@ -86,13 +86,9 @@ export function openTab(url, active = true) {
 
 export function findTabById(id = 0) {
     return new Promise(resolve => {
-        try {
-            chrome.tabs.get(id, tab => {
-                resolve(tab);
-            });
-        } catch (error) {
-            resolve();
-        }
+        chrome.tabs.get(id, tab => {
+            resolve(tab);
+        });
     });
 }
 
@@ -150,9 +146,22 @@ export function setBadge(text = '', color = 'red') {
     });
 }
 
-export function injected(file) {
+export function injectedScript(file) {
     return new Promise(resolve => {
         chrome.tabs.executeScript(
+            {
+                file,
+            },
+            () => {
+                resolve();
+            },
+        );
+    });
+}
+
+export function insertCSS(file) {
+    return new Promise(resolve => {
+        chrome.tabs.insertCSS(
             {
                 file,
             },
