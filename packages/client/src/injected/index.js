@@ -81,7 +81,7 @@ var BilibiliLiveHimeInjected = (function () {
                         uname: query('.username', item).innerText.trim(),
                         action: query('.action', item).innerText.trim(),
                         gift: query('.gift-name', item).innerText.trim(),
-                        count: query('.count', item).innerText.trim()
+                        count: query('.gift-count', item).innerText.trim()
                       }
                     });
                   } catch (error) {//
