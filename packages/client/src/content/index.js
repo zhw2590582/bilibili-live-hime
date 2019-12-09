@@ -52,6 +52,7 @@ var BilibiliLiveHimeContent = (function () {
     createClass(Content, [{
       key: "createUI",
       value: function createUI() {
+        this.manifest = chrome.runtime.getManifest();
         this.$danmuku = document.createElement('div');
         this.$danmuku.classList.add('blh-danmuku');
         this.$danmuku.innerHTML = "\n            <div class=\"blh-header\">\n                <div class=\"blh-header-l\"></div>\n                <div class=\"blh-header-r\">\xD7</div>\n            </div>\n            <div class=\"blh-danmu\">\n                <div class=\"blh-danmu-inner\"></div>\n            </div>\n            <div class=\"blh-gift\">\n                <div class=\"blh-gift-inner\"></div>\n            </div>\n            <div class=\"blh-footer\"></div>\n        ";
@@ -62,6 +63,7 @@ var BilibiliLiveHimeContent = (function () {
         this.$gift = query('.blh-gift', this.$danmuku);
         this.$giftInner = query('.blh-gift-inner', this.$danmuku);
         this.$footer = query('.blh-footer', this.$danmuku);
+        this.$headL.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
         document.body.appendChild(this.$danmuku);
       }
     }, {
@@ -82,11 +84,11 @@ var BilibiliLiveHimeContent = (function () {
           lastPageY = event.pageY;
           lastLeft = _this.$danmuku.offsetLeft;
           lastTop = _this.$danmuku.offsetTop;
-          lastHeight = _this.$danmu.clientHeight;
         });
         this.$footer.addEventListener('mousedown', function (event) {
           isFootDroging = true;
           lastPageY = event.pageY;
+          lastHeight = _this.$danmu.clientHeight;
         });
         document.addEventListener('mousemove', function (event) {
           if (isHeadDroging) {

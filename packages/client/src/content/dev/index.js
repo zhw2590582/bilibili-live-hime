@@ -15,6 +15,7 @@ class Content {
     }
 
     createUI() {
+        this.manifest = chrome.runtime.getManifest();
         this.$danmuku = document.createElement('div');
         this.$danmuku.classList.add('blh-danmuku');
         this.$danmuku.innerHTML = `
@@ -37,6 +38,7 @@ class Content {
         this.$gift = query('.blh-gift', this.$danmuku);
         this.$giftInner = query('.blh-gift-inner', this.$danmuku);
         this.$footer = query('.blh-footer', this.$danmuku);
+        this.$headL.textContent = `${this.manifest.name} ${this.manifest.version}`;
         document.body.appendChild(this.$danmuku);
     }
 
@@ -55,12 +57,12 @@ class Content {
             lastPageY = event.pageY;
             lastLeft = this.$danmuku.offsetLeft;
             lastTop = this.$danmuku.offsetTop;
-            lastHeight = this.$danmu.clientHeight;
         });
 
         this.$footer.addEventListener('mousedown', event => {
             isFootDroging = true;
             lastPageY = event.pageY;
+            lastHeight = this.$danmu.clientHeight;
         });
 
         document.addEventListener('mousemove', event => {
@@ -69,6 +71,7 @@ class Content {
                 const y = event.pageY - lastPageY;
                 this.$danmuku.style.transform = `translate(${x}px, ${y}px)`;
             }
+
             if (isFootDroging) {
                 const height = lastHeight + event.pageY - lastPageY;
                 if (height >= 100) {
@@ -77,6 +80,7 @@ class Content {
                     isFootDroging = false;
                 }
             }
+
             if (event.composedPath().indexOf(this.$danmuku) > -1) {
                 this.isHover = true;
             } else {
@@ -93,6 +97,7 @@ class Content {
                 this.$danmuku.style.left = `${x}px`;
                 this.$danmuku.style.top = `${y}px`;
             }
+
             if (isFootDroging) {
                 isFootDroging = false;
             }
