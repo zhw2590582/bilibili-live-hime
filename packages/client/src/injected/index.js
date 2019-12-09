@@ -32,6 +32,11 @@ var BilibiliLiveHimeInjected = (function () {
   var GUARD = 'guard';
   var BLH = 'blh';
 
+  function query(el) {
+    var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
+    return doc.querySelector(el);
+  }
+
   var Injected =
   /*#__PURE__*/
   function () {
@@ -57,9 +62,9 @@ var BilibiliLiveHimeInjected = (function () {
                     window.postMessage({
                       type: DANMU,
                       data: {
-                        uid: item.dataset.uid,
-                        uname: item.dataset.uname,
-                        text: item.dataset.danmaku
+                        uid: Number(item.dataset.uid),
+                        uname: item.dataset.uname.trim(),
+                        text: item.dataset.danmaku.trim()
                       }
                     });
                   } catch (error) {//
@@ -73,10 +78,10 @@ var BilibiliLiveHimeInjected = (function () {
                       type: GIFT,
                       data: {
                         uid: null,
-                        uname: item.querySelector('.username').innerText.trim(),
-                        action: item.querySelector('.action').innerText.trim(),
-                        gift: item.querySelector('.gift-name').innerText.trim(),
-                        count: item.querySelector('.count').innerText.trim()
+                        uname: query('.username', item).innerText.trim(),
+                        action: query('.action', item).innerText.trim(),
+                        gift: query('.gift-name', item).innerText.trim(),
+                        count: query('.count', item).innerText.trim()
                       }
                     });
                   } catch (error) {//
@@ -90,10 +95,10 @@ var BilibiliLiveHimeInjected = (function () {
                       type: GUARD,
                       data: {
                         uid: null,
-                        uname: item.querySelector('.username').innerText.trim(),
+                        uname: query('.username', item).innerText.trim(),
                         action: '购买',
                         gift: '舰长',
-                        count: item.querySelector('.count').innerText.trim()
+                        count: query('.count', item).innerText.trim()
                       }
                     });
                   } catch (error) {//
@@ -115,10 +120,10 @@ var BilibiliLiveHimeInjected = (function () {
                   window.postMessage({
                     type: GIFT,
                     data: {
-                      uname: item.querySelector('.username').innerText.trim(),
-                      action: item.querySelector('.action').innerText.trim(),
-                      gift: item.querySelector('.gift-name').innerText.trim(),
-                      count: item.querySelector('.count').innerText.trim()
+                      uname: query('.username', item).innerText.trim(),
+                      action: query('.action', item).innerText.trim(),
+                      gift: query('.gift-name', item).innerText.trim(),
+                      count: query('.count', item).innerText.trim()
                     }
                   });
                 } catch (error) {//
@@ -136,7 +141,7 @@ var BilibiliLiveHimeInjected = (function () {
       value: function getChatHistoryList() {
         return new Promise(function (resolve) {
           (function loop() {
-            var chatHistoryList = document.getElementById('chat-history-list');
+            var chatHistoryList = query('#chat-history-list');
 
             if (!chatHistoryList) {
               setTimeout(loop, 1000);
@@ -151,7 +156,7 @@ var BilibiliLiveHimeInjected = (function () {
       value: function getPenuryGiftMsg() {
         return new Promise(function (resolve) {
           (function loop() {
-            var penuryGiftMsg = document.getElementById('penury-gift-msg');
+            var penuryGiftMsg = query('#penury-gift-msg');
 
             if (!penuryGiftMsg) {
               setTimeout(loop, 1000);

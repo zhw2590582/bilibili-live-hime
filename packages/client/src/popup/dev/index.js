@@ -28,12 +28,12 @@ import {
     OPEN_SUCCESS,
     CURRENT_PAGE,
     DEFAULT_SOCKET,
-    DEFAULT_BITSPER,
     PUSH_STREAM_END,
     LIVE_ROOM_ERROR,
     CAN_NOT_FIND_TAB,
     STREAM_NAME_ERROR,
     DEFAULT_RESOLUTION,
+    DEFAULT_VIDEO_BITSPER,
 } from '../../share/constant';
 
 class Popup {
@@ -126,7 +126,7 @@ class Popup {
             this.$socket.value = config.socket || DEFAULT_SOCKET;
             this.$live.value = config.live || '';
             this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
-            this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_BITSPER;
+            this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
         }
         if (!recording || !activeTab) {
             debug.clean();

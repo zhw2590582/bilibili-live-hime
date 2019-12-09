@@ -32,8 +32,10 @@ export const PUSH_STREAM_END = '已停止推流...';
 
 export const DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
 export const DEFAULT_SOCKET = 'http://localhost:8080';
-export const DEFAULT_RESOLUTION = '1920';
-export const DEFAULT_BITSPER = '2500000';
+export const DEFAULT_RESOLUTION = 720;
+export const DEFAULT_VIDEO_BITSPER = 2500000;
+export const DEFAULT_AUDIO_BITSPER = 128000;
+export const MIME_TYPE = 'video/webm; codecs="h264, opus"';
 
 export const REG_RTMP = /^rtmp:\/\/.+/i;
 export const REG_HTTP = /^https?:\/\/.+/i;

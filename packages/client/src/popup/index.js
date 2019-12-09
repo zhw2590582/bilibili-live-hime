@@ -823,8 +823,8 @@ var BilibiliLiveHimePopup = (function () {
 	var PUSH_STREAM_END = '已停止推流...';
 	var DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
 	var DEFAULT_SOCKET = 'http://localhost:8080';
-	var DEFAULT_RESOLUTION = '1920';
-	var DEFAULT_BITSPER = '2500000';
+	var DEFAULT_RESOLUTION = 720;
+	var DEFAULT_VIDEO_BITSPER = 2500000;
 	var REG_RTMP = /^rtmp:\/\/.+/i;
 	var REG_HTTP = /^https?:\/\/.+/i;
 	var REG_LIVE = /^https?:\/\/live\.bilibili\.com/i;
@@ -1172,7 +1172,7 @@ var BilibiliLiveHimePopup = (function () {
 	                this.$socket.value = config.socket || DEFAULT_SOCKET;
 	                this.$live.value = config.live || '';
 	                this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
-	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_BITSPER;
+	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
 	              }
 
 	              if (!recording || !activeTab) {

@@ -893,6 +893,10 @@ var BilibiliLiveHimeBackground = (function () {
 	var RECORDER_SUCCESS = '录制器启动成功';
 	var RECORDER_FAIL = '无法录制标签的视频流，请重试！';
 	var PUSH_STREAM_ING = '正在推流中...';
+	var DEFAULT_RESOLUTION = 720;
+	var DEFAULT_VIDEO_BITSPER = 2500000;
+	var DEFAULT_AUDIO_BITSPER = 128000;
+	var MIME_TYPE = 'video/webm; codecs="h264, opus"';
 
 	function has(result, key) {
 	  return Object.prototype.hasOwnProperty.call(result, key);
@@ -1333,8 +1337,8 @@ var BilibiliLiveHimeBackground = (function () {
 	        liveTab: null,
 	        streamname: '',
 	        activeTab: null,
-	        resolution: 1920,
-	        videoBitsPerSecond: 2500000
+	        resolution: DEFAULT_RESOLUTION,
+	        videoBitsPerSecond: DEFAULT_VIDEO_BITSPER
 	      };
 	    }
 	  }, {
@@ -1346,10 +1350,10 @@ var BilibiliLiveHimeBackground = (function () {
 	        videoConstraints: {
 	          mandatory: {
 	            chromeMediaSource: 'tab',
-	            maxWidth: 1920,
-	            minWidth: 1920,
-	            maxHeight: 1080,
-	            minHeight: 1080
+	            maxWidth: 1280,
+	            minWidth: 1280,
+	            maxHeight: 720,
+	            minHeight: 720
 	          }
 	        },
 	        audioConstraints: {
@@ -1363,9 +1367,9 @@ var BilibiliLiveHimeBackground = (function () {
 	    key: "RecorderOptions",
 	    get: function get() {
 	      return {
-	        audioBitsPerSecond: 128000,
-	        videoBitsPerSecond: 2500000,
-	        mimeType: 'video/webm; codecs="h264, opus"'
+	        audioBitsPerSecond: DEFAULT_AUDIO_BITSPER,
+	        videoBitsPerSecond: DEFAULT_VIDEO_BITSPER,
+	        mimeType: MIME_TYPE
 	      };
 	    }
 	  }, {

@@ -10,6 +10,7 @@ import {
     START,
     DANMU,
     GUARD,
+    MIME_TYPE,
     RECORDING,
     SOCKET_FAIL,
     BINARY_STREAM,
@@ -18,7 +19,10 @@ import {
     PUSH_STREAM_ING,
     RECORDER_SUCCESS,
     STREAM_DISCONNECT,
+    DEFAULT_RESOLUTION,
     TAB_VIDEO_STREAM_FAIL,
+    DEFAULT_VIDEO_BITSPER,
+    DEFAULT_AUDIO_BITSPER,
     TAB_VIDEO_STREAM_SUCCESS,
 } from '../../share/constant';
 
@@ -76,8 +80,8 @@ class Background {
             liveTab: null,
             streamname: '',
             activeTab: null,
-            resolution: 1920,
-            videoBitsPerSecond: 2500000,
+            resolution: DEFAULT_RESOLUTION,
+            videoBitsPerSecond: DEFAULT_VIDEO_BITSPER,
         };
     }
 
@@ -88,10 +92,10 @@ class Background {
             videoConstraints: {
                 mandatory: {
                     chromeMediaSource: 'tab',
-                    maxWidth: 1920,
-                    minWidth: 1920,
-                    maxHeight: 1080,
-                    minHeight: 1080,
+                    maxWidth: 1280,
+                    minWidth: 1280,
+                    maxHeight: 720,
+                    minHeight: 720,
                 },
             },
             audioConstraints: {
@@ -104,9 +108,9 @@ class Background {
 
     static get RecorderOptions() {
         return {
-            audioBitsPerSecond: 128000,
-            videoBitsPerSecond: 2500000,
-            mimeType: 'video/webm; codecs="h264, opus"',
+            audioBitsPerSecond: DEFAULT_AUDIO_BITSPER,
+            videoBitsPerSecond: DEFAULT_VIDEO_BITSPER,
+            mimeType: MIME_TYPE,
         };
     }
 

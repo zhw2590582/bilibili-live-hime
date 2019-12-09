@@ -1,5 +1,9 @@
 import { DANMU, GIFT, GUARD, BLH } from '../../share/constant';
 
+function query(el, doc = document) {
+    return doc.querySelector(el);
+}
+
 class Injected {
     constructor() {
         if (window.location.href.includes(BLH)) {
@@ -19,9 +23,9 @@ class Injected {
                                 window.postMessage({
                                     type: DANMU,
                                     data: {
-                                        uid: item.dataset.uid,
-                                        uname: item.dataset.uname,
-                                        text: item.dataset.danmaku,
+                                        uid: Number(item.dataset.uid),
+                                        uname: item.dataset.uname.trim(),
+                                        text: item.dataset.danmaku.trim(),
                                     },
                                 });
                             } catch (error) {
@@ -36,10 +40,10 @@ class Injected {
                                     type: GIFT,
                                     data: {
                                         uid: null,
-                                        uname: item.querySelector('.username').innerText.trim(),
-                                        action: item.querySelector('.action').innerText.trim(),
-                                        gift: item.querySelector('.gift-name').innerText.trim(),
-                                        count: item.querySelector('.count').innerText.trim(),
+                                        uname: query('.username', item).innerText.trim(),
+                                        action: query('.action', item).innerText.trim(),
+                                        gift: query('.gift-name', item).innerText.trim(),
+                                        count: query('.count', item).innerText.trim(),
                                     },
                                 });
                             } catch (error) {
@@ -54,10 +58,10 @@ class Injected {
                                     type: GUARD,
                                     data: {
                                         uid: null,
-                                        uname: item.querySelector('.username').innerText.trim(),
+                                        uname: query('.username', item).innerText.trim(),
                                         action: '购买',
                                         gift: '舰长',
-                                        count: item.querySelector('.count').innerText.trim(),
+                                        count: query('.count', item).innerText.trim(),
                                     },
                                 });
                             } catch (error) {
@@ -79,10 +83,10 @@ class Injected {
                             window.postMessage({
                                 type: GIFT,
                                 data: {
-                                    uname: item.querySelector('.username').innerText.trim(),
-                                    action: item.querySelector('.action').innerText.trim(),
-                                    gift: item.querySelector('.gift-name').innerText.trim(),
-                                    count: item.querySelector('.count').innerText.trim(),
+                                    uname: query('.username', item).innerText.trim(),
+                                    action: query('.action', item).innerText.trim(),
+                                    gift: query('.gift-name', item).innerText.trim(),
+                                    count: query('.count', item).innerText.trim(),
                                 },
                             });
                         } catch (error) {
@@ -98,7 +102,7 @@ class Injected {
     getChatHistoryList() {
         return new Promise(resolve => {
             (function loop() {
-                const chatHistoryList = document.getElementById('chat-history-list');
+                const chatHistoryList = query('#chat-history-list');
                 if (!chatHistoryList) {
                     setTimeout(loop, 1000);
                 } else {
@@ -111,7 +115,7 @@ class Injected {
     getPenuryGiftMsg() {
         return new Promise(resolve => {
             (function loop() {
-                const penuryGiftMsg = document.getElementById('penury-gift-msg');
+                const penuryGiftMsg = query('#penury-gift-msg');
                 if (!penuryGiftMsg) {
                     setTimeout(loop, 1000);
                 } else {
