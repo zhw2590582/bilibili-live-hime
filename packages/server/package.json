@@ -1,6 +1,6 @@
 {
   "name": "bilibili-live-hime-server",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "哔哩哔哩直播姬 Chrome 扩展服务端",
   "homepage": "https://github.com/zhw2590582/bilibili-live-hime",
   "scripts": {

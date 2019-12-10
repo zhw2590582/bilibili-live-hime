@@ -1,6 +1,15 @@
 import 'crx-hotreload';
 import io from 'socket.io-client/dist/socket.io';
-import { debug, setBadge, setStorage, onMessage, storageChange, sendMessageToTab } from '../../share';
+import {
+    sleep,
+    debug,
+    setBadge,
+    onMessage,
+    setStorage,
+    getStorage,
+    storageChange,
+    sendMessageToTab,
+} from '../../share';
 import {
     LOG,
     FAIL,
@@ -12,10 +21,13 @@ import {
     GUARD,
     MIME_TYPE,
     RECORDING,
+    RECONNECT,
     SOCKET_FAIL,
     BINARY_STREAM,
     RECORDER_FAIL,
+    RECONNECT_TIME,
     SOCKET_SUCCESS,
+    RECONNECT_INFO,
     PUSH_STREAM_ING,
     RECORDER_SUCCESS,
     STREAM_DISCONNECT,
@@ -30,6 +42,7 @@ class Background {
     constructor() {
         this.stream = null;
         this.socket = null;
+        this.reconnect = 0;
         this.mediaRecorder = null;
         this.config = Background.Config;
 
@@ -188,15 +201,37 @@ class Background {
         const { socket, rtmp, streamname, resolution, videoBitsPerSecond } = this.config;
 
         try {
+            const rtmpFullUrl = rtmp + streamname;
             this.socket = await this.connectSocket(socket);
             await debug.log(SOCKET_SUCCESS);
-            this.socket.emit(RTMP, rtmp + streamname);
+            // 告知服务器命令：开启ffmpeg进程
+            this.socket.emit(RTMP, rtmpFullUrl);
+            // 来自服务器命令：打印
+            this.socket.on(LOG, async info => {
+                await debug.log(info);
+            });
+            // 来自服务器命令：重连
+            this.socket.on(RECONNECT, async info => {
+                await debug.err(info);
+                const recording1 = await getStorage(RECORDING);
+                if (this.reconnect >= RECONNECT_TIME || !recording1) {
+                    await this.stop();
+                } else {
+                    await sleep(1000);
+                    const recording2 = await getStorage(RECORDING);
+                    if (recording2) {
+                        this.reconnect += 1;
+                        await debug.log(RECONNECT_INFO + this.reconnect);
+                        this.socket.emit(RTMP, rtmpFullUrl);
+                    } else {
+                        await this.stop();
+                    }
+                }
+            });
+            // 来自服务器命令：终止
             this.socket.on(FAIL, async info => {
                 await debug.err(info);
                 await this.stop();
-            });
-            this.socket.on(LOG, async info => {
-                await debug.log(info);
             });
         } catch (error) {
             await debug.err(`${SOCKET_FAIL}: ${error.message.trim()}`);
@@ -218,6 +253,7 @@ class Background {
             await debug.log(RECORDER_SUCCESS);
             this.mediaRecorder.ondataavailable = event => {
                 if (event.data && event.data.size > 0) {
+                    // 告知服务器命令：推流
                     this.socket.emit(BINARY_STREAM, event.data);
                 }
             };
@@ -231,6 +267,7 @@ class Background {
     }
 
     async stop() {
+        this.reconnect = 0;
         setStorage(RECORDING, false);
         this.config = Background.Config;
 

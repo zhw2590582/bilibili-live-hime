@@ -11,6 +11,7 @@ import {
     getActiveTab,
     storageChange,
     injectedScript,
+    getCapturedTab,
 } from '../../share';
 import {
     BLH,
@@ -120,6 +121,7 @@ class Popup {
         const recording = await getStorage(RECORDING);
         const config = (await getStorage(CONFIG)) || {};
         const activeTab = await findTabById(config.activeTab);
+        const capturedTab = await getCapturedTab();
         if (config) {
             this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
             this.$streamname.value = config.streamname || '';
@@ -128,9 +130,12 @@ class Popup {
             this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
         }
-        if (!recording || !activeTab) {
+        if (!recording || !activeTab || !capturedTab) {
             debug.clean();
             setStorage(RECORDING, false);
+            sendMessage({
+                type: STOP,
+            });
         }
     }
 

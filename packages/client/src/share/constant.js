@@ -10,6 +10,7 @@ export const LOG = 'log';
 export const ERROR = 'error';
 export const FAIL = 'fail';
 export const RTMP = 'rtmp';
+export const RECONNECT = 'reconnect';
 export const STREAM_DISCONNECT = 'stream_disconnect';
 export const BINARY_STREAM = 'binary_stream';
 export const BLH = 'blh';
@@ -29,6 +30,7 @@ export const LIVE_ROOM_ERROR = '不是有效B站直播间地址';
 export const OPEN_SUCCESS = '打开直播间页面成功，保持该页面打开既可以获取弹幕';
 export const CURRENT_PAGE = '当前页面';
 export const PUSH_STREAM_END = '已停止推流...';
+export const RECONNECT_INFO = '自动重连中：';
 
 export const DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
 export const DEFAULT_SOCKET = 'http://localhost:8080';
@@ -36,6 +38,7 @@ export const DEFAULT_RESOLUTION = 720;
 export const DEFAULT_VIDEO_BITSPER = 2500000;
 export const DEFAULT_AUDIO_BITSPER = 128000;
 export const MIME_TYPE = 'video/webm; codecs="h264, opus"';
+export const RECONNECT_TIME = 100;
 
 export const REG_RTMP = /^rtmp:\/\/.+/i;
 export const REG_HTTP = /^https?:\/\/.+/i;

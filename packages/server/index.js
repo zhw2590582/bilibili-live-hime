@@ -24,9 +24,10 @@ let ffmpeg = null;
 console.log(`中转地址：http://localhost:${port}`);
 
 io.on('connection', function(socket) {
-    // rtmp 事件用于告知服务器初始化ffmpeg
+    // 来自浏览器：开启ffmpeg进程
     socket.on('rtmp', rtmp => {
-        // 假如已经有 ffmpeg 进程就先停止
+        console.log('来自浏览器：开启ffmpeg进程');
+        
         if (ffmpeg) {
             try {
                 ffmpeg.stdin.end();
@@ -37,11 +38,10 @@ io.on('connection', function(socket) {
             }
         }
 
-        // 创建 ffmpeg 进程
         ffmpeg = createFFmpegProcess(rtmp);
 
-        // log 事件可以告知浏览器打印消息
-        socket.emit('log', '创建ffmpeg进程成功');
+        // 告知浏览器：打印
+        socket.emit('log', '创建FFmpeg进程成功');
 
         ffmpeg.stdout.on('data', data => {
             console.log(String(data));
@@ -52,22 +52,25 @@ io.on('connection', function(socket) {
         });
 
         ffmpeg.on('close', code => {
-            // fail 事件可以告知浏览器关闭推流
-            const msg = 'ffmpeg进程退出：' + code;
-            socket.emit('fail', msg);
+            // 告知浏览器：重连
+            const msg = 'FFmpeg进程退出：' + code;
+            socket.emit('reconnect', msg);
+            // 告知浏览器：终止
+            // socket.emit('fail', msg);
             console.log(msg);
         });
     });
 
-    // binary_stream 事件用于告知服务器接收数据流
+    // 来自浏览器：推流
     socket.on('binary_stream', data => {
         if (ffmpeg) {
             ffmpeg.stdin.write(data);
         }
     });
 
-    // stream_disconnect 事件用于告知服务器关闭ffmpeg进程
+    // 来自浏览器：终止
     socket.on('stream_disconnect', () => {
+        console.log('来自浏览器：终止');
         if (ffmpeg) {
             try {
                 ffmpeg.stdin.end();

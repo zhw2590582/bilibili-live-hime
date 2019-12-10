@@ -84,6 +84,28 @@ export function openTab(url, active = true) {
     });
 }
 
+export function setActiveTab(tabId) {
+    return new Promise(resolve => {
+        chrome.tabs.update(
+            tabId,
+            {
+                active: true,
+            },
+            tab => {
+                resolve(tab);
+            },
+        );
+    });
+}
+
+export function getCapturedTab() {
+    return new Promise(resolve => {
+        chrome.tabCapture.getCapturedTabs(tabs => {
+            resolve(tabs[0]);
+        });
+    })
+}
+
 export function findTabById(id = 0) {
     return new Promise(resolve => {
         chrome.tabs.get(id, tab => {
