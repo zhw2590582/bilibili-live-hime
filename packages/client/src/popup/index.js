@@ -821,6 +821,7 @@ var BilibiliLiveHimePopup = (function () {
 	var OPEN_SUCCESS = '打开直播间页面成功';
 	var CURRENT_PAGE = '当前页面';
 	var PUSH_STREAM_END = '已停止推流...';
+	var INJECTED_SUCCESS = '注入文件：';
 	var DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
 	var DEFAULT_SOCKET = 'http://localhost:8080';
 	var DEFAULT_RESOLUTION = 720;
@@ -1011,10 +1012,28 @@ var BilibiliLiveHimePopup = (function () {
 	    });
 	  });
 	}
+	function runScript(code) {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.executeScript({
+	      code: code
+	    }, function () {
+	      resolve();
+	    });
+	  });
+	}
 	function insertCSS(file) {
 	  return new Promise(function (resolve) {
 	    chrome.tabs.insertCSS({
 	      file: file
+	    }, function () {
+	      resolve();
+	    });
+	  });
+	}
+	function runCss(code) {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.insertCSS({
+	      code: code
 	    }, function () {
 	      resolve();
 	    });
@@ -1063,9 +1082,9 @@ var BilibiliLiveHimePopup = (function () {
 	    value: function bindEvent() {
 	      var _this2 = this;
 
-	      return regenerator.async(function bindEvent$(_context) {
+	      return regenerator.async(function bindEvent$(_context2) {
 	        while (1) {
-	          switch (_context.prev = _context.next) {
+	          switch (_context2.prev = _context2.next) {
 	            case 0:
 	              this.$name.addEventListener('click', function () {
 	                openTab("https://chrome.google.com/webstore/detail/".concat(chrome.runtime.id));
@@ -1097,10 +1116,52 @@ var BilibiliLiveHimePopup = (function () {
 	              this.$stop.addEventListener('click', function () {
 	                _this2.stop();
 	              });
+	              this.$container.addEventListener('dragover', function (event) {
+	                event.preventDefault();
+	              });
+	              this.$container.addEventListener('drop', function _callee(event) {
+	                var files;
+	                return regenerator.async(function _callee$(_context) {
+	                  while (1) {
+	                    switch (_context.prev = _context.next) {
+	                      case 0:
+	                        event.preventDefault();
+	                        files = Array.from(event.dataTransfer.files);
+	                        _context.next = 4;
+	                        return regenerator.awrap(debug.log(INJECTED_SUCCESS + files.map(function (f) {
+	                          return f.name;
+	                        }).join(',')));
 
-	            case 10:
+	                      case 4:
+	                        files.forEach(function (file) {
+	                          var reader = new FileReader();
+	                          reader.addEventListener('load', function () {
+	                            var code = reader.result;
+
+	                            switch (file.type) {
+	                              case 'text/javascript':
+	                                runScript(code);
+	                                break;
+
+	                              case 'text/css':
+	                                runCss(code);
+	                                break;
+	                            }
+	                          });
+	                          reader.readAsText(file);
+	                        });
+
+	                      case 5:
+	                      case "end":
+	                        return _context.stop();
+	                    }
+	                  }
+	                });
+	              });
+
+	            case 12:
 	            case "end":
-	              return _context.stop();
+	              return _context2.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1109,32 +1170,32 @@ var BilibiliLiveHimePopup = (function () {
 	    key: "saveInput",
 	    value: function saveInput(name) {
 	      var config;
-	      return regenerator.async(function saveInput$(_context2) {
+	      return regenerator.async(function saveInput$(_context3) {
 	        while (1) {
-	          switch (_context2.prev = _context2.next) {
+	          switch (_context3.prev = _context3.next) {
 	            case 0:
-	              _context2.next = 2;
+	              _context3.next = 2;
 	              return regenerator.awrap(getStorage(CONFIG));
 
 	            case 2:
-	              _context2.t0 = _context2.sent;
+	              _context3.t0 = _context3.sent;
 
-	              if (_context2.t0) {
-	                _context2.next = 5;
+	              if (_context3.t0) {
+	                _context3.next = 5;
 	                break;
 	              }
 
-	              _context2.t0 = {};
+	              _context3.t0 = {};
 
 	            case 5:
-	              config = _context2.t0;
+	              config = _context3.t0;
 	              config[name] = this["$".concat(name)].value.trim();
-	              _context2.next = 9;
+	              _context3.next = 9;
 	              return regenerator.awrap(setStorage(CONFIG, config));
 
 	            case 9:
 	            case "end":
-	              return _context2.stop();
+	              return _context3.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1143,40 +1204,40 @@ var BilibiliLiveHimePopup = (function () {
 	    key: "init",
 	    value: function init() {
 	      var recording, config, activeTab, capturedTab;
-	      return regenerator.async(function init$(_context3) {
+	      return regenerator.async(function init$(_context4) {
 	        while (1) {
-	          switch (_context3.prev = _context3.next) {
+	          switch (_context4.prev = _context4.next) {
 	            case 0:
-	              _context3.next = 2;
+	              _context4.next = 2;
 	              return regenerator.awrap(getStorage(RECORDING));
 
 	            case 2:
-	              recording = _context3.sent;
-	              _context3.next = 5;
+	              recording = _context4.sent;
+	              _context4.next = 5;
 	              return regenerator.awrap(getStorage(CONFIG));
 
 	            case 5:
-	              _context3.t0 = _context3.sent;
+	              _context4.t0 = _context4.sent;
 
-	              if (_context3.t0) {
-	                _context3.next = 8;
+	              if (_context4.t0) {
+	                _context4.next = 8;
 	                break;
 	              }
 
-	              _context3.t0 = {};
+	              _context4.t0 = {};
 
 	            case 8:
-	              config = _context3.t0;
-	              _context3.next = 11;
+	              config = _context4.t0;
+	              _context4.next = 11;
 	              return regenerator.awrap(findTabById(config.activeTab));
 
 	            case 11:
-	              activeTab = _context3.sent;
-	              _context3.next = 14;
+	              activeTab = _context4.sent;
+	              _context4.next = 14;
 	              return regenerator.awrap(getCapturedTab());
 
 	            case 14:
-	              capturedTab = _context3.sent;
+	              capturedTab = _context4.sent;
 
 	              if (config) {
 	                this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
@@ -1197,7 +1258,7 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 17:
 	            case "end":
-	              return _context3.stop();
+	              return _context4.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1206,25 +1267,25 @@ var BilibiliLiveHimePopup = (function () {
 	    key: "updateDebug",
 	    value: function updateDebug() {
 	      var logs;
-	      return regenerator.async(function updateDebug$(_context4) {
+	      return regenerator.async(function updateDebug$(_context5) {
 	        while (1) {
-	          switch (_context4.prev = _context4.next) {
+	          switch (_context5.prev = _context5.next) {
 	            case 0:
-	              _context4.next = 2;
+	              _context5.next = 2;
 	              return regenerator.awrap(getStorage(DEBUG));
 
 	            case 2:
-	              _context4.t0 = _context4.sent;
+	              _context5.t0 = _context5.sent;
 
-	              if (_context4.t0) {
-	                _context4.next = 5;
+	              if (_context5.t0) {
+	                _context5.next = 5;
 	                break;
 	              }
 
-	              _context4.t0 = [];
+	              _context5.t0 = [];
 
 	            case 5:
-	              logs = _context4.t0;
+	              logs = _context5.t0;
 	              this.$debug.innerHTML = logs.map(function (item) {
 	                return "<p class=\"".concat(item.type, "\">").concat(item.data, "</p>");
 	              }).join('');
@@ -1232,7 +1293,7 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 8:
 	            case "end":
-	              return _context4.stop();
+	              return _context5.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1241,35 +1302,35 @@ var BilibiliLiveHimePopup = (function () {
 	    key: "updateRecording",
 	    value: function updateRecording() {
 	      var recording, config, activeTab;
-	      return regenerator.async(function updateRecording$(_context5) {
+	      return regenerator.async(function updateRecording$(_context6) {
 	        while (1) {
-	          switch (_context5.prev = _context5.next) {
+	          switch (_context6.prev = _context6.next) {
 	            case 0:
-	              _context5.next = 2;
+	              _context6.next = 2;
 	              return regenerator.awrap(getStorage(RECORDING));
 
 	            case 2:
-	              recording = _context5.sent;
-	              _context5.next = 5;
+	              recording = _context6.sent;
+	              _context6.next = 5;
 	              return regenerator.awrap(getStorage(CONFIG));
 
 	            case 5:
-	              _context5.t0 = _context5.sent;
+	              _context6.t0 = _context6.sent;
 
-	              if (_context5.t0) {
-	                _context5.next = 8;
+	              if (_context6.t0) {
+	                _context6.next = 8;
 	                break;
 	              }
 
-	              _context5.t0 = {};
+	              _context6.t0 = {};
 
 	            case 8:
-	              config = _context5.t0;
-	              _context5.next = 11;
+	              config = _context6.t0;
+	              _context6.next = 11;
 	              return regenerator.awrap(findTabById(config.activeTab));
 
 	            case 11:
-	              activeTab = _context5.sent;
+	              activeTab = _context6.sent;
 
 	              if (recording && activeTab) {
 	                this.$container.classList.add(RECORDING);
@@ -1291,7 +1352,7 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 13:
 	            case "end":
-	              return _context5.stop();
+	              return _context6.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1300,26 +1361,26 @@ var BilibiliLiveHimePopup = (function () {
 	    key: "start",
 	    value: function start() {
 	      var activeTab, config, url, liveTab;
-	      return regenerator.async(function start$(_context6) {
+	      return regenerator.async(function start$(_context7) {
 	        while (1) {
-	          switch (_context6.prev = _context6.next) {
+	          switch (_context7.prev = _context7.next) {
 	            case 0:
-	              _context6.next = 2;
+	              _context7.next = 2;
 	              return regenerator.awrap(getActiveTab());
 
 	            case 2:
-	              activeTab = _context6.sent;
+	              activeTab = _context7.sent;
 
 	              if (activeTab) {
-	                _context6.next = 7;
+	                _context7.next = 7;
 	                break;
 	              }
 
-	              _context6.next = 6;
+	              _context7.next = 6;
 	              return regenerator.awrap(debug.err(CAN_NOT_FIND_TAB));
 
 	            case 6:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 7:
 	              config = {
@@ -1333,93 +1394,93 @@ var BilibiliLiveHimePopup = (function () {
 	              };
 
 	              if (!(!config.rtmp || !REG_RTMP.test(config.rtmp))) {
-	                _context6.next = 12;
+	                _context7.next = 12;
 	                break;
 	              }
 
-	              _context6.next = 11;
+	              _context7.next = 11;
 	              return regenerator.awrap(debug.err(RTMP_ERROR));
 
 	            case 11:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 12:
 	              if (config.streamname) {
-	                _context6.next = 16;
+	                _context7.next = 16;
 	                break;
 	              }
 
-	              _context6.next = 15;
+	              _context7.next = 15;
 	              return regenerator.awrap(debug.err(STREAM_NAME_ERROR));
 
 	            case 15:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 16:
 	              if (!(!config.socket || !REG_HTTP.test(config.socket))) {
-	                _context6.next = 20;
+	                _context7.next = 20;
 	                break;
 	              }
 
-	              _context6.next = 19;
+	              _context7.next = 19;
 	              return regenerator.awrap(debug.err(SOCKET_ERROR));
 
 	            case 19:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 20:
 	              if (!config.live) {
-	                _context6.next = 38;
+	                _context7.next = 38;
 	                break;
 	              }
 
 	              if (REG_LIVE.test(config.live)) {
-	                _context6.next = 25;
+	                _context7.next = 25;
 	                break;
 	              }
 
-	              _context6.next = 24;
+	              _context7.next = 24;
 	              return regenerator.awrap(debug.err(LIVE_ROOM_ERROR));
 
 	            case 24:
-	              return _context6.abrupt("return");
+	              return _context7.abrupt("return");
 
 	            case 25:
 	              url = new URL(config.live);
 	              url.searchParams.append(BLH, 1);
-	              _context6.next = 29;
+	              _context7.next = 29;
 	              return regenerator.awrap(openTab(url.href, false));
 
 	            case 29:
-	              liveTab = _context6.sent;
+	              liveTab = _context7.sent;
 
 	              if (!liveTab) {
-	                _context6.next = 38;
+	                _context7.next = 38;
 	                break;
 	              }
 
-	              _context6.next = 33;
+	              _context7.next = 33;
 	              return regenerator.awrap(debug.log(OPEN_SUCCESS));
 
 	            case 33:
 	              config.liveTab = liveTab.id;
-	              _context6.next = 36;
+	              _context7.next = 36;
 	              return regenerator.awrap(injectedScript('content/index.js'));
 
 	            case 36:
-	              _context6.next = 38;
+	              _context7.next = 38;
 	              return regenerator.awrap(insertCSS('content/index.css'));
 
 	            case 38:
-	              _context6.next = 40;
+	              _context7.next = 40;
 	              return regenerator.awrap(debug.log("".concat(CURRENT_PAGE, "\uFF1A").concat(activeTab.title)));
 
 	            case 40:
-	              _context6.next = 42;
+	              _context7.next = 42;
 	              return regenerator.awrap(setStorage(RECORDING, true));
 
 	            case 42:
-	              _context6.next = 44;
+	              _context7.next = 44;
 	              return regenerator.awrap(setStorage(CONFIG, config));
 
 	            case 44:
@@ -1430,7 +1491,7 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 45:
 	            case "end":
-	              return _context6.stop();
+	              return _context7.stop();
 	          }
 	        }
 	      }, null, this);
@@ -1438,20 +1499,20 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "stop",
 	    value: function stop() {
-	      return regenerator.async(function stop$(_context7) {
+	      return regenerator.async(function stop$(_context8) {
 	        while (1) {
-	          switch (_context7.prev = _context7.next) {
+	          switch (_context8.prev = _context8.next) {
 	            case 0:
 	              sendMessage({
 	                type: STOP
 	              });
 	              setStorage(RECORDING, false);
-	              _context7.next = 4;
+	              _context8.next = 4;
 	              return regenerator.awrap(debug.log(PUSH_STREAM_END));
 
 	            case 4:
 	            case "end":
-	              return _context7.stop();
+	              return _context8.stop();
 	          }
 	        }
 	      });

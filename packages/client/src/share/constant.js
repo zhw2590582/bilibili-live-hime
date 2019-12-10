@@ -31,6 +31,7 @@ export const OPEN_SUCCESS = '打开直播间页面成功';
 export const CURRENT_PAGE = '当前页面';
 export const PUSH_STREAM_END = '已停止推流...';
 export const RECONNECT_INFO = '自动重连中：';
+export const INJECTED_SUCCESS = '注入文件：';
 
 export const DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
 export const DEFAULT_SOCKET = 'http://localhost:8080';

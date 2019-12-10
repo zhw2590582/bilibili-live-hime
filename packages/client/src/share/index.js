@@ -103,7 +103,7 @@ export function getCapturedTab() {
         chrome.tabCapture.getCapturedTabs(tabs => {
             resolve(tabs[0]);
         });
-    })
+    });
 }
 
 export function findTabById(id = 0) {
@@ -181,11 +181,37 @@ export function injectedScript(file) {
     });
 }
 
+export function runScript(code) {
+    return new Promise(resolve => {
+        chrome.tabs.executeScript(
+            {
+                code,
+            },
+            () => {
+                resolve();
+            },
+        );
+    });
+}
+
 export function insertCSS(file) {
     return new Promise(resolve => {
         chrome.tabs.insertCSS(
             {
                 file,
+            },
+            () => {
+                resolve();
+            },
+        );
+    });
+}
+
+export function runCss(code) {
+    return new Promise(resolve => {
+        chrome.tabs.insertCSS(
+            {
+                code,
             },
             () => {
                 resolve();

@@ -2,7 +2,9 @@ import './index.scss';
 import {
     debug,
     query,
+    runCss,
     openTab,
+    runScript,
     insertCSS,
     getStorage,
     setStorage,
@@ -31,6 +33,7 @@ import {
     DEFAULT_SOCKET,
     PUSH_STREAM_END,
     LIVE_ROOM_ERROR,
+    INJECTED_SUCCESS,
     CAN_NOT_FIND_TAB,
     STREAM_NAME_ERROR,
     DEFAULT_RESOLUTION,
@@ -108,6 +111,33 @@ class Popup {
 
         this.$stop.addEventListener('click', () => {
             this.stop();
+        });
+
+        this.$container.addEventListener('dragover', event => {
+            event.preventDefault();
+        });
+
+        this.$container.addEventListener('drop', async event => {
+            event.preventDefault();
+            const files = Array.from(event.dataTransfer.files);
+            await debug.log(INJECTED_SUCCESS + files.map(f => f.name).join(','));
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.addEventListener('load', () => {
+                    const code = reader.result;
+                    switch (file.type) {
+                        case 'text/javascript':
+                            runScript(code);
+                            break;
+                        case 'text/css':
+                            runCss(code);
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                reader.readAsText(file);
+            });
         });
     }
 
