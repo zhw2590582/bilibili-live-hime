@@ -11,6 +11,9 @@ class Content {
             this.createUI();
             this.eventBind();
             this.receiveDanmu();
+        } else {
+            query('.blh-danmuku .blh-danmu-inner').innerHTML = '';
+            query('.blh-danmuku .blh-gift-inner').innerHTML = '';
         }
     }
 
