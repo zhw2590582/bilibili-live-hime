@@ -30,6 +30,7 @@ var BilibiliLiveHimeContent = (function () {
   var DANMU = 'danmu';
   var GIFT = 'gift';
   var GUARD = 'guard';
+  var MAX_DANMU = 50;
 
   function query(el) {
     var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
@@ -152,7 +153,7 @@ var BilibiliLiveHimeContent = (function () {
 
         var children = this.$danmuInner.children;
 
-        if (children.length > 50) {
+        if (children.length > MAX_DANMU) {
           var child = children[0];
           query('.blh-danmu-uname', child).innerText = "".concat(danmu.uname, ":");
           query('.blh-danmu-text', child).innerText = danmu.text;
@@ -175,7 +176,7 @@ var BilibiliLiveHimeContent = (function () {
 
         var children = this.$giftInner.children;
 
-        if (children.length > 50) {
+        if (children.length > MAX_DANMU) {
           var child = children[0];
           query('.blh-gift-uname', child).innerText = "".concat(gift.uname, ":");
           query('.blh-gift-text', child).innerText = "".concat(gift.action, " ").concat(gift.gift, " ").concat(gift.count);
