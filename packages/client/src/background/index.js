@@ -1236,7 +1236,7 @@ var BilibiliLiveHimeBackground = (function () {
 
 	                      case 10:
 	                        _context3.next = 12;
-	                        return regenerator.awrap(sleep(1000));
+	                        return regenerator.awrap(sleep(3000));
 
 	                      case 12:
 	                        _context3.next = 14;

@@ -42,10 +42,15 @@ var BilibiliLiveHimeContent = (function () {
     function Content() {
       classCallCheck(this, Content);
 
-      if (!query('.blh-danmuku')) {
+      var $danmuku = query('.blh-danmuku');
+
+      if (!$danmuku) {
         this.createUI();
         this.eventBind();
         this.receiveDanmu();
+      } else {
+        query('.blh-danmu-inner', $danmuku).innerHTML = '';
+        query('.blh-gift-inner', $danmuku).innerHTML = '';
       }
     }
 

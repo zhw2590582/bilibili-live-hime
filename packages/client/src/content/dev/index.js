@@ -7,13 +7,14 @@ function query(el, doc = document) {
 
 class Content {
     constructor() {
-        if (!query('.blh-danmuku')) {
+        const $danmuku = query('.blh-danmuku');
+        if (!$danmuku) {
             this.createUI();
             this.eventBind();
             this.receiveDanmu();
         } else {
-            query('.blh-danmuku .blh-danmu-inner').innerHTML = '';
-            query('.blh-danmuku .blh-gift-inner').innerHTML = '';
+            query('.blh-danmu-inner', $danmuku).innerHTML = '';
+            query('.blh-gift-inner', $danmuku).innerHTML = '';
         }
     }
 

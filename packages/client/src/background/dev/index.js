@@ -217,11 +217,11 @@ class Background {
                 if (this.reconnect >= RECONNECT_TIME || !recording1) {
                     await this.stop();
                 } else {
-                    await sleep(1000);
+                    this.reconnect += 1;
+                    await debug.log(RECONNECT_INFO + this.reconnect);
+                    await sleep(3000);
                     const recording2 = await getStorage(RECORDING);
                     if (recording2) {
-                        this.reconnect += 1;
-                        await debug.log(RECONNECT_INFO + this.reconnect);
                         this.socket.emit(RTMP, rtmpFullUrl);
                     } else {
                         await this.stop();
