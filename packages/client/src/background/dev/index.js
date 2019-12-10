@@ -280,7 +280,7 @@ class Background {
             this.socket.close();
         }
 
-        if (this.mediaRecorder) {
+        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
             this.mediaRecorder.stop();
         }
     }
