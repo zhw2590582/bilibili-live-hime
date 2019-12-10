@@ -40,7 +40,7 @@ module.exports = ['background', 'popup', 'content', 'injected', 'danmu'].map(ite
                 plugins: ['@babel/plugin-external-helpers', '@babel/plugin-transform-runtime'],
             }),
             replace({
-                'process.env.NODE_ENV': JSON.stringify('production'),
+                '__ENV__': JSON.stringify(process.env.NODE_ENV),
             }),
             postcss({
                 plugins: [

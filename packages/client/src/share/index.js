@@ -106,7 +106,7 @@ export function getCapturedTab() {
     });
 }
 
-export function findTabById(id = 0) {
+export function findTabById(id) {
     return new Promise(resolve => {
         chrome.tabs.get(id, tab => {
             resolve(tab);

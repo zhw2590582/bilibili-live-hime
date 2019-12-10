@@ -154,7 +154,7 @@ class Content {
         if (children.length > MAX_DANMU) {
             const child = children[0];
             query('.blh-gift-uname', child).innerText = `${gift.uname}:`;
-            query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} ${gift.count}`;
+            query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} ${gift.num} ${gift.count}`;
             this.$giftInner.appendChild(child);
         } else {
             this.$giftInner.insertAdjacentHTML(
@@ -162,7 +162,7 @@ class Content {
                 `
                 <div class="blh-gift-item">
                     <span class="blh-gift-uname">${gift.uname}:</span>
-                    <span class="blh-gift-text">${gift.action} ${gift.gift} ${gift.count}</span>
+                    <span class="blh-gift-text">${gift.action} ${gift.gift} ${gift.num} ${gift.count}</span>
                 </div>
             `,
             );

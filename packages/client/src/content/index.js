@@ -179,10 +179,10 @@ var BilibiliLiveHimeContent = (function () {
         if (children.length > MAX_DANMU) {
           var child = children[0];
           query('.blh-gift-uname', child).innerText = "".concat(gift.uname, ":");
-          query('.blh-gift-text', child).innerText = "".concat(gift.action, " ").concat(gift.gift, " ").concat(gift.count);
+          query('.blh-gift-text', child).innerText = "".concat(gift.action, " ").concat(gift.gift, " ").concat(gift.num, " ").concat(gift.count);
           this.$giftInner.appendChild(child);
         } else {
-          this.$giftInner.insertAdjacentHTML('beforeend', "\n                <div class=\"blh-gift-item\">\n                    <span class=\"blh-gift-uname\">".concat(gift.uname, ":</span>\n                    <span class=\"blh-gift-text\">").concat(gift.action, " ").concat(gift.gift, " ").concat(gift.count, "</span>\n                </div>\n            "));
+          this.$giftInner.insertAdjacentHTML('beforeend', "\n                <div class=\"blh-gift-item\">\n                    <span class=\"blh-gift-uname\">".concat(gift.uname, ":</span>\n                    <span class=\"blh-gift-text\">").concat(gift.action, " ").concat(gift.gift, " ").concat(gift.num, " ").concat(gift.count, "</span>\n                </div>\n            "));
         }
 
         if (!this.isHover) {

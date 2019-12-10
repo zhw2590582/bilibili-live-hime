@@ -803,7 +803,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }
 	}
 
-	var objToString_1 = objToString;
+	var _objToString_1_0_1_objToString = objToString;
 
 	var START = 'start';
 	var STOP = 'stop';
@@ -905,14 +905,6 @@ var BilibiliLiveHimePopup = (function () {
 	    });
 	  });
 	}
-	function findTabById() {
-	  var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-	  return new Promise(function (resolve) {
-	    chrome.tabs.get(id, function (tab) {
-	      resolve(tab);
-	    });
-	  });
-	}
 	var debug = {
 	  log: function log(msg) {
 	    var logs;
@@ -937,7 +929,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context.t0;
 	            logs.push({
 	              type: LOG,
-	              data: objToString_1(msg)
+	              data: _objToString_1_0_1_objToString(msg)
 	            });
 	            _context.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -972,7 +964,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context2.t0;
 	            logs.push({
 	              type: ERROR,
-	              data: objToString_1(msg)
+	              data: _objToString_1_0_1_objToString(msg)
 	            });
 	            _context2.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -1203,7 +1195,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "init",
 	    value: function init() {
-	      var recording, config, activeTab, capturedTab;
+	      var recording, config, capturedTab;
 	      return regenerator.async(function init$(_context4) {
 	        while (1) {
 	          switch (_context4.prev = _context4.next) {
@@ -1229,14 +1221,9 @@ var BilibiliLiveHimePopup = (function () {
 	            case 8:
 	              config = _context4.t0;
 	              _context4.next = 11;
-	              return regenerator.awrap(findTabById(config.activeTab));
-
-	            case 11:
-	              activeTab = _context4.sent;
-	              _context4.next = 14;
 	              return regenerator.awrap(getCapturedTab());
 
-	            case 14:
+	            case 11:
 	              capturedTab = _context4.sent;
 
 	              if (config) {
@@ -1248,7 +1235,7 @@ var BilibiliLiveHimePopup = (function () {
 	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
 	              }
 
-	              if (!recording || !activeTab || !capturedTab) {
+	              if (!recording || !capturedTab) {
 	                debug.clean();
 	                setStorage(RECORDING, false);
 	                sendMessage({
@@ -1256,7 +1243,7 @@ var BilibiliLiveHimePopup = (function () {
 	                });
 	              }
 
-	            case 17:
+	            case 14:
 	            case "end":
 	              return _context4.stop();
 	          }
@@ -1301,7 +1288,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "updateRecording",
 	    value: function updateRecording() {
-	      var recording, config, activeTab;
+	      var recording, capturedTab;
 	      return regenerator.async(function updateRecording$(_context6) {
 	        while (1) {
 	          switch (_context6.prev = _context6.next) {
@@ -1312,27 +1299,12 @@ var BilibiliLiveHimePopup = (function () {
 	            case 2:
 	              recording = _context6.sent;
 	              _context6.next = 5;
-	              return regenerator.awrap(getStorage(CONFIG));
+	              return regenerator.awrap(getCapturedTab());
 
 	            case 5:
-	              _context6.t0 = _context6.sent;
+	              capturedTab = _context6.sent;
 
-	              if (_context6.t0) {
-	                _context6.next = 8;
-	                break;
-	              }
-
-	              _context6.t0 = {};
-
-	            case 8:
-	              config = _context6.t0;
-	              _context6.next = 11;
-	              return regenerator.awrap(findTabById(config.activeTab));
-
-	            case 11:
-	              activeTab = _context6.sent;
-
-	              if (recording && activeTab) {
+	              if (recording && capturedTab) {
 	                this.$container.classList.add(RECORDING);
 	                this.$rtmp.disabled = true;
 	                this.$streamname.disabled = true;
@@ -1350,7 +1322,7 @@ var BilibiliLiveHimePopup = (function () {
 	                this.$videoBitsPerSecond.disabled = false;
 	              }
 
-	            case 13:
+	            case 7:
 	            case "end":
 	              return _context6.stop();
 	          }

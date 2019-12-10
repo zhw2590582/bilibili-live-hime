@@ -81,6 +81,7 @@ var BilibiliLiveHimeInjected = (function () {
                         uname: query('.username', item).innerText.trim(),
                         action: query('.action', item).innerText.trim(),
                         gift: query('.gift-name', item).innerText.trim(),
+                        num: query('.gift-num', item).innerText.trim(),
                         count: query('.gift-count', item).innerText.trim()
                       }
                     });
@@ -98,6 +99,7 @@ var BilibiliLiveHimeInjected = (function () {
                         uname: query('.username', item).innerText.trim(),
                         action: '购买',
                         gift: '舰长',
+                        num: '',
                         count: query('.count', item).innerText.trim()
                       }
                     });
@@ -120,9 +122,11 @@ var BilibiliLiveHimeInjected = (function () {
                   window.postMessage({
                     type: GIFT,
                     data: {
+                      uid: null,
                       uname: query('.username', item).innerText.trim(),
                       action: query('.action', item).innerText.trim(),
                       gift: query('.gift-name', item).innerText.trim(),
+                      num: '',
                       count: query('.count', item).innerText.trim()
                     }
                   });

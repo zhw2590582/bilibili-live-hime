@@ -9,7 +9,6 @@ import {
     getStorage,
     setStorage,
     sendMessage,
-    findTabById,
     getActiveTab,
     storageChange,
     injectedScript,
@@ -150,7 +149,6 @@ class Popup {
     async init() {
         const recording = await getStorage(RECORDING);
         const config = (await getStorage(CONFIG)) || {};
-        const activeTab = await findTabById(config.activeTab);
         const capturedTab = await getCapturedTab();
         if (config) {
             this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
@@ -160,7 +158,7 @@ class Popup {
             this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
         }
-        if (!recording || !activeTab || !capturedTab) {
+        if (!recording || !capturedTab) {
             debug.clean();
             setStorage(RECORDING, false);
             sendMessage({
@@ -177,9 +175,8 @@ class Popup {
 
     async updateRecording() {
         const recording = await getStorage(RECORDING);
-        const config = (await getStorage(CONFIG)) || {};
-        const activeTab = await findTabById(config.activeTab);
-        if (recording && activeTab) {
+        const capturedTab = await getCapturedTab();
+        if (recording && capturedTab) {
             this.$container.classList.add(RECORDING);
             this.$rtmp.disabled = true;
             this.$streamname.disabled = true;
