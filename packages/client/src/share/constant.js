@@ -27,7 +27,7 @@ export const RTMP_ERROR = '请输入正确的rtmp推流地址';
 export const STREAM_NAME_ERROR = '请输入正确的直播码';
 export const SOCKET_ERROR = '请输入正确的中转地址';
 export const LIVE_ROOM_ERROR = '不是有效B站直播间地址';
-export const OPEN_SUCCESS = '打开直播间页面成功，保持该页面打开既可以获取弹幕';
+export const OPEN_SUCCESS = '打开直播间页面成功';
 export const CURRENT_PAGE = '当前页面';
 export const PUSH_STREAM_END = '已停止推流...';
 export const RECONNECT_INFO = '自动重连中：';
@@ -39,6 +39,7 @@ export const DEFAULT_VIDEO_BITSPER = 2500000;
 export const DEFAULT_AUDIO_BITSPER = 128000;
 export const MIME_TYPE = 'video/webm; codecs="h264, opus"';
 export const RECONNECT_TIME = 100;
+export const MAX_DANMU = 50;
 
 export const REG_RTMP = /^rtmp:\/\/.+/i;
 export const REG_HTTP = /^https?:\/\/.+/i;

@@ -1,5 +1,5 @@
 import './index.scss';
-import { DANMU, GIFT, GUARD } from '../../share/constant';
+import { DANMU, GIFT, GUARD, MAX_DANMU } from '../../share/constant';
 
 function query(el, doc = document) {
     return doc.querySelector(el);
@@ -125,7 +125,7 @@ class Content {
 
     addDanmu(danmu) {
         const { children } = this.$danmuInner;
-        if (children.length > 50) {
+        if (children.length > MAX_DANMU) {
             const child = children[0];
             query('.blh-danmu-uname', child).innerText = `${danmu.uname}:`;
             query('.blh-danmu-text', child).innerText = danmu.text;
@@ -151,7 +151,7 @@ class Content {
 
     addGift(gift) {
         const { children } = this.$giftInner;
-        if (children.length > 50) {
+        if (children.length > MAX_DANMU) {
             const child = children[0];
             query('.blh-gift-uname', child).innerText = `${gift.uname}:`;
             query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} ${gift.count}`;
