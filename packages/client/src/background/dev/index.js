@@ -4,6 +4,7 @@ import {
     sleep,
     debug,
     setBadge,
+    removeTab,
     onMessage,
     setStorage,
     getStorage,
@@ -15,14 +16,13 @@ import {
     FAIL,
     RTMP,
     STOP,
-    GIFT,
     START,
-    DANMU,
-    GUARD,
     MIME_TYPE,
     RECORDING,
     RECONNECT,
+    DANMU_ERROR,
     SOCKET_FAIL,
+    DANMU_OPTION,
     BINARY_STREAM,
     RECORDER_FAIL,
     RECONNECT_TIME,
@@ -59,14 +59,20 @@ class Background {
                 case STOP:
                     this.stop();
                     break;
-                case DANMU:
-                case GIFT:
-                case GUARD:
+                case DANMU_ERROR: {
+                    if (this.config && this.config.liveTab) {
+                        removeTab(this.config.liveTab);
+                    }
+                    break;
+                }
+                case DANMU_OPTION:
                     if (this.config && sender) {
                         const { activeTab, liveTab } = this.config;
                         const { tab } = sender;
                         if (activeTab && liveTab && tab && liveTab === tab.id) {
+                            setStorage(DANMU_OPTION, request);
                             sendMessageToTab(activeTab, request);
+                            removeTab(liveTab);
                         }
                     }
                     break;
@@ -269,6 +275,7 @@ class Background {
     async stop() {
         this.reconnect = 0;
         setStorage(RECORDING, false);
+        setStorage(DANMU_OPTION, false);
         this.config = Background.Config;
 
         if (this.stream) {

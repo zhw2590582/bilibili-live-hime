@@ -14,6 +14,8 @@ export const RECONNECT = 'reconnect';
 export const STREAM_DISCONNECT = 'stream_disconnect';
 export const BINARY_STREAM = 'binary_stream';
 export const BLH = 'blh';
+export const DANMU_OPTION = 'danmu_option';
+export const DANMU_ERROR = 'danmu_error';
 
 export const SOCKET_SUCCESS = '建立socket连接成功';
 export const SOCKET_FAIL = '建立socket连接失败';
@@ -45,3 +47,4 @@ export const MAX_DANMU = 50;
 export const REG_RTMP = /^rtmp:\/\/.+/i;
 export const REG_HTTP = /^https?:\/\/.+/i;
 export const REG_LIVE = /^https?:\/\/live\.bilibili\.com/i;
+export const REG_FUNCTION = /^function\s*([\w$]*)\s*\(([\w\s,$]*)\)\s*\{([\w\W\s\S]*)\}$/;

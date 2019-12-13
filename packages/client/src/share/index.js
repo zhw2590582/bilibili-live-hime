@@ -114,6 +114,14 @@ export function findTabById(id) {
     });
 }
 
+export function removeTab(id) {
+    return new Promise(resolve => {
+        chrome.tabs.remove(id, () => {
+            resolve();
+        });
+    });
+}
+
 export const debug = {
     async log(msg) {
         const logs = (await getStorage(DEBUG)) || [];
@@ -168,11 +176,13 @@ export function setBadge(text = '', color = 'red') {
     });
 }
 
-export function injectedScript(file) {
+export function injectedScript(tabId, file) {
     return new Promise(resolve => {
         chrome.tabs.executeScript(
+            tabId,
             {
                 file,
+                runAt: 'document_start',
             },
             () => {
                 resolve();
@@ -194,9 +204,10 @@ export function runScript(code) {
     });
 }
 
-export function insertCSS(file) {
+export function insertCSS(tabId, file) {
     return new Promise(resolve => {
         chrome.tabs.insertCSS(
+            tabId,
             {
                 file,
             },

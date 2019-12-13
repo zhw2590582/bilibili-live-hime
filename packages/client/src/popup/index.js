@@ -812,7 +812,7 @@ var BilibiliLiveHimePopup = (function () {
 	var DEBUG = 'debug';
 	var LOG = 'log';
 	var ERROR = 'error';
-	var BLH = 'blh';
+	var DANMU_OPTION = 'danmu_option';
 	var CAN_NOT_FIND_TAB = '未获取到当前激活的标签';
 	var RTMP_ERROR = '请输入正确的rtmp推流地址';
 	var STREAM_NAME_ERROR = '请输入正确的直播码';
@@ -830,6 +830,12 @@ var BilibiliLiveHimePopup = (function () {
 	var REG_HTTP = /^https?:\/\/.+/i;
 	var REG_LIVE = /^https?:\/\/live\.bilibili\.com/i;
 
+	function sleep() {
+	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+	  return new Promise(function (resolve) {
+	    return setTimeout(resolve, ms);
+	  });
+	}
 	function query(el) {
 	  var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
 	  return doc.querySelector(el);
@@ -995,10 +1001,14 @@ var BilibiliLiveHimePopup = (function () {
 	function sendMessage(data) {
 	  chrome.runtime.sendMessage(data);
 	}
-	function injectedScript(file) {
+	function sendMessageToTab(tabId, data) {
+	  chrome.tabs.sendMessage(tabId, data);
+	}
+	function injectedScript(tabId, file) {
 	  return new Promise(function (resolve) {
-	    chrome.tabs.executeScript({
-	      file: file
+	    chrome.tabs.executeScript(tabId, {
+	      file: file,
+	      runAt: 'document_start'
 	    }, function () {
 	      resolve();
 	    });
@@ -1013,9 +1023,9 @@ var BilibiliLiveHimePopup = (function () {
 	    });
 	  });
 	}
-	function insertCSS(file) {
+	function insertCSS(tabId, file) {
 	  return new Promise(function (resolve) {
-	    chrome.tabs.insertCSS({
+	    chrome.tabs.insertCSS(tabId, {
 	      file: file
 	    }, function () {
 	      resolve();
@@ -1195,7 +1205,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "init",
 	    value: function init() {
-	      var recording, config, capturedTab;
+	      var recording, config, danmu_option, capturedTab;
 	      return regenerator.async(function init$(_context4) {
 	        while (1) {
 	          switch (_context4.prev = _context4.next) {
@@ -1221,9 +1231,14 @@ var BilibiliLiveHimePopup = (function () {
 	            case 8:
 	              config = _context4.t0;
 	              _context4.next = 11;
-	              return regenerator.awrap(getCapturedTab());
+	              return regenerator.awrap(getStorage(DANMU_OPTION));
 
 	            case 11:
+	              danmu_option = _context4.sent;
+	              _context4.next = 14;
+	              return regenerator.awrap(getCapturedTab());
+
+	            case 14:
 	              capturedTab = _context4.sent;
 
 	              if (config) {
@@ -1235,15 +1250,35 @@ var BilibiliLiveHimePopup = (function () {
 	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
 	              }
 
-	              if (!recording || !capturedTab) {
-	                debug.clean();
-	                setStorage(RECORDING, false);
-	                sendMessage({
-	                  type: STOP
-	                });
+	              if (!(recording && capturedTab && danmu_option && config.activeTab)) {
+	                _context4.next = 26;
+	                break;
 	              }
 
-	            case 14:
+	              _context4.next = 19;
+	              return regenerator.awrap(injectedScript(config.activeTab, 'active/index.js'));
+
+	            case 19:
+	              _context4.next = 21;
+	              return regenerator.awrap(insertCSS(config.activeTab, 'active/index.css'));
+
+	            case 21:
+	              _context4.next = 23;
+	              return regenerator.awrap(sleep(100));
+
+	            case 23:
+	              sendMessageToTab(config.activeTab, danmu_option);
+	              _context4.next = 29;
+	              break;
+
+	            case 26:
+	              debug.clean();
+	              setStorage(RECORDING, false);
+	              sendMessage({
+	                type: STOP
+	              });
+
+	            case 29:
 	            case "end":
 	              return _context4.stop();
 	          }
@@ -1332,7 +1367,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "start",
 	    value: function start() {
-	      var activeTab, config, url, liveTab;
+	      var activeTab, config, liveTab;
 	      return regenerator.async(function start$(_context7) {
 	        while (1) {
 	          switch (_context7.prev = _context7.next) {
@@ -1401,67 +1436,63 @@ var BilibiliLiveHimePopup = (function () {
 	              return _context7.abrupt("return");
 
 	            case 20:
-	              if (!config.live) {
-	                _context7.next = 38;
+	              if (!REG_LIVE.test(config.live)) {
+	                _context7.next = 37;
 	                break;
 	              }
 
-	              if (REG_LIVE.test(config.live)) {
-	                _context7.next = 25;
-	                break;
-	              }
+	              _context7.next = 23;
+	              return regenerator.awrap(injectedScript(config.activeTab, 'active/index.js'));
 
-	              _context7.next = 24;
-	              return regenerator.awrap(debug.err(LIVE_ROOM_ERROR));
-
-	            case 24:
-	              return _context7.abrupt("return");
+	            case 23:
+	              _context7.next = 25;
+	              return regenerator.awrap(insertCSS(config.activeTab, 'active/index.css'));
 
 	            case 25:
-	              url = new URL(config.live);
-	              url.searchParams.append(BLH, 1);
+	              _context7.next = 27;
+	              return regenerator.awrap(sleep(100));
+
+	            case 27:
 	              _context7.next = 29;
-	              return regenerator.awrap(openTab(url.href, false));
+	              return regenerator.awrap(openTab(config.live, false));
 
 	            case 29:
 	              liveTab = _context7.sent;
-
-	              if (!liveTab) {
-	                _context7.next = 38;
-	                break;
-	              }
-
+	              config.liveTab = liveTab.id;
 	              _context7.next = 33;
 	              return regenerator.awrap(debug.log(OPEN_SUCCESS));
 
 	            case 33:
-	              config.liveTab = liveTab.id;
-	              _context7.next = 36;
-	              return regenerator.awrap(injectedScript('content/index.js'));
+	              _context7.next = 35;
+	              return regenerator.awrap(injectedScript(config.liveTab, 'danmu/index.js'));
 
-	            case 36:
-	              _context7.next = 38;
-	              return regenerator.awrap(insertCSS('content/index.css'));
+	            case 35:
+	              _context7.next = 39;
+	              break;
 
-	            case 38:
-	              _context7.next = 40;
+	            case 37:
+	              _context7.next = 39;
+	              return regenerator.awrap(debug.err(LIVE_ROOM_ERROR));
+
+	            case 39:
+	              _context7.next = 41;
 	              return regenerator.awrap(debug.log("".concat(CURRENT_PAGE, "\uFF1A").concat(activeTab.title)));
 
-	            case 40:
-	              _context7.next = 42;
+	            case 41:
+	              _context7.next = 43;
 	              return regenerator.awrap(setStorage(RECORDING, true));
 
-	            case 42:
-	              _context7.next = 44;
+	            case 43:
+	              _context7.next = 45;
 	              return regenerator.awrap(setStorage(CONFIG, config));
 
-	            case 44:
+	            case 45:
 	              sendMessage({
 	                type: START,
 	                data: config
 	              });
 
-	            case 45:
+	            case 46:
 	            case "end":
 	              return _context7.stop();
 	          }
@@ -1479,10 +1510,11 @@ var BilibiliLiveHimePopup = (function () {
 	                type: STOP
 	              });
 	              setStorage(RECORDING, false);
-	              _context8.next = 4;
+	              setStorage(DANMU_OPTION, false);
+	              _context8.next = 5;
 	              return regenerator.awrap(debug.log(PUSH_STREAM_END));
 
-	            case 4:
+	            case 5:
 	            case "end":
 	              return _context8.stop();
 	          }

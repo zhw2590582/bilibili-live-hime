@@ -1,5 +1,6 @@
 import './index.scss';
-import { DANMU, GIFT, GUARD, MAX_DANMU } from '../../share/constant';
+import './DanmakuWebSocket';
+import { DANMU_OPTION, MAX_DANMU } from '../../share/constant';
 
 function query(el, doc = document) {
     return doc.querySelector(el);
@@ -7,15 +8,34 @@ function query(el, doc = document) {
 
 class Content {
     constructor() {
-        const $danmuku = query('.blh-danmuku');
-        if (!$danmuku) {
-            this.createUI();
-            this.eventBind();
-            this.receiveDanmu();
-        } else {
-            query('.blh-danmu-inner', $danmuku).innerHTML = '';
-            query('.blh-gift-inner', $danmuku).innerHTML = '';
-        }
+        chrome.runtime.onMessage.addListener(request => {
+            const { type, data } = request;
+            switch (type) {
+                case DANMU_OPTION: {
+                    if (!query('.blh-danmuku')) {
+                        this.dws = new window.DanmakuWebSocket({
+                            ...data,
+                            onInitialized: () => {
+                                if (!query('.blh-danmuku')) {
+                                    this.createUI();
+                                    this.eventBind();
+                                }
+                            },
+                            onReceivedMessage: msg => {
+                                this.receivedMessage(msg);
+                            },
+                        });
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+
+    receivedMessage(msg) {
+        console.log(msg);
     }
 
     createUI() {
@@ -173,25 +193,6 @@ class Content {
                 this.$gift.scrollTo(0, this.$gift.scrollHeight);
             }, 100);
         }
-    }
-
-    receiveDanmu() {
-        if (!chrome) return;
-        chrome.runtime.onMessage.addListener(request => {
-            const { type, data } = request;
-            window.postMessage(request);
-            switch (type) {
-                case DANMU:
-                    this.addDanmu(data);
-                    break;
-                case GIFT:
-                case GUARD:
-                    this.addGift(data);
-                    break;
-                default:
-                    break;
-            }
-        });
     }
 }
 

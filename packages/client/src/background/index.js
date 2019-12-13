@@ -875,9 +875,6 @@ var BilibiliLiveHimeBackground = (function () {
 
 	var START = 'start';
 	var STOP = 'stop';
-	var DANMU = 'danmu';
-	var GIFT = 'gift';
-	var GUARD = 'guard';
 	var RECORDING = 'recording';
 	var DEBUG = 'debug';
 	var LOG = 'log';
@@ -887,6 +884,8 @@ var BilibiliLiveHimeBackground = (function () {
 	var RECONNECT = 'reconnect';
 	var STREAM_DISCONNECT = 'stream_disconnect';
 	var BINARY_STREAM = 'binary_stream';
+	var DANMU_OPTION = 'danmu_option';
+	var DANMU_ERROR = 'danmu_error';
 	var SOCKET_SUCCESS = '建立socket连接成功';
 	var SOCKET_FAIL = '建立socket连接失败';
 	var TAB_VIDEO_STREAM_SUCCESS = '获取标签视频流成功';
@@ -934,6 +933,13 @@ var BilibiliLiveHimeBackground = (function () {
 	}
 	function storageChange(callback) {
 	  chrome.storage.onChanged.addListener(callback);
+	}
+	function removeTab(id) {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.remove(id, function () {
+	      resolve();
+	    });
+	  });
 	}
 	var debug = {
 	  log: function log(msg) {
@@ -1078,9 +1084,16 @@ var BilibiliLiveHimeBackground = (function () {
 
 	          break;
 
-	        case DANMU:
-	        case GIFT:
-	        case GUARD:
+	        case DANMU_ERROR:
+	          {
+	            if (_this.config && _this.config.liveTab) {
+	              removeTab(_this.config.liveTab);
+	            }
+
+	            break;
+	          }
+
+	        case DANMU_OPTION:
 	          if (_this.config && sender) {
 	            var _this$config = _this.config,
 	                activeTab = _this$config.activeTab,
@@ -1088,7 +1101,9 @@ var BilibiliLiveHimeBackground = (function () {
 	            var tab = sender.tab;
 
 	            if (activeTab && liveTab && tab && liveTab === tab.id) {
+	              setStorage(DANMU_OPTION, request);
 	              sendMessageToTab(activeTab, request);
+	              removeTab(liveTab);
 	            }
 	          }
 
@@ -1386,6 +1401,7 @@ var BilibiliLiveHimeBackground = (function () {
 	            case 0:
 	              this.reconnect = 0;
 	              setStorage(RECORDING, false);
+	              setStorage(DANMU_OPTION, false);
 	              this.config = Background.Config;
 
 	              if (this.stream) {
@@ -1403,7 +1419,7 @@ var BilibiliLiveHimeBackground = (function () {
 	                this.mediaRecorder.stop();
 	              }
 
-	            case 6:
+	            case 7:
 	            case "end":
 	              return _context6.stop();
 	          }

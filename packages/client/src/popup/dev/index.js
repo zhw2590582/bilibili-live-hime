@@ -1,5 +1,6 @@
 import './index.scss';
 import {
+    sleep,
     debug,
     query,
     runCss,
@@ -13,9 +14,9 @@ import {
     storageChange,
     injectedScript,
     getCapturedTab,
+    sendMessageToTab,
 } from '../../share';
 import {
-    BLH,
     STOP,
     START,
     DEBUG,
@@ -25,6 +26,7 @@ import {
     REG_LIVE,
     RECORDING,
     RTMP_ERROR,
+    DANMU_OPTION,
     DEFAULT_RTMP,
     SOCKET_ERROR,
     OPEN_SUCCESS,
@@ -149,7 +151,9 @@ class Popup {
     async init() {
         const recording = await getStorage(RECORDING);
         const config = (await getStorage(CONFIG)) || {};
+        const danmu_option = await getStorage(DANMU_OPTION);
         const capturedTab = await getCapturedTab();
+
         if (config) {
             this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
             this.$streamname.value = config.streamname || '';
@@ -158,7 +162,13 @@ class Popup {
             this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
         }
-        if (!recording || !capturedTab) {
+
+        if (recording && capturedTab && danmu_option && config.activeTab) {
+            await injectedScript(config.activeTab, 'active/index.js');
+            await insertCSS(config.activeTab, 'active/index.css');
+            await sleep(100);
+            sendMessageToTab(config.activeTab, danmu_option);
+        } else {
             debug.clean();
             setStorage(RECORDING, false);
             sendMessage({
@@ -228,20 +238,16 @@ class Popup {
             return;
         }
 
-        if (config.live) {
-            if (!REG_LIVE.test(config.live)) {
-                await debug.err(LIVE_ROOM_ERROR);
-                return;
-            }
-            const url = new URL(config.live);
-            url.searchParams.append(BLH, 1);
-            const liveTab = await openTab(url.href, false);
-            if (liveTab) {
-                await debug.log(OPEN_SUCCESS);
-                config.liveTab = liveTab.id;
-                await injectedScript('content/index.js');
-                await insertCSS('content/index.css');
-            }
+        if (REG_LIVE.test(config.live)) {
+            await injectedScript(config.activeTab, 'active/index.js');
+            await insertCSS(config.activeTab, 'active/index.css');
+            await sleep(100);
+            const liveTab = await openTab(config.live, false);
+            config.liveTab = liveTab.id;
+            await debug.log(OPEN_SUCCESS);
+            await injectedScript(config.liveTab, 'danmu/index.js');
+        } else {
+            await debug.err(LIVE_ROOM_ERROR);
         }
 
         await debug.log(`${CURRENT_PAGE}：${activeTab.title}`);
@@ -258,6 +264,7 @@ class Popup {
             type: STOP,
         });
         setStorage(RECORDING, false);
+        setStorage(DANMU_OPTION, false);
         await debug.log(PUSH_STREAM_END);
     }
 }

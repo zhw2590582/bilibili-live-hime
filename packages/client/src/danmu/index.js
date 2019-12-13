@@ -9,22 +9,49 @@ var BilibiliLiveHimeDanmu = (function () {
 
   var classCallCheck = _classCallCheck;
 
+  var REG_FUNCTION = /^function\s*([\w$]*)\s*\(([\w\s,$]*)\)\s*\{([\w\W\s\S]*)\}$/;
+
+  function getDanmuOption() {
+    var initTime = Date.now();
+
+    (function loop() {
+      if (window.DanmakuWebSocket) {
+        var DWS = window.DanmakuWebSocket;
+
+        window.DanmakuWebSocket = function f(option) {
+          var dws = new DWS(option);
+          window.postMessage({
+            type: 'danmu_option',
+            data: Object.keys(option).reduce(function (obj, key) {
+              if (typeof option[key] !== 'function') {
+                obj[key] = option[key];
+              }
+
+              return obj;
+            }, {})
+          });
+          return dws;
+        };
+      } else if (Date.now() - initTime >= 60000) {
+        window.postMessage({
+          type: 'danmu_error'
+        });
+      } else {
+        setTimeout(loop, 10);
+      }
+    })();
+  }
+
   var Danmu = function Danmu() {
     classCallCheck(this, Danmu);
 
     var $script = document.createElement('script');
-    $script.src = chrome.extension.getURL('injected/index.js');
-
-    $script.onload = function () {
-      return $script.remove();
-    };
-
+    $script.type = 'text/javascript';
+    $script.text = getDanmuOption.toString().match(REG_FUNCTION)[3];
     document.documentElement.appendChild($script);
+    $script.onload = document.documentElement.removeChild($script);
     window.addEventListener('message', function (event) {
-      try {
-        chrome.runtime.sendMessage(event.data);
-      } catch (error) {//
-      }
+      chrome.runtime.sendMessage(event.data);
     });
   };
 

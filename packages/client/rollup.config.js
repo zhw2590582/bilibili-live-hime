@@ -11,7 +11,7 @@ const cssnano = require('cssnano');
 const { name, version, homepage } = require('./package.json');
 
 const isProd = process.env.NODE_ENV === 'production';
-module.exports = ['background', 'popup', 'content', 'injected', 'danmu'].map(item => {
+module.exports = ['background', 'popup', 'active', 'danmu'].map(item => {
     return {
         input: `src/${item}/dev/index.js`,
         output: {
@@ -40,7 +40,7 @@ module.exports = ['background', 'popup', 'content', 'injected', 'danmu'].map(ite
                 plugins: ['@babel/plugin-external-helpers', '@babel/plugin-transform-runtime'],
             }),
             replace({
-                '__ENV__': JSON.stringify(process.env.NODE_ENV),
+                __ENV__: JSON.stringify(process.env.NODE_ENV),
             }),
             postcss({
                 plugins: [
