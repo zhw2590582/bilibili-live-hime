@@ -23,6 +23,7 @@ import {
     DANMU_ERROR,
     SOCKET_FAIL,
     DANMU_OPTION,
+    DANMU_SUCCESS,
     BINARY_STREAM,
     RECORDER_FAIL,
     RECONNECT_TIME,
@@ -46,7 +47,7 @@ class Background {
         this.mediaRecorder = null;
         this.config = Background.Config;
 
-        onMessage((request, sender) => {
+        onMessage(async (request, sender) => {
             const { type, data } = request;
             switch (type) {
                 case START:
@@ -73,6 +74,7 @@ class Background {
                             setStorage(DANMU_OPTION, request);
                             sendMessageToTab(activeTab, request);
                             removeTab(liveTab);
+                            await debug.log(DANMU_SUCCESS);
                         }
                     }
                     break;
