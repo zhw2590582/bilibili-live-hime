@@ -62,24 +62,8 @@ export function storageChange(callback) {
 
 export function openTab(url, active = true) {
     return new Promise(resolve => {
-        chrome.tabs.query({}, tabs => {
-            const findTab = tabs.find(tab => tab.url === url);
-            if (findTab) {
-                chrome.tabs.update(
-                    findTab.id,
-                    {
-                        active,
-                        url,
-                    },
-                    tab => {
-                        resolve(tab);
-                    },
-                );
-            } else {
-                chrome.tabs.create({ url, active }, tab => {
-                    resolve(tab);
-                });
-            }
+        chrome.tabs.create({ url, active }, tab => {
+            resolve(tab);
         });
     });
 }

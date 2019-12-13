@@ -9,23 +9,22 @@ function query(el, doc = document) {
 class Content {
     constructor() {
         chrome.runtime.onMessage.addListener(request => {
+            if (query('.blh-danmuku')) return;
             const { type, data } = request;
             switch (type) {
                 case DANMU_OPTION: {
-                    if (!query('.blh-danmuku')) {
-                        this.dws = new window.DanmakuWebSocket({
-                            ...data,
-                            onInitialized: () => {
-                                if (!query('.blh-danmuku')) {
-                                    this.createUI();
-                                    this.eventBind();
-                                }
-                            },
-                            onReceivedMessage: msg => {
-                                this.receivedMessage(msg);
-                            },
-                        });
-                    }
+                    this.dws = new window.DanmakuWebSocket({
+                        ...data,
+                        onInitialized: () => {
+                            if (!query('.blh-danmuku')) {
+                                this.createUI();
+                                this.eventBind();
+                            }
+                        },
+                        onReceivedMessage: msg => {
+                            this.receivedMessage(msg);
+                        },
+                    });
                     break;
                 }
                 default:

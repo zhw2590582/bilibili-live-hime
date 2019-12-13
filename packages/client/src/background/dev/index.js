@@ -20,6 +20,7 @@ import {
     MIME_TYPE,
     RECORDING,
     RECONNECT,
+    DANMU_FAIL,
     DANMU_ERROR,
     SOCKET_FAIL,
     DANMU_OPTION,
@@ -63,6 +64,7 @@ class Background {
                 case DANMU_ERROR: {
                     if (this.config && this.config.liveTab) {
                         removeTab(this.config.liveTab);
+                        await debug.err(DANMU_FAIL);
                     }
                     break;
                 }
