@@ -171,6 +171,7 @@ class Popup {
         } else {
             debug.clean();
             setStorage(RECORDING, false);
+            setStorage(DANMU_OPTION, false);
             sendMessage({
                 type: STOP,
             });
