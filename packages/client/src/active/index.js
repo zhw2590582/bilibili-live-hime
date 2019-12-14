@@ -1714,27 +1714,27 @@ var BilibiliLiveHimeActive = (function () {
       classCallCheck(this, Content);
 
       chrome.runtime.onMessage.addListener(function (request) {
+        if (query('.blh-danmuku')) return;
         var type = request.type,
             data = request.data;
 
         switch (type) {
           case DANMU_OPTION:
             {
-              if (!query('.blh-danmuku')) {
-                _this.dws = new window.DanmakuWebSocket(_objectSpread({}, data, {
-                  onInitialized: function onInitialized() {
-                    if (!query('.blh-danmuku')) {
-                      _this.createUI();
+              _this.dws = new window.DanmakuWebSocket(_objectSpread({}, data, {
+                onInitialized: function onInitialized() {
+                  if (!query('.blh-danmuku')) {
+                    _this.createUI();
 
-                      _this.eventBind();
-                    }
-                  },
-                  onReceivedMessage: function onReceivedMessage(msg) {
-                    _this.receivedMessage(msg);
+                    _this.eventBind();
                   }
-                }));
-              }
+                },
+                onReceivedMessage: function onReceivedMessage(msg) {
+                  window.postMessage(msg);
 
+                  _this.receivedMessage(msg);
+                }
+              }));
               break;
             }
         }
@@ -1744,7 +1744,40 @@ var BilibiliLiveHimeActive = (function () {
     createClass(Content, [{
       key: "receivedMessage",
       value: function receivedMessage(msg) {
-        console.log(msg);
+        var cmd = msg.cmd,
+            info = msg.info,
+            data = msg.data;
+
+        switch (cmd) {
+          case 'DANMU_MSG':
+            this.addDanmu({
+              uname: info[2][1],
+              text: info[1]
+            });
+            break;
+
+          case 'SEND_GIFT':
+            this.addGift({
+              uname: data.uname,
+              action: data.action,
+              gift: data.giftName,
+              num: data.num
+            });
+            break;
+
+          case 'GUARD_BUY':
+            this.addGift({
+              uname: data.username,
+              action: '购买',
+              gift: data.gift_name,
+              num: data.num
+            });
+            break;
+
+          default:
+            console.log(msg);
+            break;
+        }
       }
     }, {
       key: "createUI",
@@ -1870,10 +1903,10 @@ var BilibiliLiveHimeActive = (function () {
         if (children.length > MAX_DANMU) {
           var child = children[0];
           query('.blh-gift-uname', child).innerText = "".concat(gift.uname, ":");
-          query('.blh-gift-text', child).innerText = "".concat(gift.action, " ").concat(gift.gift, " ").concat(gift.num, " ").concat(gift.count);
+          query('.blh-gift-text', child).innerText = "".concat(gift.action, " ").concat(gift.gift, " X ").concat(gift.num);
           this.$giftInner.appendChild(child);
         } else {
-          this.$giftInner.insertAdjacentHTML('beforeend', "\n                <div class=\"blh-gift-item\">\n                    <span class=\"blh-gift-uname\">".concat(gift.uname, ":</span>\n                    <span class=\"blh-gift-text\">").concat(gift.action, " ").concat(gift.gift, " ").concat(gift.num, " ").concat(gift.count, "</span>\n                </div>\n            "));
+          this.$giftInner.insertAdjacentHTML('beforeend', "\n                <div class=\"blh-gift-item\">\n                    <span class=\"blh-gift-uname\">".concat(gift.uname, ":</span>\n                    <span class=\"blh-gift-text\">").concat(gift.action, " ").concat(gift.gift, " X ").concat(gift.num, "</span>\n                </div>\n            "));
         }
 
         if (!this.isHover) {

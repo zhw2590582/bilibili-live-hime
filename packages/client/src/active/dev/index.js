@@ -22,6 +22,7 @@ class Content {
                             }
                         },
                         onReceivedMessage: msg => {
+                            window.postMessage(msg);
                             this.receivedMessage(msg);
                         },
                     });
@@ -34,7 +35,34 @@ class Content {
     }
 
     receivedMessage(msg) {
-        console.log(msg);
+        const { cmd, info, data } = msg;
+        switch (cmd) {
+            case 'DANMU_MSG':
+                this.addDanmu({
+                    uname: info[2][1],
+                    text: info[1],
+                });
+                break;
+            case 'SEND_GIFT':
+                this.addGift({
+                    uname: data.uname,
+                    action: data.action,
+                    gift: data.giftName,
+                    num: data.num,
+                });
+                break;
+            case 'GUARD_BUY':
+                this.addGift({
+                    uname: data.username,
+                    action: '购买',
+                    gift: data.gift_name,
+                    num: data.num,
+                });
+                break;
+            default:
+                console.log(msg);
+                break;
+        }
     }
 
     createUI() {
@@ -173,7 +201,7 @@ class Content {
         if (children.length > MAX_DANMU) {
             const child = children[0];
             query('.blh-gift-uname', child).innerText = `${gift.uname}:`;
-            query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} ${gift.num} ${gift.count}`;
+            query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} X ${gift.num}`;
             this.$giftInner.appendChild(child);
         } else {
             this.$giftInner.insertAdjacentHTML(
@@ -181,7 +209,7 @@ class Content {
                 `
                 <div class="blh-gift-item">
                     <span class="blh-gift-uname">${gift.uname}:</span>
-                    <span class="blh-gift-text">${gift.action} ${gift.gift} ${gift.num} ${gift.count}</span>
+                    <span class="blh-gift-text">${gift.action} ${gift.gift} X ${gift.num}</span>
                 </div>
             `,
             );

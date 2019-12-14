@@ -881,26 +881,11 @@ var BilibiliLiveHimePopup = (function () {
 	function openTab(url) {
 	  var active = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 	  return new Promise(function (resolve) {
-	    chrome.tabs.query({}, function (tabs) {
-	      var findTab = tabs.find(function (tab) {
-	        return tab.url === url;
-	      });
-
-	      if (findTab) {
-	        chrome.tabs.update(findTab.id, {
-	          active: active,
-	          url: url
-	        }, function (tab) {
-	          resolve(tab);
-	        });
-	      } else {
-	        chrome.tabs.create({
-	          url: url,
-	          active: active
-	        }, function (tab) {
-	          resolve(tab);
-	        });
-	      }
+	    chrome.tabs.create({
+	      url: url,
+	      active: active
+	    }, function (tab) {
+	      resolve(tab);
 	    });
 	  });
 	}
@@ -1268,17 +1253,18 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 23:
 	              sendMessageToTab(config.activeTab, danmu_option);
-	              _context4.next = 29;
+	              _context4.next = 30;
 	              break;
 
 	            case 26:
 	              debug.clean();
 	              setStorage(RECORDING, false);
+	              setStorage(DANMU_OPTION, false);
 	              sendMessage({
 	                type: STOP
 	              });
 
-	            case 29:
+	            case 30:
 	            case "end":
 	              return _context4.stop();
 	          }

@@ -894,6 +894,7 @@ var BilibiliLiveHimeBackground = (function () {
 	var RECORDER_FAIL = '无法录制标签的视频流，请重试！';
 	var PUSH_STREAM_ING = '正在推流中...';
 	var DANMU_SUCCESS = '获取弹幕接口成功';
+	var DANMU_FAIL = '获取弹幕接口失败';
 	var RECONNECT_INFO = '自动重连中：';
 	var DEFAULT_RESOLUTION = 720;
 	var DEFAULT_VIDEO_BITSPER = 2500000;
@@ -1077,7 +1078,7 @@ var BilibiliLiveHimeBackground = (function () {
 	            case 0:
 	              type = request.type, data = request.data;
 	              _context.t0 = type;
-	              _context.next = _context.t0 === START ? 4 : _context.t0 === STOP ? 7 : _context.t0 === DANMU_ERROR ? 9 : _context.t0 === DANMU_OPTION ? 11 : 21;
+	              _context.next = _context.t0 === START ? 4 : _context.t0 === STOP ? 7 : _context.t0 === DANMU_ERROR ? 9 : _context.t0 === DANMU_OPTION ? 14 : 24;
 	              break;
 
 	            case 4:
@@ -1085,23 +1086,29 @@ var BilibiliLiveHimeBackground = (function () {
 
 	              _this.start();
 
-	              return _context.abrupt("break", 22);
+	              return _context.abrupt("break", 25);
 
 	            case 7:
 	              _this.stop();
 
-	              return _context.abrupt("break", 22);
+	              return _context.abrupt("break", 25);
 
 	            case 9:
-	              if (_this.config && _this.config.liveTab) {
-	                removeTab(_this.config.liveTab);
+	              if (!(_this.config && _this.config.liveTab)) {
+	                _context.next = 13;
+	                break;
 	              }
 
-	              return _context.abrupt("break", 22);
+	              removeTab(_this.config.liveTab);
+	              _context.next = 13;
+	              return regenerator.awrap(debug.err(DANMU_FAIL));
 
-	            case 11:
+	            case 13:
+	              return _context.abrupt("break", 25);
+
+	            case 14:
 	              if (!(_this.config && sender)) {
-	                _context.next = 20;
+	                _context.next = 23;
 	                break;
 	              }
 
@@ -1109,23 +1116,23 @@ var BilibiliLiveHimeBackground = (function () {
 	              tab = sender.tab;
 
 	              if (!(activeTab && liveTab && tab && liveTab === tab.id)) {
-	                _context.next = 20;
+	                _context.next = 23;
 	                break;
 	              }
 
 	              setStorage(DANMU_OPTION, request);
 	              sendMessageToTab(activeTab, request);
 	              removeTab(liveTab);
-	              _context.next = 20;
+	              _context.next = 23;
 	              return regenerator.awrap(debug.log(DANMU_SUCCESS));
 
-	            case 20:
-	              return _context.abrupt("break", 22);
+	            case 23:
+	              return _context.abrupt("break", 25);
 
-	            case 21:
-	              return _context.abrupt("break", 22);
+	            case 24:
+	              return _context.abrupt("break", 25);
 
-	            case 22:
+	            case 25:
 	            case "end":
 	              return _context.stop();
 	          }
