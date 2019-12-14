@@ -1,8 +1,5 @@
 export const START = 'start';
 export const STOP = 'stop';
-export const DANMU = 'danmu';
-export const GIFT = 'gift';
-export const GUARD = 'guard';
 export const CONFIG = 'config';
 export const RECORDING = 'recording';
 export const DEBUG = 'debug';
@@ -13,7 +10,6 @@ export const RTMP = 'rtmp';
 export const RECONNECT = 'reconnect';
 export const STREAM_DISCONNECT = 'stream_disconnect';
 export const BINARY_STREAM = 'binary_stream';
-export const BLH = 'blh';
 export const DANMU_OPTION = 'danmu_option';
 export const DANMU_ERROR = 'danmu_error';
 
