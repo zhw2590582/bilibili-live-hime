@@ -4,6 +4,7 @@ import {
     sleep,
     debug,
     setBadge,
+    removeTab,
     onMessage,
     setStorage,
     getStorage,
@@ -15,14 +16,15 @@ import {
     FAIL,
     RTMP,
     STOP,
-    GIFT,
     START,
-    DANMU,
-    GUARD,
     MIME_TYPE,
     RECORDING,
     RECONNECT,
+    DANMU_FAIL,
+    DANMU_ERROR,
     SOCKET_FAIL,
+    DANMU_OPTION,
+    DANMU_SUCCESS,
     BINARY_STREAM,
     RECORDER_FAIL,
     RECONNECT_TIME,
@@ -46,7 +48,7 @@ class Background {
         this.mediaRecorder = null;
         this.config = Background.Config;
 
-        onMessage((request, sender) => {
+        onMessage(async (request, sender) => {
             const { type, data } = request;
             switch (type) {
                 case START:
@@ -59,14 +61,22 @@ class Background {
                 case STOP:
                     this.stop();
                     break;
-                case DANMU:
-                case GIFT:
-                case GUARD:
+                case DANMU_ERROR: {
+                    if (this.config && this.config.liveTab) {
+                        removeTab(this.config.liveTab);
+                        await debug.err(DANMU_FAIL);
+                    }
+                    break;
+                }
+                case DANMU_OPTION:
                     if (this.config && sender) {
                         const { activeTab, liveTab } = this.config;
                         const { tab } = sender;
                         if (activeTab && liveTab && tab && liveTab === tab.id) {
+                            setStorage(DANMU_OPTION, request);
                             sendMessageToTab(activeTab, request);
+                            removeTab(liveTab);
+                            await debug.log(DANMU_SUCCESS);
                         }
                     }
                     break;
@@ -269,6 +279,7 @@ class Background {
     async stop() {
         this.reconnect = 0;
         setStorage(RECORDING, false);
+        setStorage(DANMU_OPTION, false);
         this.config = Background.Config;
 
         if (this.stream) {

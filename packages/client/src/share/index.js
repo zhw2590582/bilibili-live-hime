@@ -62,24 +62,8 @@ export function storageChange(callback) {
 
 export function openTab(url, active = true) {
     return new Promise(resolve => {
-        chrome.tabs.query({}, tabs => {
-            const findTab = tabs.find(tab => tab.url === url);
-            if (findTab) {
-                chrome.tabs.update(
-                    findTab.id,
-                    {
-                        active,
-                        url,
-                    },
-                    tab => {
-                        resolve(tab);
-                    },
-                );
-            } else {
-                chrome.tabs.create({ url, active }, tab => {
-                    resolve(tab);
-                });
-            }
+        chrome.tabs.create({ url, active }, tab => {
+            resolve(tab);
         });
     });
 }
@@ -110,6 +94,14 @@ export function findTabById(id) {
     return new Promise(resolve => {
         chrome.tabs.get(id, tab => {
             resolve(tab);
+        });
+    });
+}
+
+export function removeTab(id) {
+    return new Promise(resolve => {
+        chrome.tabs.remove(id, () => {
+            resolve();
         });
     });
 }
@@ -168,11 +160,13 @@ export function setBadge(text = '', color = 'red') {
     });
 }
 
-export function injectedScript(file) {
+export function injectedScript(tabId, file) {
     return new Promise(resolve => {
         chrome.tabs.executeScript(
+            tabId,
             {
                 file,
+                runAt: 'document_start',
             },
             () => {
                 resolve();
@@ -194,9 +188,10 @@ export function runScript(code) {
     });
 }
 
-export function insertCSS(file) {
+export function insertCSS(tabId, file) {
     return new Promise(resolve => {
         chrome.tabs.insertCSS(
+            tabId,
             {
                 file,
             },

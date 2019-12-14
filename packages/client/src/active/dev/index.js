@@ -1,5 +1,6 @@
 import './index.scss';
-import { DANMU, GIFT, GUARD, MAX_DANMU } from '../../share/constant';
+import './DanmakuWebSocket';
+import { DANMU_OPTION, MAX_DANMU } from '../../share/constant';
 
 function query(el, doc = document) {
     return doc.querySelector(el);
@@ -7,14 +8,60 @@ function query(el, doc = document) {
 
 class Content {
     constructor() {
-        const $danmuku = query('.blh-danmuku');
-        if (!$danmuku) {
-            this.createUI();
-            this.eventBind();
-            this.receiveDanmu();
-        } else {
-            query('.blh-danmu-inner', $danmuku).innerHTML = '';
-            query('.blh-gift-inner', $danmuku).innerHTML = '';
+        chrome.runtime.onMessage.addListener(request => {
+            if (query('.blh-danmuku')) return;
+            const { type, data } = request;
+            switch (type) {
+                case DANMU_OPTION: {
+                    this.dws = new window.DanmakuWebSocket({
+                        ...data,
+                        onInitialized: () => {
+                            if (!query('.blh-danmuku')) {
+                                this.createUI();
+                                this.eventBind();
+                            }
+                        },
+                        onReceivedMessage: msg => {
+                            window.postMessage(msg);
+                            this.receivedMessage(msg);
+                        },
+                    });
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    }
+
+    receivedMessage(msg) {
+        const { cmd, info, data } = msg;
+        switch (cmd) {
+            case 'DANMU_MSG':
+                this.addDanmu({
+                    uname: info[2][1],
+                    text: info[1],
+                });
+                break;
+            case 'SEND_GIFT':
+                this.addGift({
+                    uname: data.uname,
+                    action: data.action,
+                    gift: data.giftName,
+                    num: data.num,
+                });
+                break;
+            case 'GUARD_BUY':
+                this.addGift({
+                    uname: data.username,
+                    action: '购买',
+                    gift: data.gift_name,
+                    num: data.num,
+                });
+                break;
+            default:
+                console.log(msg);
+                break;
         }
     }
 
@@ -154,7 +201,7 @@ class Content {
         if (children.length > MAX_DANMU) {
             const child = children[0];
             query('.blh-gift-uname', child).innerText = `${gift.uname}:`;
-            query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} ${gift.num} ${gift.count}`;
+            query('.blh-gift-text', child).innerText = `${gift.action} ${gift.gift} X ${gift.num}`;
             this.$giftInner.appendChild(child);
         } else {
             this.$giftInner.insertAdjacentHTML(
@@ -162,7 +209,7 @@ class Content {
                 `
                 <div class="blh-gift-item">
                     <span class="blh-gift-uname">${gift.uname}:</span>
-                    <span class="blh-gift-text">${gift.action} ${gift.gift} ${gift.num} ${gift.count}</span>
+                    <span class="blh-gift-text">${gift.action} ${gift.gift} X ${gift.num}</span>
                 </div>
             `,
             );
@@ -173,25 +220,6 @@ class Content {
                 this.$gift.scrollTo(0, this.$gift.scrollHeight);
             }, 100);
         }
-    }
-
-    receiveDanmu() {
-        if (!chrome) return;
-        chrome.runtime.onMessage.addListener(request => {
-            const { type, data } = request;
-            window.postMessage(request);
-            switch (type) {
-                case DANMU:
-                    this.addDanmu(data);
-                    break;
-                case GIFT:
-                case GUARD:
-                    this.addGift(data);
-                    break;
-                default:
-                    break;
-            }
-        });
     }
 }
 

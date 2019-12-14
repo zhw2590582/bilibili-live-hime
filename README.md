@@ -75,15 +75,15 @@ rtmp://***/{直播码}
 
 ```js
 window.addEventListener('message', event => {
-    const { type, data } = event.data;
-    switch (type) {
-        case 'danmu':
-            console.log('弹幕', data);
+    const { cmd, info, data } = event.data;
+    switch (cmd) {
+        case 'DANMU_MSG':
+            console.log('弹幕', info);
             break;
-        case 'gift':
+        case 'SEND_GIFT':
             console.log('礼物', data);
             break;
-        case 'guard':
+        case 'GUARD_BUY':
             console.log('上船', data);
             break;
         default:
