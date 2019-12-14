@@ -60,7 +60,6 @@ class Content {
                 });
                 break;
             default:
-                console.log(msg);
                 break;
         }
     }
