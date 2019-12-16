@@ -27,8 +27,13 @@ body {
         border-bottom: 1px solid #e6e6e6;
 
         .name,
+        .autofill,
         .feedback {
             cursor: pointer;
+        }
+
+        .autofill {
+            margin-right: 5px;
         }
     }
 

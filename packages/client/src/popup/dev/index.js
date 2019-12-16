@@ -6,6 +6,7 @@ import {
     runCss,
     openTab,
     runScript,
+    removeTab,
     insertCSS,
     getStorage,
     setStorage,
@@ -24,13 +25,16 @@ import {
     REG_RTMP,
     REG_HTTP,
     REG_LIVE,
+    AUTO_FILL,
     RECORDING,
     RTMP_ERROR,
+    REG_FUNCTION,
     DANMU_OPTION,
     DEFAULT_RTMP,
     SOCKET_ERROR,
     OPEN_SUCCESS,
     CURRENT_PAGE,
+    DEFAULT_START,
     DEFAULT_SOCKET,
     PUSH_STREAM_END,
     LIVE_ROOM_ERROR,
@@ -47,6 +51,7 @@ class Popup {
         this.$container = query('.container');
         this.$name = query('.name');
         this.$feedback = query('.feedback');
+        this.$autofill = query('.autofill');
         this.$name.textContent = `${this.manifest.name} ${this.manifest.version}`;
 
         this.$rtmp = query('.rtmp');
@@ -118,27 +123,89 @@ class Popup {
             event.preventDefault();
         });
 
+        this.$autofill.addEventListener('click', () => {
+            this.autofill();
+        });
+
         this.$container.addEventListener('drop', async event => {
-            event.preventDefault();
-            const files = Array.from(event.dataTransfer.files);
-            await debug.log(INJECTED_SUCCESS + files.map(f => f.name).join(','));
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.addEventListener('load', () => {
-                    const code = reader.result;
-                    switch (file.type) {
-                        case 'text/javascript':
-                            runScript(code);
-                            break;
-                        case 'text/css':
-                            runCss(code);
-                            break;
-                        default:
-                            break;
+            this.inject(event);
+        });
+    }
+
+    async autofill() {
+        const startTab = await openTab(DEFAULT_START, false);
+        await debug.log(AUTO_FILL);
+        await sleep(3000);
+        chrome.tabs.executeScript(
+            startTab.id,
+            {
+                runAt: 'document_end',
+                code: function f() {
+                    const $roomId = document.querySelector('.room-id a');
+                    if ($roomId) {
+                        const live = `https://live.bilibili.com/${$roomId.innerText}`;
+                        document.querySelector('.category-toggle').click();
+                        setTimeout(() => {
+                            document.querySelector('.categories a').click();
+                            const $rtmp = document.querySelector('.rtmp input');
+                            const $streamname = document.querySelector('.live-code input');
+                            chrome.storage.local.get('config', result => {
+                                const config = result.config || {};
+                                if ($rtmp.value && $streamname.value) {
+                                    chrome.storage.local.set({
+                                        config: Object.assign(config, {
+                                            live,
+                                            rtmp: $rtmp.value,
+                                            streamname: $streamname.value,
+                                        }),
+                                    });
+                                } else {
+                                    document.querySelector('.live-btn').click();
+                                    setTimeout(() => {
+                                        chrome.storage.local.set({
+                                            config: Object.assign(config, {
+                                                live,
+                                                rtmp: $rtmp.value,
+                                                streamname: $streamname.value,
+                                            }),
+                                        });
+                                    }, 1000);
+                                }
+                            });
+                        }, 1000);
                     }
-                });
-                reader.readAsText(file);
+                }
+                    .toString()
+                    .match(REG_FUNCTION)[3],
+            },
+            async () => {
+                await sleep(3000);
+                await removeTab(startTab.id);
+                window.location.reload();
+            },
+        );
+    }
+
+    async inject(event) {
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files);
+        await debug.log(INJECTED_SUCCESS + files.map(f => f.name).join(','));
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                const code = reader.result;
+                switch (file.type) {
+                    case 'text/javascript':
+                        runScript(code);
+                        break;
+                    case 'text/css':
+                        runCss(code);
+                        break;
+                    default:
+                        break;
+                }
             });
+            reader.readAsText(file);
         });
     }
 
