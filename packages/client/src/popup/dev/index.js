@@ -163,17 +163,19 @@ class Popup {
                                 setTimeout(() => {
                                     const $category = document.querySelector('.categories a');
                                     $category.click();
-                                    $live.click();
                                     setTimeout(() => {
-                                        chrome.storage.local.set({
-                                            config: Object.assign(config, {
-                                                live,
-                                                rtmp: $rtmp.value,
-                                                streamname: $streamname.value,
-                                            }),
-                                        });
-                                    }, 1000);
-                                }, 1000);
+                                        $live.click();
+                                        setTimeout(() => {
+                                            chrome.storage.local.set({
+                                                config: Object.assign(config, {
+                                                    live,
+                                                    rtmp: $rtmp.value,
+                                                    streamname: $streamname.value,
+                                                }),
+                                            });
+                                        }, 500);
+                                    }, 500);
+                                }, 500);
                             }
                         });
                     }
@@ -182,7 +184,7 @@ class Popup {
                     .match(REG_FUNCTION)[3],
             },
             async () => {
-                await sleep(3000);
+                await sleep(2000);
                 await removeTab(startTab.id);
                 window.location.reload();
             },
