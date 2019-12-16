@@ -803,7 +803,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }
 	}
 
-	var objToString_1 = objToString;
+	var _objToString_1_0_1_objToString = objToString;
 
 	var START = 'start';
 	var STOP = 'stop';
@@ -823,8 +823,6 @@ var BilibiliLiveHimePopup = (function () {
 	var PUSH_STREAM_END = '已停止推流...';
 	var INJECTED_SUCCESS = '注入文件：';
 	var AUTO_FILL = '正在自动获取直播配置，请勿关闭此弹窗...';
-	var DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
-	var DEFAULT_START = 'https://link.bilibili.com/p/center/index#/my-room/start-live';
 	var DEFAULT_SOCKET = 'http://localhost:8080';
 	var DEFAULT_RESOLUTION = 720;
 	var DEFAULT_VIDEO_BITSPER = 2500000;
@@ -930,7 +928,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context.t0;
 	            logs.push({
 	              type: LOG,
-	              data: objToString_1(msg)
+	              data: _objToString_1_0_1_objToString(msg)
 	            });
 	            _context.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -965,7 +963,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context2.t0;
 	            logs.push({
 	              type: ERROR,
-	              data: objToString_1(msg)
+	              data: _objToString_1_0_1_objToString(msg)
 	            });
 	            _context2.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -1145,24 +1143,25 @@ var BilibiliLiveHimePopup = (function () {
 	  }, {
 	    key: "autofill",
 	    value: function autofill() {
-	      var startTab;
+	      var url, startTab;
 	      return regenerator.async(function autofill$(_context4) {
 	        while (1) {
 	          switch (_context4.prev = _context4.next) {
 	            case 0:
-	              _context4.next = 2;
-	              return regenerator.awrap(openTab(DEFAULT_START, false));
+	              url = 'https://link.bilibili.com/p/center/index#/my-room/start-live';
+	              _context4.next = 3;
+	              return regenerator.awrap(openTab(url, false));
 
-	            case 2:
+	            case 3:
 	              startTab = _context4.sent;
-	              _context4.next = 5;
+	              _context4.next = 6;
 	              return regenerator.awrap(debug.log(AUTO_FILL));
 
-	            case 5:
-	              _context4.next = 7;
-	              return regenerator.awrap(sleep(5000));
+	            case 6:
+	              _context4.next = 8;
+	              return regenerator.awrap(sleep(3000));
 
-	            case 7:
+	            case 8:
 	              chrome.tabs.executeScript(startTab.id, {
 	                runAt: 'document_end',
 	                code: function f() {
@@ -1170,36 +1169,41 @@ var BilibiliLiveHimePopup = (function () {
 
 	                  if ($roomId) {
 	                    var live = "https://live.bilibili.com/".concat($roomId.innerText);
-	                    document.querySelector('.category-toggle').click();
-	                    setTimeout(function () {
-	                      document.querySelector('.categories a').click();
-	                      var $rtmp = document.querySelector('.rtmp input');
-	                      var $streamname = document.querySelector('.live-code input');
-	                      chrome.storage.local.get('config', function (result) {
-	                        var config = result.config || {};
+	                    var $rtmp = document.querySelector('.rtmp input');
+	                    var $streamname = document.querySelector('.live-code input');
+	                    var $toggle = document.querySelector('.category-toggle');
+	                    var $live = document.querySelector('.live-btn');
+	                    chrome.storage.local.get('config', function (result) {
+	                      var config = result.config || {};
 
-	                        if ($rtmp.value && $streamname.value) {
-	                          chrome.storage.local.set({
-	                            config: Object.assign(config, {
-	                              live: live,
-	                              rtmp: $rtmp.value,
-	                              streamname: $streamname.value
-	                            })
-	                          });
-	                        } else {
-	                          document.querySelector('.live-btn').click();
+	                      if ($rtmp.value && $streamname.value) {
+	                        chrome.storage.local.set({
+	                          config: Object.assign(config, {
+	                            live: live,
+	                            rtmp: $rtmp.value,
+	                            streamname: $streamname.value
+	                          })
+	                        });
+	                      } else {
+	                        $toggle.click();
+	                        setTimeout(function () {
+	                          var $category = document.querySelector('.categories a');
+	                          $category.click();
 	                          setTimeout(function () {
-	                            chrome.storage.local.set({
-	                              config: Object.assign(config, {
-	                                live: live,
-	                                rtmp: $rtmp.value,
-	                                streamname: $streamname.value
-	                              })
-	                            });
-	                          }, 1000);
-	                        }
-	                      });
-	                    }, 1000);
+	                            $live.click();
+	                            setTimeout(function () {
+	                              chrome.storage.local.set({
+	                                config: Object.assign(config, {
+	                                  live: live,
+	                                  rtmp: $rtmp.value,
+	                                  streamname: $streamname.value
+	                                })
+	                              });
+	                            }, 500);
+	                          }, 500);
+	                        }, 500);
+	                      }
+	                    });
 	                  }
 	                }.toString().match(REG_FUNCTION)[3]
 	              }, function _callee2() {
@@ -1208,7 +1212,7 @@ var BilibiliLiveHimePopup = (function () {
 	                    switch (_context3.prev = _context3.next) {
 	                      case 0:
 	                        _context3.next = 2;
-	                        return regenerator.awrap(sleep(3000));
+	                        return regenerator.awrap(sleep(2000));
 
 	                      case 2:
 	                        _context3.next = 4;
@@ -1225,7 +1229,7 @@ var BilibiliLiveHimePopup = (function () {
 	                });
 	              });
 
-	            case 8:
+	            case 9:
 	            case "end":
 	              return _context4.stop();
 	          }
@@ -1347,10 +1351,10 @@ var BilibiliLiveHimePopup = (function () {
 	              capturedTab = _context7.sent;
 
 	              if (config) {
-	                this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
+	                this.$rtmp.value = config.rtmp || '';
+	                this.$live.value = config.live || '';
 	                this.$streamname.value = config.streamname || '';
 	                this.$socket.value = config.socket || DEFAULT_SOCKET;
-	                this.$live.value = config.live || '';
 	                this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
 	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
 	              }

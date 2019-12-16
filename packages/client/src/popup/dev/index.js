@@ -30,11 +30,9 @@ import {
     RTMP_ERROR,
     REG_FUNCTION,
     DANMU_OPTION,
-    DEFAULT_RTMP,
     SOCKET_ERROR,
     OPEN_SUCCESS,
     CURRENT_PAGE,
-    DEFAULT_START,
     DEFAULT_SOCKET,
     PUSH_STREAM_END,
     LIVE_ROOM_ERROR,
@@ -133,7 +131,8 @@ class Popup {
     }
 
     async autofill() {
-        const startTab = await openTab(DEFAULT_START, false);
+        const url = 'https://link.bilibili.com/p/center/index#/my-room/start-live';
+        const startTab = await openTab(url, false);
         await debug.log(AUTO_FILL);
         await sleep(3000);
         chrome.tabs.executeScript(
@@ -227,10 +226,10 @@ class Popup {
         const capturedTab = await getCapturedTab();
 
         if (config) {
-            this.$rtmp.value = config.rtmp || DEFAULT_RTMP;
+            this.$rtmp.value = config.rtmp || '';
+            this.$live.value = config.live || '';
             this.$streamname.value = config.streamname || '';
             this.$socket.value = config.socket || DEFAULT_SOCKET;
-            this.$live.value = config.live || '';
             this.$resolution.value = config.resolution || DEFAULT_RESOLUTION;
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
         }

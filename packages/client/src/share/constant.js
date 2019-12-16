@@ -34,8 +34,6 @@ export const RECONNECT_INFO = '自动重连中：';
 export const INJECTED_SUCCESS = '注入文件：';
 export const AUTO_FILL = '正在自动获取直播配置，请勿关闭此弹窗...';
 
-export const DEFAULT_RTMP = 'rtmp://bvc.live-send.acg.tv/live-bvc/';
-export const DEFAULT_START = 'https://link.bilibili.com/p/center/index#/my-room/start-live';
 export const DEFAULT_SOCKET = 'http://localhost:8080';
 export const DEFAULT_RESOLUTION = 720;
 export const DEFAULT_VIDEO_BITSPER = 2500000;
