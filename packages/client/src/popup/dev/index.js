@@ -146,6 +146,8 @@ class Popup {
                         const live = `https://live.bilibili.com/${$roomId.innerText}`;
                         const $rtmp = document.querySelector('.rtmp input');
                         const $streamname = document.querySelector('.live-code input');
+                        const $toggle = document.querySelector('.category-toggle');
+                        const $live = document.querySelector('.live-btn');
                         chrome.storage.local.get('config', result => {
                             const config = result.config || {};
                             if ($rtmp.value && $streamname.value) {
@@ -157,10 +159,11 @@ class Popup {
                                     }),
                                 });
                             } else {
-                                document.querySelector('.category-toggle').click();
+                                $toggle.click();
                                 setTimeout(() => {
-                                    document.querySelector('.categories a').click();
-                                    document.querySelector('.live-btn').click();
+                                    const $category = document.querySelector('.categories a');
+                                    $category.click();
+                                    $live.click();
                                     setTimeout(() => {
                                         chrome.storage.local.set({
                                             config: Object.assign(config, {
