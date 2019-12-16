@@ -135,7 +135,7 @@ class Popup {
     async autofill() {
         const startTab = await openTab(DEFAULT_START, false);
         await debug.log(AUTO_FILL);
-        await sleep(5000);
+        await sleep(3000);
         chrome.tabs.executeScript(
             startTab.id,
             {
@@ -144,22 +144,22 @@ class Popup {
                     const $roomId = document.querySelector('.room-id a');
                     if ($roomId) {
                         const live = `https://live.bilibili.com/${$roomId.innerText}`;
-                        document.querySelector('.category-toggle').click();
-                        setTimeout(() => {
-                            document.querySelector('.categories a').click();
-                            const $rtmp = document.querySelector('.rtmp input');
-                            const $streamname = document.querySelector('.live-code input');
-                            chrome.storage.local.get('config', result => {
-                                const config = result.config || {};
-                                if ($rtmp.value && $streamname.value) {
-                                    chrome.storage.local.set({
-                                        config: Object.assign(config, {
-                                            live,
-                                            rtmp: $rtmp.value,
-                                            streamname: $streamname.value,
-                                        }),
-                                    });
-                                } else {
+                        const $rtmp = document.querySelector('.rtmp input');
+                        const $streamname = document.querySelector('.live-code input');
+                        chrome.storage.local.get('config', result => {
+                            const config = result.config || {};
+                            if ($rtmp.value && $streamname.value) {
+                                chrome.storage.local.set({
+                                    config: Object.assign(config, {
+                                        live,
+                                        rtmp: $rtmp.value,
+                                        streamname: $streamname.value,
+                                    }),
+                                });
+                            } else {
+                                document.querySelector('.category-toggle').click();
+                                setTimeout(() => {
+                                    document.querySelector('.categories a').click();
                                     document.querySelector('.live-btn').click();
                                     setTimeout(() => {
                                         chrome.storage.local.set({
@@ -170,9 +170,9 @@ class Popup {
                                             }),
                                         });
                                     }, 1000);
-                                }
-                            });
-                        }, 1000);
+                                }, 1000);
+                            }
+                        });
                     }
                 }
                     .toString()
