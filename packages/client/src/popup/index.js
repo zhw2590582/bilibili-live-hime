@@ -803,7 +803,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }
 	}
 
-	var _objToString_1_0_1_objToString = objToString;
+	var objToString_1 = objToString;
 
 	var START = 'start';
 	var STOP = 'stop';
@@ -920,7 +920,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context.t0;
 	            logs.push({
 	              type: LOG,
-	              data: _objToString_1_0_1_objToString(msg)
+	              data: objToString_1(msg)
 	            });
 	            _context.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -955,7 +955,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context2.t0;
 	            logs.push({
 	              type: ERROR,
-	              data: _objToString_1_0_1_objToString(msg)
+	              data: objToString_1(msg)
 	            });
 	            _context2.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -1235,28 +1235,35 @@ var BilibiliLiveHimePopup = (function () {
 	                this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
 	              }
 
-	              if (!(recording && capturedTab && danmu_option && config.activeTab)) {
-	                _context4.next = 26;
+	              if (!(recording && capturedTab)) {
+	                _context4.next = 27;
 	                break;
 	              }
 
-	              _context4.next = 19;
+	              if (!(danmu_option && config.activeTab)) {
+	                _context4.next = 25;
+	                break;
+	              }
+
+	              _context4.next = 20;
 	              return regenerator.awrap(injectedScript(config.activeTab, 'active/index.js'));
 
-	            case 19:
-	              _context4.next = 21;
+	            case 20:
+	              _context4.next = 22;
 	              return regenerator.awrap(insertCSS(config.activeTab, 'active/index.css'));
 
-	            case 21:
-	              _context4.next = 23;
+	            case 22:
+	              _context4.next = 24;
 	              return regenerator.awrap(sleep(100));
 
-	            case 23:
+	            case 24:
 	              sendMessageToTab(config.activeTab, danmu_option);
-	              _context4.next = 30;
+
+	            case 25:
+	              _context4.next = 31;
 	              break;
 
-	            case 26:
+	            case 27:
 	              debug.clean();
 	              setStorage(RECORDING, false);
 	              setStorage(DANMU_OPTION, false);
@@ -1264,7 +1271,7 @@ var BilibiliLiveHimePopup = (function () {
 	                type: STOP
 	              });
 
-	            case 30:
+	            case 31:
 	            case "end":
 	              return _context4.stop();
 	          }

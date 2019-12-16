@@ -1773,10 +1773,6 @@ var BilibiliLiveHimeActive = (function () {
               num: data.num
             });
             break;
-
-          default:
-            console.log(msg);
-            break;
         }
       }
     }, {

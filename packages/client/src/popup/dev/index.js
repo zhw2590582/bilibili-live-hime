@@ -163,11 +163,13 @@ class Popup {
             this.$videoBitsPerSecond.value = config.videoBitsPerSecond || DEFAULT_VIDEO_BITSPER;
         }
 
-        if (recording && capturedTab && danmu_option && config.activeTab) {
-            await injectedScript(config.activeTab, 'active/index.js');
-            await insertCSS(config.activeTab, 'active/index.css');
-            await sleep(100);
-            sendMessageToTab(config.activeTab, danmu_option);
+        if (recording && capturedTab) {
+            if (danmu_option && config.activeTab) {
+                await injectedScript(config.activeTab, 'active/index.js');
+                await insertCSS(config.activeTab, 'active/index.css');
+                await sleep(100);
+                sendMessageToTab(config.activeTab, danmu_option);
+            }
         } else {
             debug.clean();
             setStorage(RECORDING, false);
