@@ -135,7 +135,7 @@ class Popup {
     async autofill() {
         const startTab = await openTab(DEFAULT_START, false);
         await debug.log(AUTO_FILL);
-        await sleep(3000);
+        await sleep(5000);
         chrome.tabs.executeScript(
             startTab.id,
             {

@@ -1160,7 +1160,7 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 5:
 	              _context4.next = 7;
-	              return regenerator.awrap(sleep(3000));
+	              return regenerator.awrap(sleep(5000));
 
 	            case 7:
 	              chrome.tabs.executeScript(startTab.id, {
