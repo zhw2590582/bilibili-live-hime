@@ -56,14 +56,14 @@ class Background {
                         ...Background.Config,
                         ...data,
                     };
-                    this.start();
+                    await this.start();
                     break;
                 case STOP:
-                    this.stop();
+                    await this.stop();
                     break;
                 case DANMU_ERROR: {
                     if (this.config && this.config.liveTab) {
-                        removeTab(this.config.liveTab);
+                        await removeTab(this.config.liveTab);
                         await debug.err(DANMU_FAIL);
                     }
                     break;
@@ -73,9 +73,9 @@ class Background {
                         const { activeTab, liveTab } = this.config;
                         const { tab } = sender;
                         if (activeTab && liveTab && tab && liveTab === tab.id) {
-                            setStorage(DANMU_OPTION, request);
+                            await setStorage(DANMU_OPTION, request);
                             sendMessageToTab(activeTab, request);
-                            removeTab(liveTab);
+                            await removeTab(liveTab);
                             await debug.log(DANMU_SUCCESS);
                         }
                     }
@@ -88,9 +88,9 @@ class Background {
         storageChange(async changes => {
             if (changes[RECORDING]) {
                 if (changes[RECORDING].newValue) {
-                    setBadge('ON');
+                    await setBadge('ON');
                 } else {
-                    setBadge('');
+                    await setBadge('');
                 }
             }
         });
@@ -274,13 +274,14 @@ class Background {
         }
 
         await debug.log(PUSH_STREAM_ING);
+        await setStorage(RECORDING, true);
     }
 
     async stop() {
         this.reconnect = 0;
-        setStorage(RECORDING, false);
-        setStorage(DANMU_OPTION, false);
         this.config = Background.Config;
+        await setStorage(RECORDING, false);
+        await setStorage(DANMU_OPTION, false);
 
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());

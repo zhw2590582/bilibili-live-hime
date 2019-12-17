@@ -1283,18 +1283,16 @@ var BilibiliLiveHimePopup = (function () {
 	              sendMessageToTab(config.activeTab, danmu_option);
 
 	            case 25:
-	              _context5.next = 31;
+	              _context5.next = 29;
 	              break;
 
 	            case 27:
 	              debug.clean();
-	              setStorage(RECORDING, false);
-	              setStorage(DANMU_OPTION, false);
 	              sendMessage({
 	                type: STOP
 	              });
 
-	            case 31:
+	            case 29:
 	            case "end":
 	              return _context5.stop();
 	          }
@@ -1496,24 +1494,15 @@ var BilibiliLiveHimePopup = (function () {
 
 	            case 41:
 	              _context8.next = 43;
-	              return regenerator.awrap(setStorage(RECORDING, true));
-
-	            case 43:
-	              _context8.next = 45;
 	              return regenerator.awrap(setStorage(CONFIG, config));
 
-	            case 45:
+	            case 43:
 	              sendMessage({
 	                type: START,
 	                data: config
 	              });
-	              _context8.next = 48;
-	              return regenerator.awrap(sleep(1000));
 
-	            case 48:
-	              window.location.reload();
-
-	            case 49:
+	            case 44:
 	            case "end":
 	              return _context8.stop();
 	          }
@@ -1527,15 +1516,15 @@ var BilibiliLiveHimePopup = (function () {
 	        while (1) {
 	          switch (_context9.prev = _context9.next) {
 	            case 0:
+	              _context9.next = 2;
+	              return regenerator.awrap(debug.log(PUSH_STREAM_END));
+
+	            case 2:
 	              sendMessage({
 	                type: STOP
 	              });
-	              setStorage(RECORDING, false);
-	              setStorage(DANMU_OPTION, false);
-	              _context9.next = 5;
-	              return regenerator.awrap(debug.log(PUSH_STREAM_END));
 
-	            case 5:
+	            case 3:
 	            case "end":
 	              return _context9.stop();
 	          }

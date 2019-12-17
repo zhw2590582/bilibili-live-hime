@@ -185,8 +185,6 @@ class Popup {
             }
         } else {
             debug.clean();
-            setStorage(RECORDING, false);
-            setStorage(DANMU_OPTION, false);
             sendMessage({
                 type: STOP,
             });
@@ -267,23 +265,18 @@ class Popup {
         }
 
         await debug.log(`${CURRENT_PAGE}：${activeTab.title}`);
-        await setStorage(RECORDING, true);
         await setStorage(CONFIG, config);
         sendMessage({
             type: START,
             data: config,
         });
-        await sleep(1000);
-        window.location.reload();
     }
 
     async stop() {
+        await debug.log(PUSH_STREAM_END);
         sendMessage({
             type: STOP,
         });
-        setStorage(RECORDING, false);
-        setStorage(DANMU_OPTION, false);
-        await debug.log(PUSH_STREAM_END);
     }
 }
 
