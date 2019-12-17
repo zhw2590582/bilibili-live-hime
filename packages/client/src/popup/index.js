@@ -1452,7 +1452,7 @@ var BilibiliLiveHimePopup = (function () {
 	              return _context8.abrupt("return");
 
 	            case 20:
-	              if (!REG_LIVE.test(config.live)) {
+	              if (!(config.live && REG_LIVE.test(config.live))) {
 	                _context8.next = 37;
 	                break;
 	              }
@@ -1507,8 +1507,13 @@ var BilibiliLiveHimePopup = (function () {
 	                type: START,
 	                data: config
 	              });
+	              _context8.next = 48;
+	              return regenerator.awrap(sleep(1000));
 
-	            case 46:
+	            case 48:
+	              window.location.reload();
+
+	            case 49:
 	            case "end":
 	              return _context8.stop();
 	          }

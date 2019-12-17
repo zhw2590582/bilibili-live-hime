@@ -254,7 +254,7 @@ class Popup {
             return;
         }
 
-        if (REG_LIVE.test(config.live)) {
+        if (config.live && REG_LIVE.test(config.live)) {
             await injectedScript(config.activeTab, 'active/index.js');
             await insertCSS(config.activeTab, 'active/index.css');
             await sleep(100);
@@ -273,6 +273,8 @@ class Popup {
             type: START,
             data: config,
         });
+        await sleep(1000);
+        window.location.reload();
     }
 
     async stop() {
