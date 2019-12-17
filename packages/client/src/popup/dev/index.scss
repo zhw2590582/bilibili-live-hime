@@ -27,13 +27,8 @@ body {
         border-bottom: 1px solid #e6e6e6;
 
         .name,
-        .autofill,
         .feedback {
             cursor: pointer;
-        }
-
-        .autofill {
-            margin-right: 5px;
         }
     }
 
@@ -46,6 +41,11 @@ body {
             margin-bottom: 10px;
             .key {
                 margin-bottom: 5px;
+
+                .setting {
+                    color: #4fc1e9;
+                    cursor: pointer;
+                }
             }
             .value {
                 input,

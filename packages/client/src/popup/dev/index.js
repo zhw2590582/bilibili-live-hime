@@ -6,7 +6,6 @@ import {
     runCss,
     openTab,
     runScript,
-    removeTab,
     insertCSS,
     getStorage,
     setStorage,
@@ -25,10 +24,8 @@ import {
     REG_RTMP,
     REG_HTTP,
     REG_LIVE,
-    AUTO_FILL,
     RECORDING,
     RTMP_ERROR,
-    REG_FUNCTION,
     DANMU_OPTION,
     SOCKET_ERROR,
     OPEN_SUCCESS,
@@ -49,7 +46,8 @@ class Popup {
         this.$container = query('.container');
         this.$name = query('.name');
         this.$feedback = query('.feedback');
-        this.$autofill = query('.autofill');
+        this.$liveSetting = query('.liveSetting');
+        this.$socketSetting = query('.socketSetting');
         this.$name.textContent = `${this.manifest.name} ${this.manifest.version}`;
 
         this.$rtmp = query('.rtmp');
@@ -83,6 +81,14 @@ class Popup {
 
         this.$feedback.addEventListener('click', () => {
             openTab('https://github.com/zhw2590582/bilibili-live-hime');
+        });
+
+        this.$liveSetting.addEventListener('click', () => {
+            openTab('https://link.bilibili.com/p/center/index#/my-room/start-live');
+        });
+
+        this.$socketSetting.addEventListener('click', () => {
+            openTab('https://github.com/zhw2590582/bilibili-live-hime#%E6%9C%8D%E5%8A%A1%E7%AB%AF');
         });
 
         this.$rtmp.addEventListener('input', () => {
@@ -121,73 +127,9 @@ class Popup {
             event.preventDefault();
         });
 
-        this.$autofill.addEventListener('click', () => {
-            this.autofill();
-        });
-
         this.$container.addEventListener('drop', async event => {
             this.inject(event);
         });
-    }
-
-    async autofill() {
-        const url = 'https://link.bilibili.com/p/center/index#/my-room/start-live';
-        const startTab = await openTab(url, false);
-        await debug.log(AUTO_FILL);
-        await sleep(3000);
-        chrome.tabs.executeScript(
-            startTab.id,
-            {
-                runAt: 'document_end',
-                code: function f() {
-                    const $roomId = document.querySelector('.room-id a');
-                    if ($roomId) {
-                        const live = `https://live.bilibili.com/${$roomId.innerText}`;
-                        const $rtmp = document.querySelector('.rtmp input');
-                        const $streamname = document.querySelector('.live-code input');
-                        const $toggle = document.querySelector('.category-toggle');
-                        const $live = document.querySelector('.live-btn');
-                        chrome.storage.local.get('config', result => {
-                            const config = result.config || {};
-                            if ($rtmp.value && $streamname.value) {
-                                chrome.storage.local.set({
-                                    config: Object.assign(config, {
-                                        live,
-                                        rtmp: $rtmp.value,
-                                        streamname: $streamname.value,
-                                    }),
-                                });
-                            } else {
-                                $toggle.click();
-                                setTimeout(() => {
-                                    const $category = document.querySelector('.categories a');
-                                    $category.click();
-                                    setTimeout(() => {
-                                        $live.click();
-                                        setTimeout(() => {
-                                            chrome.storage.local.set({
-                                                config: Object.assign(config, {
-                                                    live,
-                                                    rtmp: $rtmp.value,
-                                                    streamname: $streamname.value,
-                                                }),
-                                            });
-                                        }, 500);
-                                    }, 500);
-                                }, 500);
-                            }
-                        });
-                    }
-                }
-                    .toString()
-                    .match(REG_FUNCTION)[3],
-            },
-            async () => {
-                await sleep(2000);
-                await removeTab(startTab.id);
-                window.location.reload();
-            },
-        );
     }
 
     async inject(event) {

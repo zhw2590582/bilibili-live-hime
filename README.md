@@ -31,16 +31,16 @@
 npm i bilibili-live-hime-server
 ```
 
-进入代码目录运行服务端，默认端口`8080`，默认中转地址就是`http://localhost:8080`：
+进入代码目录，假如不是通过`npm`获取的话，还需要安装依赖：
+
+```bash
+npm install
+```
+
+运行服务端，默认端口`8080`，默认中转地址就是`http://localhost:8080`：
 
 ```bash
 npm start
-```
-
-也可以指定端口：
-
-```bash
-npm start 3000
 ```
 
 ## 使用

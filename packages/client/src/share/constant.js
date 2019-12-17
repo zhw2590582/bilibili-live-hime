@@ -32,7 +32,6 @@ export const CURRENT_PAGE = '当前页面';
 export const PUSH_STREAM_END = '已停止推流...';
 export const RECONNECT_INFO = '自动重连中：';
 export const INJECTED_SUCCESS = '注入文件：';
-export const AUTO_FILL = '正在自动获取直播配置，请勿关闭此弹窗...';
 
 export const DEFAULT_SOCKET = 'http://localhost:8080';
 export const DEFAULT_RESOLUTION = 720;
