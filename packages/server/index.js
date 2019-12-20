@@ -5,14 +5,24 @@ const FFmpeg = require('./FFmpeg');
 console.log(`中转地址：http://localhost:${port}`);
 
 io.on('connection', function(socket) {
-    // 来自浏览器：开启ffmpeg进程
+    // 来自浏览器：开启进程
     socket.on('rtmp', rtmp => {
-        const ffmpeg = FFmpeg.getInstance(socket) || new FFmpeg(rtmp, socket);
+        // 销毁旧的重复进程
+        const ffmpeg_old = FFmpeg.getInstance(socket);
+        if (ffmpeg_old) {
+            ffmpeg_old.destroy();
+            socket.emit('log', '销毁旧的重复FFmpeg进程');
+        }
 
-        ffmpeg.close(code => {
+        // 创建新进程
+        const ffmpeg = new FFmpeg(rtmp, socket);
+
+        // 进程关闭时
+        ffmpeg.onClose(code => {
+            // 每次关闭都销毁进程
             ffmpeg.destroy();
 
-            const msg = 'FFmpeg进程退出：' + code;
+            const msg = 'FFmpeg进程退出码：' + code;
 
             // 告知浏览器：重连
             socket.emit('reconnect', msg);
@@ -46,13 +56,19 @@ io.on('connection', function(socket) {
 
     socket.on('error', error => {
         console.log(error);
+        const ffmpeg = FFmpeg.getInstance(socket);
+        if (ffmpeg) {
+            ffmpeg.destroy();
+        }
     });
 });
 
 io.on('error', error => {
+    FFmpeg.instances.forEach(item => item.destroy());
     console.log(error);
 });
 
 process.on('uncaughtException', error => {
+    FFmpeg.instances.forEach(item => item.destroy());
     console.log(error);
 });

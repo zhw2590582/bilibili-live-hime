@@ -37,7 +37,7 @@ class FFmpeg {
         }
     }
 
-    close(callback) {
+    onClose(callback) {
         if (this.ff) {
             this.ff.on('close', callback);
         }
