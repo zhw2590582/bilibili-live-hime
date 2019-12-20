@@ -4,14 +4,14 @@ const FFmpeg = require('./FFmpeg');
 
 console.log(`中转地址：http://localhost:${port}`);
 
-io.on('connection', function(socket) {
+io.on('connection', socket => {
     // 来自浏览器：开启进程
     socket.on('rtmp', rtmp => {
         // 销毁旧的重复进程
         const ffmpeg_old = FFmpeg.getInstance(socket);
         if (ffmpeg_old) {
             ffmpeg_old.destroy();
-            socket.emit('log', '销毁旧的重复FFmpeg进程');
+            socket.emit('log', `销毁旧的重复FFmpeg进程: ${FFmpeg.instances.size}`);
         }
 
         // 创建新进程
