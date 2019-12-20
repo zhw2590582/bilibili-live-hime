@@ -1,6 +1,6 @@
 {
   "name": "bilibili-live-hime-server",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "哔哩哔哩直播姬 Chrome 扩展服务端",
   "homepage": "https://github.com/zhw2590582/bilibili-live-hime",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
-    "nodemon": "^2.0.1",
+    "nodemon": "^2.0.2",
     "socket.io": "^2.3.0"
   }
 }
