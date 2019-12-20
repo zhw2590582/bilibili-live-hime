@@ -1,6 +1,5 @@
 import './index.scss';
 import {
-    sleep,
     debug,
     query,
     runCss,
@@ -180,7 +179,6 @@ class Popup {
             if (danmu_option && config.activeTab) {
                 await injectedScript(config.activeTab, 'active/index.js');
                 await insertCSS(config.activeTab, 'active/index.css');
-                await sleep(100);
                 sendMessageToTab(config.activeTab, danmu_option);
             }
         } else {
@@ -256,11 +254,9 @@ class Popup {
             if (REG_LIVE.test(config.live)) {
                 await injectedScript(config.activeTab, 'active/index.js');
                 await insertCSS(config.activeTab, 'active/index.css');
-                await sleep(100);
                 const liveTab = await openTab(config.live, false);
                 config.liveTab = liveTab.id;
                 await debug.log(OPEN_SUCCESS);
-                await injectedScript(config.liveTab, 'danmu/index.js');
             } else {
                 await debug.err(LIVE_ROOM_ERROR);
                 return;

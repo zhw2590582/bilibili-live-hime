@@ -9,6 +9,7 @@ import {
     setStorage,
     getStorage,
     storageChange,
+    injectedScript,
     sendMessageToTab,
 } from '../../share';
 import {
@@ -208,7 +209,11 @@ class Background {
     }
 
     async start() {
-        const { socket, rtmp, streamname, resolution, videoBitsPerSecond } = this.config;
+        const { socket, rtmp, liveTab, streamname, resolution, videoBitsPerSecond } = this.config;
+
+        if (liveTab) {
+            await injectedScript(liveTab, 'danmu/index.js');
+        }
 
         try {
             const rtmpFullUrl = rtmp + streamname;
