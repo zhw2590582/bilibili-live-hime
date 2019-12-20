@@ -21,7 +21,7 @@
 -   [在线 chrome 网上应用商店](https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag)
 -   [代码目录 packages/client](./packages/client)
 
-**目前 chrome 网上应用商店审核周期大概是一周时间，所以商店的版本和开发的版本不同步，想体验最新功能的话，推荐本地离线安装本扩展**
+**注意：目前 chrome 网上应用商店审核周期大概是一周时间，所以商店的版本和开发的版本不同步，想体验最新功能的话，推荐本地离线安装本扩展**
 
 -   [离线安装 packages/client/dist](https://github.com/zhw2590582/bilibili-live-hime/tree/master/packages/client/dist)
 
@@ -45,6 +45,12 @@ npm install
 
 ```bash
 npm start
+```
+
+假如是部署到服务器的话，中转地址就是`http://[公网IP]:8080`，或者也可以使用自定义端口：
+
+```bash
+npm start 8081
 ```
 
 ## 使用
@@ -75,7 +81,7 @@ rtmp://***/{直播码}
 
 ## 弹幕
 
-假如你有填写`B站直播间地址`的话，默认就会生成一个动态简单的弹幕姬，你也可以自定义弹幕行为，只要你的页面有类似下面的代码就能接收到弹幕：
+假如你有填写`直播间地址`的话，默认就会生成一个动态简单的弹幕姬，你也可以自定义弹幕行为，只要你的`被直播页面`有类似下面的代码就能接收到弹幕：
 
 ```js
 window.addEventListener('message', event => {
