@@ -21,7 +21,7 @@
 -   [在线 chrome 网上应用商店](https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag)
 -   [代码目录 packages/client](./packages/client)
 
-**目前谷歌商店审核需要一周时间，所以最新版本会和开发版本不同步，想体验最新功能的话，推荐本地安装扩展**
+**目前 chrome 网上应用商店审核周期大概是一周时间，所以商店的版本和开发的版本不同步，想体验最新功能的话，推荐本地离线安装本扩展**
 
 -   [离线安装 packages/client/dist](https://github.com/zhw2590582/bilibili-live-hime/tree/master/packages/client/dist)
 
