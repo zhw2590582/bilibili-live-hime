@@ -1,5 +1,5 @@
 /*!
- * bilibili-live-hime v1.0.2
+ * bilibili-live-hime v1.0.3
  * Github: https://github.com/zhw2590582/bilibili-live-hime
  * (c) 2018-2019 Harvey Zack
  * Released under the MIT License.

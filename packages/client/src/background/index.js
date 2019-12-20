@@ -893,6 +893,7 @@ var BilibiliLiveHimeBackground = (function () {
 	var RECORDER_SUCCESS = '录制器启动成功';
 	var RECORDER_FAIL = '无法录制标签的视频流，请重试！';
 	var PUSH_STREAM_ING = '正在推流中...';
+	var DANMU_ING = '正在获取弹幕接口...';
 	var DANMU_SUCCESS = '获取弹幕接口成功';
 	var DANMU_FAIL = '获取弹幕接口失败';
 	var RECONNECT_INFO = '自动重连中：';
@@ -1048,6 +1049,16 @@ var BilibiliLiveHimeBackground = (function () {
 	      }, function () {
 	        resolve();
 	      });
+	    });
+	  });
+	}
+	function injectedScript(tabId, file) {
+	  return new Promise(function (resolve) {
+	    chrome.tabs.executeScript(tabId, {
+	      file: file,
+	      runAt: 'document_start'
+	    }, function () {
+	      resolve();
 	    });
 	  });
 	}
@@ -1238,24 +1249,38 @@ var BilibiliLiveHimeBackground = (function () {
 	    value: function start() {
 	      var _this2 = this;
 
-	      var _this$config2, socket, rtmp, streamname, resolution, videoBitsPerSecond, rtmpFullUrl;
+	      var _this$config2, socket, rtmp, liveTab, streamname, resolution, videoBitsPerSecond, rtmpFullUrl;
 
 	      return regenerator.async(function start$(_context6) {
 	        while (1) {
 	          switch (_context6.prev = _context6.next) {
 	            case 0:
-	              _this$config2 = this.config, socket = _this$config2.socket, rtmp = _this$config2.rtmp, streamname = _this$config2.streamname, resolution = _this$config2.resolution, videoBitsPerSecond = _this$config2.videoBitsPerSecond;
-	              _context6.prev = 1;
+	              _this$config2 = this.config, socket = _this$config2.socket, rtmp = _this$config2.rtmp, liveTab = _this$config2.liveTab, streamname = _this$config2.streamname, resolution = _this$config2.resolution, videoBitsPerSecond = _this$config2.videoBitsPerSecond;
+
+	              if (!liveTab) {
+	                _context6.next = 6;
+	                break;
+	              }
+
+	              _context6.next = 4;
+	              return regenerator.awrap(debug.log(DANMU_ING));
+
+	            case 4:
+	              _context6.next = 6;
+	              return regenerator.awrap(injectedScript(liveTab, 'danmu/index.js'));
+
+	            case 6:
+	              _context6.prev = 6;
 	              rtmpFullUrl = rtmp + streamname;
-	              _context6.next = 5;
+	              _context6.next = 10;
 	              return regenerator.awrap(this.connectSocket(socket));
 
-	            case 5:
+	            case 10:
 	              this.socket = _context6.sent;
-	              _context6.next = 8;
+	              _context6.next = 13;
 	              return regenerator.awrap(debug.log(SOCKET_SUCCESS));
 
-	            case 8:
+	            case 13:
 	              // 告知服务器命令：开启ffmpeg进程
 	              this.socket.emit(RTMP, rtmpFullUrl); // 来自服务器命令：打印
 
@@ -1360,60 +1385,60 @@ var BilibiliLiveHimeBackground = (function () {
 	                  }
 	                });
 	              });
-	              _context6.next = 21;
+	              _context6.next = 26;
 	              break;
 
-	            case 14:
-	              _context6.prev = 14;
-	              _context6.t0 = _context6["catch"](1);
-	              _context6.next = 18;
+	            case 19:
+	              _context6.prev = 19;
+	              _context6.t0 = _context6["catch"](6);
+	              _context6.next = 23;
 	              return regenerator.awrap(debug.err("".concat(SOCKET_FAIL, ": ").concat(_context6.t0.message.trim())));
 
-	            case 18:
-	              _context6.next = 20;
+	            case 23:
+	              _context6.next = 25;
 	              return regenerator.awrap(this.stop());
 
-	            case 20:
+	            case 25:
 	              return _context6.abrupt("return");
 
-	            case 21:
-	              _context6.prev = 21;
-	              _context6.next = 24;
+	            case 26:
+	              _context6.prev = 26;
+	              _context6.next = 29;
 	              return regenerator.awrap(this.tabCapture(resolution));
 
-	            case 24:
+	            case 29:
 	              this.stream = _context6.sent;
-	              _context6.next = 27;
+	              _context6.next = 32;
 	              return regenerator.awrap(debug.log(TAB_VIDEO_STREAM_SUCCESS));
 
-	            case 27:
-	              _context6.next = 36;
+	            case 32:
+	              _context6.next = 41;
 	              break;
 
-	            case 29:
-	              _context6.prev = 29;
-	              _context6.t1 = _context6["catch"](21);
-	              _context6.next = 33;
+	            case 34:
+	              _context6.prev = 34;
+	              _context6.t1 = _context6["catch"](26);
+	              _context6.next = 38;
 	              return regenerator.awrap(debug.err(TAB_VIDEO_STREAM_FAIL));
 
-	            case 33:
-	              _context6.next = 35;
+	            case 38:
+	              _context6.next = 40;
 	              return regenerator.awrap(this.stop());
 
-	            case 35:
+	            case 40:
 	              return _context6.abrupt("return");
 
-	            case 36:
-	              _context6.prev = 36;
-	              _context6.next = 39;
+	            case 41:
+	              _context6.prev = 41;
+	              _context6.next = 44;
 	              return regenerator.awrap(this.recorder(this.stream, videoBitsPerSecond));
 
-	            case 39:
+	            case 44:
 	              this.mediaRecorder = _context6.sent;
-	              _context6.next = 42;
+	              _context6.next = 47;
 	              return regenerator.awrap(debug.log(RECORDER_SUCCESS));
 
-	            case 42:
+	            case 47:
 	              this.mediaRecorder.ondataavailable = function (event) {
 	                if (event.data && event.data.size > 0) {
 	                  // 告知服务器命令：推流
@@ -1422,33 +1447,33 @@ var BilibiliLiveHimeBackground = (function () {
 	              };
 
 	              this.mediaRecorder.start(1000);
-	              _context6.next = 52;
+	              _context6.next = 57;
 	              break;
 
-	            case 46:
-	              _context6.prev = 46;
-	              _context6.t2 = _context6["catch"](36);
-	              _context6.next = 50;
+	            case 51:
+	              _context6.prev = 51;
+	              _context6.t2 = _context6["catch"](41);
+	              _context6.next = 55;
 	              return regenerator.awrap(debug.err(RECORDER_FAIL));
 
-	            case 50:
-	              _context6.next = 52;
+	            case 55:
+	              _context6.next = 57;
 	              return regenerator.awrap(this.stop());
 
-	            case 52:
-	              _context6.next = 54;
+	            case 57:
+	              _context6.next = 59;
 	              return regenerator.awrap(debug.log(PUSH_STREAM_ING));
 
-	            case 54:
-	              _context6.next = 56;
+	            case 59:
+	              _context6.next = 61;
 	              return regenerator.awrap(setStorage(RECORDING, true));
 
-	            case 56:
+	            case 61:
 	            case "end":
 	              return _context6.stop();
 	          }
 	        }
-	      }, null, this, [[1, 14], [21, 29], [36, 46]]);
+	      }, null, this, [[6, 19], [26, 34], [41, 51]]);
 	    }
 	  }, {
 	    key: "stop",

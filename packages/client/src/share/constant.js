@@ -26,6 +26,7 @@ export const STREAM_NAME_ERROR = '请输入正确的直播码';
 export const SOCKET_ERROR = '请输入正确的中转地址';
 export const LIVE_ROOM_ERROR = '不是有效的 Bilibili 直播间地址';
 export const OPEN_SUCCESS = '打开直播间页面成功';
+export const DANMU_ING = '正在获取弹幕接口...';
 export const DANMU_SUCCESS = '获取弹幕接口成功';
 export const DANMU_FAIL = '获取弹幕接口失败';
 export const CURRENT_PAGE = '当前页面';

@@ -18,6 +18,7 @@ import {
     RTMP,
     STOP,
     START,
+    DANMU_ING,
     MIME_TYPE,
     RECORDING,
     RECONNECT,
@@ -212,6 +213,7 @@ class Background {
         const { socket, rtmp, liveTab, streamname, resolution, videoBitsPerSecond } = this.config;
 
         if (liveTab) {
+            await debug.log(DANMU_ING);
             await injectedScript(liveTab, 'danmu/index.js');
         }
 

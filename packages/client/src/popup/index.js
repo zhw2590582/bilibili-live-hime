@@ -829,12 +829,6 @@ var BilibiliLiveHimePopup = (function () {
 	var REG_HTTP = /^https?:\/\/.+/i;
 	var REG_LIVE = /^https?:\/\/live\.bilibili\.com/i;
 
-	function sleep() {
-	  var ms = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-	  return new Promise(function (resolve) {
-	    return setTimeout(resolve, ms);
-	  });
-	}
 	function query(el) {
 	  var doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
 	  return doc.querySelector(el);
@@ -1259,12 +1253,12 @@ var BilibiliLiveHimePopup = (function () {
 	              }
 
 	              if (!(recording && capturedTab)) {
-	                _context5.next = 27;
+	                _context5.next = 25;
 	                break;
 	              }
 
 	              if (!(danmu_option && config.activeTab)) {
-	                _context5.next = 25;
+	                _context5.next = 23;
 	                break;
 	              }
 
@@ -1276,23 +1270,19 @@ var BilibiliLiveHimePopup = (function () {
 	              return regenerator.awrap(insertCSS(config.activeTab, 'active/index.css'));
 
 	            case 22:
-	              _context5.next = 24;
-	              return regenerator.awrap(sleep(100));
-
-	            case 24:
 	              sendMessageToTab(config.activeTab, danmu_option);
 
-	            case 25:
-	              _context5.next = 29;
+	            case 23:
+	              _context5.next = 27;
 	              break;
 
-	            case 27:
+	            case 25:
 	              debug.clean();
 	              sendMessage({
 	                type: STOP
 	              });
 
-	            case 29:
+	            case 27:
 	            case "end":
 	              return _context5.stop();
 	          }
@@ -1450,59 +1440,59 @@ var BilibiliLiveHimePopup = (function () {
 	              return _context8.abrupt("return");
 
 	            case 20:
-	              if (!(config.live && REG_LIVE.test(config.live))) {
+	              if (!config.live) {
 	                _context8.next = 37;
 	                break;
 	              }
 
-	              _context8.next = 23;
+	              if (!REG_LIVE.test(config.live)) {
+	                _context8.next = 34;
+	                break;
+	              }
+
+	              _context8.next = 24;
 	              return regenerator.awrap(injectedScript(config.activeTab, 'active/index.js'));
 
-	            case 23:
-	              _context8.next = 25;
+	            case 24:
+	              _context8.next = 26;
 	              return regenerator.awrap(insertCSS(config.activeTab, 'active/index.css'));
 
-	            case 25:
-	              _context8.next = 27;
-	              return regenerator.awrap(sleep(100));
-
-	            case 27:
-	              _context8.next = 29;
+	            case 26:
+	              _context8.next = 28;
 	              return regenerator.awrap(openTab(config.live, false));
 
-	            case 29:
+	            case 28:
 	              liveTab = _context8.sent;
 	              config.liveTab = liveTab.id;
-	              _context8.next = 33;
+	              _context8.next = 32;
 	              return regenerator.awrap(debug.log(OPEN_SUCCESS));
 
-	            case 33:
-	              _context8.next = 35;
-	              return regenerator.awrap(injectedScript(config.liveTab, 'danmu/index.js'));
-
-	            case 35:
-	              _context8.next = 39;
+	            case 32:
+	              _context8.next = 37;
 	              break;
+
+	            case 34:
+	              _context8.next = 36;
+	              return regenerator.awrap(debug.err(LIVE_ROOM_ERROR));
+
+	            case 36:
+	              return _context8.abrupt("return");
 
 	            case 37:
 	              _context8.next = 39;
-	              return regenerator.awrap(debug.err(LIVE_ROOM_ERROR));
+	              return regenerator.awrap(debug.log("".concat(CURRENT_PAGE, "\uFF1A").concat(activeTab.title)));
 
 	            case 39:
 	              _context8.next = 41;
-	              return regenerator.awrap(debug.log("".concat(CURRENT_PAGE, "\uFF1A").concat(activeTab.title)));
-
-	            case 41:
-	              _context8.next = 43;
 	              return regenerator.awrap(setStorage(CONFIG, config));
 
-	            case 43:
+	            case 41:
 	              sendMessage({
 	                type: START,
 	                data: config
 	              });
 
-	            case 44:
+	            case 42:
 	            case "end":
 	              return _context8.stop();
 	          }
