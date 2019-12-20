@@ -271,7 +271,7 @@ class Background {
             this.mediaRecorder.ondataavailable = event => {
                 if (event.data && event.data.size > 0) {
                     // 告知服务器命令：推流
-                    this.socket.emit(BINARY_STREAM, event.data);
+                    this.socket.emit(BINARY_STREAM, event.data, rtmp);
                 }
             };
             this.mediaRecorder.start(1000);
