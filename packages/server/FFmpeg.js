@@ -45,8 +45,10 @@ class FFmpeg {
 
     destroy() {
         if (this.ff) {
-            this.ff.stdin.end();
-            this.ff.kill('SIGINT');
+            try {
+                this.ff.stdin.end();
+                this.ff.kill('SIGINT');
+            } catch (error) {}
             this.ff = null;
         }
         FFmpeg.instances.delete(this.socket);

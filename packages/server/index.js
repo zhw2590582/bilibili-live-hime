@@ -64,11 +64,11 @@ io.on('connection', socket => {
 });
 
 io.on('error', error => {
-    FFmpeg.instances.forEach(item => item.destroy());
     console.log(error);
+    FFmpeg.instances.forEach(item => item.destroy());
 });
 
 process.on('uncaughtException', error => {
-    FFmpeg.instances.forEach(item => item.destroy());
     console.log(error);
+    FFmpeg.instances.forEach(item => item.destroy());
 });
