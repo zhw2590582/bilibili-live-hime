@@ -1773,6 +1773,12 @@ var BilibiliLiveHimeActive = (function () {
               num: data.num
             });
             break;
+
+          case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
+            this.$version.style.display = 'none';
+            this.$roomid.innerText = "\u623F\u95F4\uFF1A".concat(data.roomid);
+            this.$fans.innerText = "\u4EBA\u6C14\uFF1A".concat(data.fans);
+            break;
         }
       }
     }, {
@@ -1781,15 +1787,18 @@ var BilibiliLiveHimeActive = (function () {
         this.manifest = chrome.runtime.getManifest();
         this.$danmuku = document.createElement('div');
         this.$danmuku.classList.add('blh-danmuku');
-        this.$danmuku.innerHTML = "\n            <div class=\"blh-header\">\n                <div class=\"blh-header-l\"></div>\n                <div class=\"blh-header-r\">\xD7</div>\n            </div>\n            <div class=\"blh-danmu\">\n                <div class=\"blh-danmu-inner\"></div>\n            </div>\n            <div class=\"blh-gift\">\n                <div class=\"blh-gift-inner\"></div>\n            </div>\n            <div class=\"blh-footer\"></div>\n        ";
+        this.$danmuku.innerHTML = "\n            <div class=\"blh-header\">\n                <div class=\"blh-header-l\">\n                    <span class=\"blh-version\"></span>\n                    <span class=\"blh-roomid\"></span>\n                    <span class=\"blh-fans\"></span>\n                </div>\n                <div class=\"blh-header-r\">\xD7</div>\n            </div>\n            <div class=\"blh-danmu\">\n                <div class=\"blh-danmu-inner\"></div>\n            </div>\n            <div class=\"blh-gift\">\n                <div class=\"blh-gift-inner\"></div>\n            </div>\n            <div class=\"blh-footer\"></div>\n        ";
         this.$headL = query('.blh-header-l', this.$danmuku);
+        this.$version = query('.blh-version', this.$danmuku);
+        this.$roomid = query('.blh-roomid', this.$danmuku);
+        this.$fans = query('.blh-fans', this.$danmuku);
         this.$headR = query('.blh-header-r', this.$danmuku);
         this.$danmu = query('.blh-danmu', this.$danmuku);
         this.$danmuInner = query('.blh-danmu-inner', this.$danmuku);
         this.$gift = query('.blh-gift', this.$danmuku);
         this.$giftInner = query('.blh-gift-inner', this.$danmuku);
         this.$footer = query('.blh-footer', this.$danmuku);
-        this.$headL.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
+        this.$version.textContent = "".concat(this.manifest.name, " ").concat(this.manifest.version);
         document.body.appendChild(this.$danmuku);
         this.$icon = document.createElement('div');
         this.$icon.classList.add('blh-danmuku-icon');

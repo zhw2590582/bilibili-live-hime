@@ -33,6 +33,11 @@
     color: #fff;
     background-color: rgba(0, 0, 0, 0.6);
 
+    @supports ((-webkit-backdrop-filter: initial) or (backdrop-filter: initial)) {
+        -webkit-backdrop-filter: saturate(180%) blur(10px);
+        backdrop-filter: saturate(180%) blur(10px);
+    }
+
     .blh-header {
         display: flex;
         height: 25px;
@@ -46,6 +51,10 @@
             cursor: move;
             padding: 0 10px;
             font-size: 13px;
+
+            .blh-roomid {
+                margin-right: 10px;
+            }
         }
 
         .blh-header-r {
