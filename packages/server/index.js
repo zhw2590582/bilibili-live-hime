@@ -11,6 +11,8 @@ io.on('connection', socket => {
         const ffmpeg_old = FFmpeg.getInstance(socket);
         if (ffmpeg_old) {
             ffmpeg_old.destroy();
+
+            // 告知浏览器：打印
             socket.emit('log', `销毁旧的重复FFmpeg进程: ${FFmpeg.instances.size}`);
         }
 
@@ -19,18 +21,18 @@ io.on('connection', socket => {
 
         // 进程关闭时
         ffmpeg.onClose(code => {
-            // 每次关闭都销毁进程
-            ffmpeg.destroy();
-
             const msg = 'FFmpeg进程退出码：' + code;
 
             // 告知浏览器：重连
             socket.emit('reconnect', msg);
 
-            // 告知浏览器：终止
+            // 告知浏览器：不重连直接终止
             // socket.emit('fail', msg);
 
             console.log(msg);
+
+            // 每次关闭都销毁进程
+            ffmpeg.destroy();
         });
 
         // 告知浏览器：打印
