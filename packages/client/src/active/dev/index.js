@@ -85,8 +85,8 @@ class Content {
                 <div class="blh-header-r">×</div>
             </div>
             <div class="blh-info">
-                <span class="blh-popular"></span>
-                <span class="blh-fans"></span>
+                <span class="blh-popular">人气：--</span>
+                <span class="blh-fans">粉丝：--</span>
             </div>
             <div class="blh-danmu">
                 <div class="blh-danmu-inner"></div>
