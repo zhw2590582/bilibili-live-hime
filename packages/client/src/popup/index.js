@@ -803,7 +803,7 @@ var BilibiliLiveHimePopup = (function () {
 	  }
 	}
 
-	var _objToString_1_0_1_objToString = objToString;
+	var objToString_1 = objToString;
 
 	var START = 'start';
 	var STOP = 'stop';
@@ -913,7 +913,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context.t0;
 	            logs.push({
 	              type: LOG,
-	              data: _objToString_1_0_1_objToString(msg)
+	              data: objToString_1(msg)
 	            });
 	            _context.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));
@@ -948,7 +948,7 @@ var BilibiliLiveHimePopup = (function () {
 	            logs = _context2.t0;
 	            logs.push({
 	              type: ERROR,
-	              data: _objToString_1_0_1_objToString(msg)
+	              data: objToString_1(msg)
 	            });
 	            _context2.next = 9;
 	            return regenerator.awrap(setStorage(DEBUG, logs));

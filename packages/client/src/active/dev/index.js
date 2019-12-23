@@ -25,6 +25,9 @@ class Content {
                             window.postMessage(msg);
                             this.receivedMessage(msg);
                         },
+                        onHeartBeatReply: msg => {
+                            this.$popular.innerText = `人气：${msg.count || 0}`;
+                        },
                     });
                     break;
                 }
@@ -60,8 +63,7 @@ class Content {
                 });
                 break;
             case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
-                this.$version.style.display = 'none';
-                this.$roomid.innerText = `房间：${data.roomid}`;
+                this.$headL.innerText = `房间：${data.roomid}`;
                 this.$fans.innerText = `粉丝：${data.fans}`;
                 break;
             default:
@@ -75,12 +77,12 @@ class Content {
         this.$danmuku.classList.add('blh-danmuku');
         this.$danmuku.innerHTML = `
             <div class="blh-header">
-                <div class="blh-header-l">
-                    <span class="blh-version"></span>
-                    <span class="blh-roomid"></span>
-                    <span class="blh-fans"></span>
-                </div>
+                <div class="blh-header-l"></div>
                 <div class="blh-header-r">×</div>
+            </div>
+            <div class="blh-info">
+                <span class="blh-popular"></span>
+                <span class="blh-fans"></span>
             </div>
             <div class="blh-danmu">
                 <div class="blh-danmu-inner"></div>
@@ -91,8 +93,7 @@ class Content {
             <div class="blh-footer"></div>
         `;
         this.$headL = query('.blh-header-l', this.$danmuku);
-        this.$version = query('.blh-version', this.$danmuku);
-        this.$roomid = query('.blh-roomid', this.$danmuku);
+        this.$popular = query('.blh-popular', this.$danmuku);
         this.$fans = query('.blh-fans', this.$danmuku);
         this.$headR = query('.blh-header-r', this.$danmuku);
         this.$danmu = query('.blh-danmu', this.$danmuku);
@@ -100,7 +101,7 @@ class Content {
         this.$gift = query('.blh-gift', this.$danmuku);
         this.$giftInner = query('.blh-gift-inner', this.$danmuku);
         this.$footer = query('.blh-footer', this.$danmuku);
-        this.$version.textContent = `${this.manifest.name} ${this.manifest.version}`;
+        this.$headL.textContent = `${this.manifest.name} ${this.manifest.version}`;
         document.body.appendChild(this.$danmuku);
 
         this.$icon = document.createElement('div');

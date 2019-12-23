@@ -51,10 +51,6 @@
             cursor: move;
             padding: 0 10px;
             font-size: 13px;
-
-            .blh-roomid {
-                margin-right: 10px;
-            }
         }
 
         .blh-header-r {
@@ -64,6 +60,18 @@
             width: 25px;
             font-size: 18px;
             cursor: pointer;
+        }
+    }
+
+    .blh-info {
+        display: flex;
+        align-items: center;
+        height: 25px;
+        padding: 0 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        color: rgba(255, 255, 255, 0.8);
+        .blh-popular {
+            margin-right: 15px;
         }
     }
 
