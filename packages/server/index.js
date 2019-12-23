@@ -67,10 +67,10 @@ io.on('connection', socket => {
 
 io.on('error', error => {
     console.log(error);
-    FFmpeg.instances.forEach(item => item.destroy());
+    [...FFmpeg.instances].forEach(item => item.destroy());
 });
 
 process.on('uncaughtException', error => {
     console.log(error);
-    FFmpeg.instances.forEach(item => item.destroy());
+    [...FFmpeg.instances].forEach(item => item.destroy());
 });
