@@ -26,7 +26,10 @@ class Content {
                             this.receivedMessage(msg);
                         },
                         onHeartBeatReply: msg => {
-                            window.postMessage(msg);
+                            window.postMessage({
+                                cmd: 'POPULAR',
+                                data: msg.count,
+                            });
                             this.$popular.innerText = `人气：${msg.count || '--'}`;
                         },
                     });
