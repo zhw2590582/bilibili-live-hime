@@ -26,7 +26,7 @@ class Content {
                             this.receivedMessage(msg);
                         },
                         onHeartBeatReply: msg => {
-                            this.$popular.innerText = `人气：${msg.count || 0}`;
+                            this.$popular.innerText = `人气：${msg.count || '--'}`;
                         },
                     });
                     break;
@@ -63,8 +63,8 @@ class Content {
                 });
                 break;
             case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
-                this.$headL.innerText = `房间：${data.roomid}`;
-                this.$fans.innerText = `粉丝：${data.fans}`;
+                this.$headL.innerText = `房间：${data.roomid || '--'}`;
+                this.$fans.innerText = `粉丝：${data.fans || '--'}`;
                 break;
             default:
                 break;

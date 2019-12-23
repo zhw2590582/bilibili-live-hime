@@ -11,7 +11,11 @@ class FFmpeg {
     }
 
     static getInstance(socket) {
-        return FFmpeg.instances.get(socket);
+        return this.instances.get(socket);
+    }
+
+    static destroy() {
+        [...this.instances.values()].forEach(item => item.destroy());
     }
 
     create(rtmp) {

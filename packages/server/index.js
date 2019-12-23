@@ -66,9 +66,11 @@ io.on('connection', socket => {
 });
 
 io.on('error', error => {
+    FFmpeg.destroy();
     console.log(error);
 });
 
 process.on('uncaughtException', error => {
+    FFmpeg.destroy();
     console.log(error);
 });
