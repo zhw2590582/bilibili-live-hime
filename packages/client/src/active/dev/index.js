@@ -62,7 +62,7 @@ class Content {
             case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
                 this.$version.style.display = 'none';
                 this.$roomid.innerText = `房间：${data.roomid}`;
-                this.$fans.innerText = `人气：${data.fans}`;
+                this.$fans.innerText = `粉丝：${data.fans}`;
                 break;
             default:
                 break;
