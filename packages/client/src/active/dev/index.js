@@ -26,6 +26,7 @@ class Content {
                             this.receivedMessage(msg);
                         },
                         onHeartBeatReply: msg => {
+                            window.postMessage(msg);
                             this.$popular.innerText = `人气：${msg.count || '--'}`;
                         },
                     });

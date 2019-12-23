@@ -85,7 +85,7 @@ rtmp://***/{直播码}
 
 ```js
 window.addEventListener('message', event => {
-    const { cmd, info, data } = event.data;
+    const { cmd, info, data, count } = event.data;
     switch (cmd) {
         case 'DANMU_MSG':
             console.log('弹幕', info);
@@ -96,8 +96,17 @@ window.addEventListener('message', event => {
         case 'GUARD_BUY':
             console.log('上船', data);
             break;
-        default:
+        case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
+            console.log('粉丝', data.fans);
+            console.log('房间', data.roomid);
             break;
+        default:
+            console.log('其他', event.data);
+            break;
+    }
+
+    if (count) {
+        console.log('人气', count);
     }
 });
 ```
