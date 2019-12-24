@@ -122,7 +122,7 @@ window.addEventListener('message', event => {
 
 -   可以录制直播的视频吗？
 
-可以的，只要在服务端的`binary_stream`事件接收到视频字节流那里把数据存起来，最后保存成`webp`视频格式就行。
+可以的，只要在服务端的`binary_stream`事件接收到视频字节流那里把数据存起来，最后保存成`webm`视频格式就行。
 
 ## 捐助
 
