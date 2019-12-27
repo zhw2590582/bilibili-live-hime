@@ -32,7 +32,8 @@
             "js": [
                 "song/index.js"
             ],
-            "all_frames": true
+            "all_frames": true,
+            "run_at": "document_start"
         }
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"

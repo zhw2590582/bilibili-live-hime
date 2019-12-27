@@ -1,6 +1,11 @@
 (function () {
     'use strict';
 
+    var $script = document.createElement('script');
+    $script.type = 'text/javascript';
+    $script.text = "var top = window.parent";
+    document.documentElement.appendChild($script); // $script.onload = document.documentElement.removeChild($script);
+
     window.addEventListener('load', function () {
       function getSongs() {
         var $list = document.querySelector('#g_playlist');
@@ -45,7 +50,7 @@
             }
           }, '*');
         }
-      }, 1000);
+      }, 500);
 
       function order_song(song) {
         var $iframe = document.querySelector('#g_iframe');

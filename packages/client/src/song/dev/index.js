@@ -1,3 +1,9 @@
+const $script = document.createElement('script');
+$script.type = 'text/javascript';
+$script.text = `var top = window.parent`;
+document.documentElement.appendChild($script);
+// $script.onload = document.documentElement.removeChild($script);
+
 window.addEventListener('load', () => {
     function getSongs() {
         const $list = document.querySelector('#g_playlist');
@@ -44,7 +50,7 @@ window.addEventListener('load', () => {
                 '*',
             );
         }
-    }, 1000);
+    }, 500);
 
     function order_song(song) {
         const $iframe = document.querySelector('#g_iframe');
