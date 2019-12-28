@@ -1735,7 +1735,11 @@ var BilibiliLiveHimeActive = (function () {
                   _this.receivedMessage(msg);
                 },
                 onHeartBeatReply: function onHeartBeatReply(msg) {
-                  _this.$popular.innerText = "\u4EBA\u6C14\uFF1A".concat(msg.count || 0);
+                  window.postMessage({
+                    cmd: 'POPULAR',
+                    data: msg.count
+                  });
+                  _this.$popular.innerText = "\u4EBA\u6C14\uFF1A".concat(msg.count || '--');
                 }
               }));
               break;
@@ -1778,8 +1782,8 @@ var BilibiliLiveHimeActive = (function () {
             break;
 
           case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
-            this.$headL.innerText = "\u623F\u95F4\uFF1A".concat(data.roomid);
-            this.$fans.innerText = "\u7C89\u4E1D\uFF1A".concat(data.fans);
+            this.$headL.innerText = "\u623F\u95F4\uFF1A".concat(data.roomid || '--');
+            this.$fans.innerText = "\u7C89\u4E1D\uFF1A".concat(data.fans || '--');
             break;
         }
       }
@@ -1789,7 +1793,7 @@ var BilibiliLiveHimeActive = (function () {
         this.manifest = chrome.runtime.getManifest();
         this.$danmuku = document.createElement('div');
         this.$danmuku.classList.add('blh-danmuku');
-        this.$danmuku.innerHTML = "\n            <div class=\"blh-header\">\n                <div class=\"blh-header-l\"></div>\n                <div class=\"blh-header-r\">\xD7</div>\n            </div>\n            <div class=\"blh-info\">\n                <span class=\"blh-popular\"></span>\n                <span class=\"blh-fans\"></span>\n            </div>\n            <div class=\"blh-danmu\">\n                <div class=\"blh-danmu-inner\"></div>\n            </div>\n            <div class=\"blh-gift\">\n                <div class=\"blh-gift-inner\"></div>\n            </div>\n            <div class=\"blh-footer\"></div>\n        ";
+        this.$danmuku.innerHTML = "\n            <div class=\"blh-header\">\n                <div class=\"blh-header-l\"></div>\n                <div class=\"blh-header-r\">\xD7</div>\n            </div>\n            <div class=\"blh-info\">\n                <span class=\"blh-popular\">\u4EBA\u6C14\uFF1A--</span>\n                <span class=\"blh-fans\">\u7C89\u4E1D\uFF1A--</span>\n            </div>\n            <div class=\"blh-danmu\">\n                <div class=\"blh-danmu-inner\"></div>\n            </div>\n            <div class=\"blh-gift\">\n                <div class=\"blh-gift-inner\"></div>\n            </div>\n            <div class=\"blh-footer\"></div>\n        ";
         this.$headL = query('.blh-header-l', this.$danmuku);
         this.$popular = query('.blh-popular', this.$danmuku);
         this.$fans = query('.blh-fans', this.$danmuku);
