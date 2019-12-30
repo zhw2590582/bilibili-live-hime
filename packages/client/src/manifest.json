@@ -21,20 +21,7 @@
         "storage",
         "activeTab",
         "tabCapture",
-        "*://*.bilibili.com/*",
-        "*://music.163.com/*"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "*://music.163.com/*"
-            ],
-            "js": [
-                "song/index.js"
-            ],
-            "all_frames": true,
-            "run_at": "document_start"
-        }
+        "*://*.bilibili.com/*"
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
