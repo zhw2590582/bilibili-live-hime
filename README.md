@@ -21,10 +21,6 @@
 -   [在线 chrome 网上应用商店](https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag)
 -   [代码目录 packages/client](./packages/client)
 
-**注意：目前 chrome 网上应用商店审核周期大概是一周时间，所以商店的版本和开发的版本不同步，想体验最新功能的话，推荐本地离线安装本扩展**
-
--   [离线安装 packages/client/dist](./packages/client/dist)
-
 #### 服务端
 
 -   [代码目录 packages/server](./packages/server)
