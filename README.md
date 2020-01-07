@@ -18,7 +18,8 @@
 
 #### 客户端
 
--   [在线 chrome 网上应用商店](https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag)
+![https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag](./images/tryitnow.png)
+
 -   [代码目录 packages/client](./packages/client)
 
 #### 服务端
