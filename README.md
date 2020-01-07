@@ -18,7 +18,7 @@
 
 #### 客户端
 
-![https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag](./images/tryitnow.png)
+[![https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag](./images/tryitnow.png)](https://chrome.google.com/webstore/detail/jfgjlmafdjaofbkjpaoojooghnocjcag)
 
 -   [代码目录 packages/client](./packages/client)
 
